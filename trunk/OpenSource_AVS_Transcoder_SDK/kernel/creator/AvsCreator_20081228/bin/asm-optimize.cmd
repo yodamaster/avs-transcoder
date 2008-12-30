@@ -1,0 +1,1 @@
+for %%i in (*.asm) do avscreator.exe -O "%%i"
