@@ -1,0 +1,193 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: MPEG2AVS_DLL - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP94.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I ".\lencod" /I ".\lencod\inc" /I ".\mpeg2dec" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MPEG2AVS_DLL_EXPORTS" /D "TRANSCODING" /Fp"Release/MPEG2AVS_DLL.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\bitstream.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block_const.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\configfile.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\fast_me.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\golomb.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\header.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\image.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\lencod.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\loopfilter.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\macroblock.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\mbuffer.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\memalloc.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\mv-search.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\quadtree.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\ratectl.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\rdopt.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\rdopt_coding_state.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\refbuf.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\slice.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\vlc.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\display.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\getbits.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\getblk.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\gethdr.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\getpic.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\getvlc.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\idct.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\idctref.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\motion.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\recon.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\spatscal.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\store.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\subspic.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\systems.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\verify.c"
+"D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP94.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP95.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:".\lib/MPEG2AVS_DLL.pdb" /machine:I386 /out:".\lib/MPEG2AVS_DLL.dll" /implib:".\lib/MPEG2AVS_DLL.lib" 
+".\Release\bitstream.obj"
+".\Release\block.obj"
+".\Release\block_const.obj"
+".\Release\configfile.obj"
+".\Release\fast_me.obj"
+".\Release\golomb.obj"
+".\Release\header.obj"
+".\Release\image.obj"
+".\Release\lencod.obj"
+".\Release\loopfilter.obj"
+".\Release\macroblock.obj"
+".\Release\mbuffer.obj"
+".\Release\memalloc.obj"
+".\Release\mv-search.obj"
+".\Release\quadtree.obj"
+".\Release\ratectl.obj"
+".\Release\rdopt.obj"
+".\Release\rdopt_coding_state.obj"
+".\Release\refbuf.obj"
+".\Release\slice.obj"
+".\Release\vlc.obj"
+".\Release\display.obj"
+".\Release\getbits.obj"
+".\Release\getblk.obj"
+".\Release\gethdr.obj"
+".\Release\getpic.obj"
+".\Release\getvlc.obj"
+".\Release\idct.obj"
+".\Release\idctref.obj"
+".\Release\motion.obj"
+".\Release\mpeg2dec.obj"
+".\Release\recon.obj"
+".\Release\spatscal.obj"
+".\Release\store.obj"
+".\Release\subspic.obj"
+".\Release\systems.obj"
+".\Release\verify.obj"
+".\Release\MPEG2AVS.OBJ"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP95.tmp"
+<h3>Output Window</h3>
+Compiling...
+bitstream.c
+block.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(237) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(238) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(239) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(240) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(241) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(242) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(243) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(244) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(369) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(370) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(371) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(372) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(373) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(374) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(375) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(376) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\block.c(468) : warning C4101: 'R' : unreferenced local variable
+block_const.c
+configfile.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\configfile.c(72) : warning C4101: 'ContentLen' : unreferenced local variable
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\configfile.c(72) : warning C4101: 'NumberParams' : unreferenced local variable
+fast_me.c
+golomb.c
+header.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\header.c(183) : warning C4101: 'i' : unreferenced local variable
+image.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\image.c(254) : warning C4244: '=' : conversion from 'const double ' to 'float ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\image.c(393) : warning C4013: 'terminate_picture' undefined; assuming extern returning int
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\image.c(420) : warning C4013: 'combine_field' undefined; assuming extern returning int
+lencod.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\lencod.c(188) : warning C4101: 'j' : unreferenced local variable
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\lencod.c(458) : warning C4244: '=' : conversion from 'float ' to 'int ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\lencod.c(1676) : warning C4133: '=' : incompatible types - from 'struct _ENC_MB_INFO_ *' to 'struct _AVS_MB_INFO_ *'
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\lencod.c(1797) : warning C4133: '=' : incompatible types - from 'struct _ENC_MB_INFO_ *' to 'struct _AVS_MB_INFO_ *'
+loopfilter.c
+macroblock.c
+mbuffer.c
+memalloc.c
+mv-search.c
+quadtree.c
+ratectl.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\ratectl.c(89) : warning C4244: '=' : conversion from 'float ' to 'int ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\ratectl.c(1201) : warning C4715: 'updateQuantizationParameter' : not all control paths return a value
+rdopt.c
+rdopt_coding_state.c
+refbuf.c
+slice.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\lencod\src\slice.c(89) : warning C4013: 'stuffing_byte' undefined; assuming extern returning int
+vlc.c
+display.c
+getbits.c
+getblk.c
+gethdr.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\gethdr.c(461) : warning C4101: 'pos' : unreferenced local variable
+getpic.c
+getvlc.c
+idct.c
+idctref.c
+motion.c
+mpeg2dec.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(118) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(161) : warning C4047: 'function' : 'int ' differs in levels of indirection from 'int *'
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(161) : warning C4024: 'Decode_Picture' : different types for formal and actual parameter 1
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(161) : warning C4047: 'function' : 'int ' differs in levels of indirection from 'int *'
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(161) : warning C4024: 'Decode_Picture' : different types for formal and actual parameter 2
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\mpeg2dec.c(167) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+recon.c
+spatscal.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\spatscal.c(97) : warning C4013: 'exit' undefined; assuming extern returning int
+store.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\store.c(160) : warning C4013: 'open' undefined; assuming extern returning int
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\store.c(176) : warning C4013: 'write' undefined; assuming extern returning int
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\store.c(178) : warning C4013: 'close' undefined; assuming extern returning int
+subspic.c
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\subspic.c(257) : warning C4013: 'open' undefined; assuming extern returning int
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\subspic.c(263) : warning C4013: 'read' undefined; assuming extern returning int
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\mpeg2dec\subspic.c(271) : warning C4013: 'close' undefined; assuming extern returning int
+systems.c
+verify.c
+MPEG2AVS.C
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C(32) : warning C4101: 'pImageFile' : unreferenced local variable
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C(38) : warning C4101: 'nBytesLeftInBuffer' : unreferenced local variable
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C(199) : warning C4133: '=' : incompatible types - from 'struct _DEC_MB_INFO_ *' to 'struct _ENC_MB_INFO_ *'
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C(185) : warning C4101: 'fpTest' : unreferenced local variable
+D:\临时文件夹\FORMAT TRANSCODING\MPEG2AVS\MPEG2AVS\MPEG2AVS.C(216) : warning C4020: 'avs_enc_destroy' : too many actual parameters
+Linking...
+   Creating library .\lib/MPEG2AVS_DLL.lib and object .\lib/MPEG2AVS_DLL.exp
+
+
+
+<h3>Results</h3>
+MPEG2AVS_DLL.dll - 0 error(s), 49 warning(s)
+</pre>
+</body>
+</html>

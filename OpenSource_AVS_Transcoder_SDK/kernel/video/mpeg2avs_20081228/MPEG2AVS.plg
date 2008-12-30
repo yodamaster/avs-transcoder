@@ -1,0 +1,143 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: MPEG2AVS - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ZHWANG~1.MS-\LOCALS~1\Temp\RSP225.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I ".\lencod" /I ".\lencod\inc" /I ".\mpeg2dec" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "TRANSCODING" /Fp"Release/MPEG2AVS.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\bitstream.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block_const.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\configfile.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\fast_me.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\golomb.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\header.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\image.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\lencod.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\loopfilter.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\macroblock.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\mbuffer.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\memalloc.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\mv-search.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\quadtree.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\ratectl.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\rdopt.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\rdopt_coding_state.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\refbuf.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\slice.c"
+"G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\vlc.c"
+]
+Creating command line "xicl6.exe @"C:\DOCUME~1\ZHWANG~1.MS-\LOCALS~1\Temp\RSP225.tmp"" 
+Creating temporary file "C:\DOCUME~1\ZHWANG~1.MS-\LOCALS~1\Temp\RSP226.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:".\bin/MPEG2AVS.pdb" /machine:I386 /out:".\bin/MPEG2AVS.exe" 
+.\Release\bitstream.obj
+.\Release\block.obj
+.\Release\block_const.obj
+.\Release\configfile.obj
+.\Release\fast_me.obj
+.\Release\golomb.obj
+.\Release\header.obj
+.\Release\image.obj
+.\Release\lencod.obj
+.\Release\loopfilter.obj
+.\Release\macroblock.obj
+.\Release\mbuffer.obj
+.\Release\memalloc.obj
+".\Release\mv-search.obj"
+.\Release\quadtree.obj
+.\Release\ratectl.obj
+.\Release\rdopt.obj
+.\Release\rdopt_coding_state.obj
+.\Release\refbuf.obj
+.\Release\slice.obj
+.\Release\vlc.obj
+.\Release\display.obj
+.\Release\getbits.obj
+.\Release\getblk.obj
+.\Release\gethdr.obj
+.\Release\getpic.obj
+.\Release\getvlc.obj
+.\Release\idct.obj
+.\Release\idctref.obj
+.\Release\motion.obj
+.\Release\mpeg2dec.obj
+.\Release\recon.obj
+.\Release\spatscal.obj
+.\Release\store.obj
+.\Release\subspic.obj
+.\Release\systems.obj
+.\Release\verify.obj
+.\Release\MPEG2AVS.OBJ
+]
+Creating command line "xilink6.exe @"C:\DOCUME~1\ZHWANG~1.MS-\LOCALS~1\Temp\RSP226.tmp""
+<h3>Output Window</h3>
+Compiling...
+bitstream.c
+block.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\bitstream.c(362) : warning C4761: integral size mismatch in argument; conversion supplied
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(237) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(238) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(239) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(240) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(241) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(242) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(243) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(244) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(369) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(370) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(371) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(372) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(373) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(374) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(375) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(376) : warning C4244: '=' : conversion from 'long ' to 'short ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\block.c(468) : warning C4101: 'R' : unreferenced local variable
+block_const.c
+configfile.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\configfile.c(72) : warning C4101: 'ContentLen' : unreferenced local variable
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\configfile.c(72) : warning C4101: 'NumberParams' : unreferenced local variable
+fast_me.c
+golomb.c
+header.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\header.c(183) : warning C4101: 'i' : unreferenced local variable
+image.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\image.c(254) : warning C4244: '=' : conversion from 'const double ' to 'float ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\image.c(393) : warning C4013: 'terminate_picture' undefined; assuming extern returning int
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\image.c(420) : warning C4013: 'combine_field' undefined; assuming extern returning int
+lencod.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\image.c(1043) : warning C4761: integral size mismatch in argument; conversion supplied
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\lencod.c(188) : warning C4101: 'j' : unreferenced local variable
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\lencod.c(458) : warning C4244: '=' : conversion from 'float ' to 'int ', possible loss of data
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\lencod.c(1676) : warning C4133: '=' : incompatible types - from 'struct _ENC_MB_INFO_ *' to 'struct _AVS_MB_INFO_ *'
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\lencod.c(1797) : warning C4133: '=' : incompatible types - from 'struct _ENC_MB_INFO_ *' to 'struct _AVS_MB_INFO_ *'
+loopfilter.c
+macroblock.c
+mbuffer.c
+memalloc.c
+mv-search.c
+quadtree.c
+ratectl.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\ratectl.c(89) : warning C4244: '=' : conversion from 'float ' to 'int ', possible loss of data
+rdopt.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\ratectl.c(1201) : warning C4715: 'updateQuantizationParameter' : not all control paths return a value
+rdopt_coding_state.c
+refbuf.c
+slice.c
+G:\video\research\transcoding\transcoding_software\mpeg2avs\zhangpeng\MPEG2AVS\lencod\src\slice.c(89) : warning C4013: 'stuffing_byte' undefined; assuming extern returning int
+vlc.c
+Linking...
+xilink6: executing 'C:\PROGRA~1\MICROS~2\VC98\Bin\link.exe'
+   Creating library .\bin/MPEG2AVS.lib and object .\bin/MPEG2AVS.exp
+
+
+
+<h3>Results</h3>
+MPEG2AVS.exe - 0 error(s), 32 warning(s)
+</pre>
+</body>
+</html>
