@@ -1,0 +1,95 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "libismacryp_st"=".\LIB\ISMACRYP\libismacryp_st.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libmissing60"=".\lib\gnu\libmissing60.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libmp4av_st"=".\lib\mp4av\libmp4av_st.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libmp4v2_st"=".\lib\mp4v2\libmp4v2_st60.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "AVScreator"=".\src\AVScreator.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libmp4v2_st
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name gnugetopt
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name need_for_win_st
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libmissing60
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libmp4av_st
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libismacryp_st
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

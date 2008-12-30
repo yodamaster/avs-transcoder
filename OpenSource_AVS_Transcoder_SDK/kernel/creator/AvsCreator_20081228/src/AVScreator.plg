@@ -1,0 +1,655 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: libmp4v2_st - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFD.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I "..\..\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"ST_Release/libmp4v2_st60.pch" /YX /Fo"ST_Release/" /Fd"ST_Release/" /FD /c 
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\3gp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avs1.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avs2.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avsc.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avsp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avss.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_dref.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_elst.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_enca.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_encv.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_free.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_ftyp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_hdlr.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_hinf.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_hnti.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_href.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mdat.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mdhd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_meta.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mp4a.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mp4s.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mp4v.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mvhd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_root.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_rtp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_sdp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_smi.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_sound.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stbl.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stdp.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stsc.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stsd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stsz.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_tfhd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_tkhd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_treftype.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_trun.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_udta.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_url.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_urn.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_video.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_vmhd.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4atom.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4container.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4descriptor.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4info.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4meta.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\odcommands.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\qosqualifiers.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFD.tmp" 
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFE.tmp" with contents
+[
+/nologo /out:"ST_Release\libmp4v2_st60.lib" 
+.\ST_Release\3gp.obj
+.\ST_Release\atom_avs1.obj
+.\ST_Release\atom_avs2.obj
+.\ST_Release\atom_avsc.obj
+.\ST_Release\atom_avsp.obj
+.\ST_Release\atom_avss.obj
+.\ST_Release\atom_dref.obj
+.\ST_Release\atom_elst.obj
+.\ST_Release\atom_enca.obj
+.\ST_Release\atom_encv.obj
+.\ST_Release\atom_free.obj
+.\ST_Release\atom_ftyp.obj
+.\ST_Release\atom_hdlr.obj
+.\ST_Release\atom_hinf.obj
+.\ST_Release\atom_hnti.obj
+.\ST_Release\atom_href.obj
+.\ST_Release\atom_mdat.obj
+.\ST_Release\atom_mdhd.obj
+.\ST_Release\atom_meta.obj
+.\ST_Release\atom_mp4a.obj
+.\ST_Release\atom_mp4s.obj
+.\ST_Release\atom_mp4v.obj
+.\ST_Release\atom_mvhd.obj
+.\ST_Release\atom_root.obj
+.\ST_Release\atom_rtp.obj
+.\ST_Release\atom_sdp.obj
+.\ST_Release\atom_smi.obj
+.\ST_Release\atom_sound.obj
+.\ST_Release\atom_standard.obj
+.\ST_Release\atom_stbl.obj
+.\ST_Release\atom_stdp.obj
+.\ST_Release\atom_stsc.obj
+.\ST_Release\atom_stsd.obj
+.\ST_Release\atom_stsz.obj
+.\ST_Release\atom_tfhd.obj
+.\ST_Release\atom_tkhd.obj
+.\ST_Release\atom_treftype.obj
+.\ST_Release\atom_trun.obj
+.\ST_Release\atom_udta.obj
+.\ST_Release\atom_url.obj
+.\ST_Release\atom_urn.obj
+.\ST_Release\atom_video.obj
+.\ST_Release\atom_vmhd.obj
+.\ST_Release\descriptors.obj
+.\ST_Release\isma.obj
+.\ST_Release\mp4.obj
+.\ST_Release\mp4atom.obj
+.\ST_Release\mp4container.obj
+.\ST_Release\mp4descriptor.obj
+.\ST_Release\mp4file.obj
+.\ST_Release\mp4file_io.obj
+.\ST_Release\mp4info.obj
+.\ST_Release\mp4meta.obj
+.\ST_Release\mp4property.obj
+.\ST_Release\mp4track.obj
+.\ST_Release\mp4util.obj
+.\ST_Release\ocidescriptors.obj
+.\ST_Release\odcommands.obj
+.\ST_Release\qosqualifiers.obj
+.\ST_Release\rtphint.obj
+]
+Creating command line "link.exe -lib @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFE.tmp"
+<h3>Output Window</h3>
+Compiling...
+3gp.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(224) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(224) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(225) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(225) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(183) : warning C4244: '+=' : conversion from '__int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(184) : warning C4244: '+=' : conversion from '__int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(444) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.h(192) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+atom_avs1.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(224) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(224) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(225) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4util.h(225) : warning C4244: '=' : conversion from 'unsigned __int32' to 'char', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(183) : warning C4244: '+=' : conversion from '__int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(184) : warning C4244: '+=' : conversion from '__int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.h(444) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.h(192) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+atom_avs2.cpp
+atom_avsc.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avsc.cpp(42) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_avsp.cpp
+atom_avss.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_avss.cpp(42) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_dref.cpp
+atom_elst.cpp
+atom_enca.cpp
+atom_encv.cpp
+atom_free.cpp
+atom_ftyp.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_ftyp.cpp(66) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_hdlr.cpp
+atom_hinf.cpp
+atom_hnti.cpp
+atom_href.cpp
+atom_mdat.cpp
+atom_mdhd.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mdhd.cpp(74) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mdhd.cpp(75) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_meta.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_meta.cpp(38) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_meta.cpp(55) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_meta.cpp(73) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_mp4a.cpp
+atom_mp4s.cpp
+atom_mp4v.cpp
+atom_mvhd.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mvhd.cpp(85) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_mvhd.cpp(86) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_root.cpp
+atom_rtp.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_rtp.cpp(122) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_rtp.cpp(123) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_sdp.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_sdp.cpp(34) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_sdp.cpp(35) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_smi.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_smi.cpp(37) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_sound.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_sound.cpp(80) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+atom_standard.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(25) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(25) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(26) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(26) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(27) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(27) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(28) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(28) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(29) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(29) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(30) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(30) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(31) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(31) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(32) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(32) : warning C4309: 'initializing' : truncation of constant value
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(33) : warning C4305: 'initializing' : truncation from 'const int' to 'const char'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_standard.cpp(33) : warning C4309: 'initializing' : truncation of constant value
+atom_stbl.cpp
+atom_stdp.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_stdp.cpp(45) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_stsc.cpp
+atom_stsd.cpp
+atom_stsz.cpp
+atom_tfhd.cpp
+atom_tkhd.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_tkhd.cpp(89) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_tkhd.cpp(90) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_treftype.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\atom_treftype.cpp(43) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+atom_trun.cpp
+atom_udta.cpp
+atom_url.cpp
+atom_urn.cpp
+atom_video.cpp
+atom_vmhd.cpp
+descriptors.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(75) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(118) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(194) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(198) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(202) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(380) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(387) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(459) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\descriptors.cpp(462) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+isma.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(144) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(156) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(170) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(267) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(269) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(337) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(339) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(395) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(443) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(445) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(466) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(466) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(522) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(524) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(545) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(545) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(560) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(702) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(751) : warning C4244: '=' : conversion from 'unsigned __int64' to 'int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(778) : warning C4244: '=' : conversion from 'unsigned __int64' to 'int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(785) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(903) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(908) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\isma.cpp(913) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+mp4.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(414) : warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(608) : warning C4800: 'unsigned __int8' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(765) : warning C4800: 'unsigned __int8' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(1700) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(1987) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(2003) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(2114) : warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4.cpp(3224) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4atom.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4atom.cpp(357) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4atom.cpp(708) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4container.cpp
+mp4descriptor.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4descriptor.cpp(113) : warning C4244: 'initializing' : conversion from 'unsigned __int64' to '__int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4descriptor.cpp(172) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4file.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1235) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1685) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1688) : warning C4244: 'initializing' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1728) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1815) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1818) : warning C4244: 'initializing' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1859) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1945) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(1948) : warning C4244: 'initializing' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2149) : warning C4244: 'initializing' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2239) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2416) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2426) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2436) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2446) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2456) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2547) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2601) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2674) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2677) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2684) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2707) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2711) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2715) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2731) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2736) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2738) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2757) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2760) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2768) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2791) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2795) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2799) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2815) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2820) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2822) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2841) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2844) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2852) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2873) : warning C4003: not enough actual parameters for macro 'VERBOSE'
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2877) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2881) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(2865) : warning C4101: 'pPictCount' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file.cpp(3322) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4file_io.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(139) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(182) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(212) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(214) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(216) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(218) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(263) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(264) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(265) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(279) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(280) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(281) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(282) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(306) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(443) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(448) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4file_io.cpp(550) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+mp4info.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4info.cpp(533) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+mp4meta.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4meta.cpp(724) : warning C4244: '=' : conversion from 'unsigned __int16' to 'unsigned __int8', possible loss of data
+mp4property.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(76) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(79) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(82) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(85) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(99) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(102) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(105) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4property.cpp(108) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4track.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(656) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(848) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(937) : warning C4244: '+=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(969) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1064) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1109) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1122) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1134) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1148) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\mp4track.cpp(1696) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+mp4util.cpp
+ocidescriptors.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp(69) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp(123) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp(158) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp(207) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ocidescriptors.cpp(216) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+odcommands.cpp
+qosqualifiers.cpp
+rtphint.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(180) : warning C4244: 'return' : conversion from '__int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(230) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned short', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(283) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(284) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(357) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(365) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(499) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(534) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(561) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(609) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(634) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(644) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(669) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(671) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(677) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(965) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(980) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(985) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(990) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(995) : warning C4244: 'return' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\rtphint.cpp(1005) : warning C4800: 'unsigned __int64' : forcing value to bool 'true' or 'false' (performance warning)
+Creating library...
+<h3>
+--------------------Configuration: libmissing60 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFF.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I "..\..\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/libmissing60.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\getopt.c"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\getopt1.c"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\need_for_win32.c"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\strcasestr.c"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\strsep.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPDFF.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\libmissing60.lib"  .\Release\getopt.obj .\Release\getopt1.obj .\Release\need_for_win32.obj .\Release\strcasestr.obj .\Release\strsep.obj "
+<h3>Output Window</h3>
+Compiling...
+getopt.c
+getopt1.c
+need_for_win32.c
+strcasestr.c
+strsep.c
+Creating library...
+<h3>
+--------------------Configuration: libmp4av_st - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE00.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I "..\mp4v2" /I "." /I "..\..\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/libmp4av_st.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\audio_hinters.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\l16.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mbs.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc2250.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc2429.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3267.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE00.tmp" 
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE01.tmp" with contents
+[
+/nologo /out:"Release\libmp4av_st.lib" 
+.\Release\audio_hinters.obj
+.\Release\avs.obj
+.\Release\avsm.obj
+.\Release\l16.obj
+.\Release\mbs.obj
+.\Release\mp3.obj
+.\Release\rfc2250.obj
+.\Release\rfc2429.obj
+.\Release\rfc3119.obj
+.\Release\rfc3267.obj
+.\Release\rfcavs.obj
+.\Release\rfcavsm.obj
+.\Release\rfcisma.obj
+]
+Creating command line "link.exe -lib @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE01.tmp"
+<h3>Output Window</h3>
+Compiling...
+audio_hinters.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\audio_hinters.cpp(66) : warning C4244: 'argument' : conversion from 'unsigned __int16' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\audio_hinters.cpp(85) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\audio_hinters.cpp(107) : warning C4244: 'argument' : conversion from 'unsigned __int16' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\audio_hinters.cpp(178) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+avs.cpp
+..\..\include\mpeg4ip_bitstream.h(187) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+..\..\include\mpeg4ip_bitstream.h(189) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(215) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(216) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(281) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(306) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(307) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(329) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+avsm.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avs.cpp(173) : warning C4715: 'avs_nal_unit_type' : not all control paths return a value
+..\..\include\mpeg4ip_bitstream.h(187) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+..\..\include\mpeg4ip_bitstream.h(189) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(206) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(207) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(209) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(255) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(256) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(259) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\avsm.cpp(283) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+l16.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\l16.cpp(85) : warning C4244: '=' : conversion from 'unsigned __int64' to 'int', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\l16.cpp(118) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+mbs.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mbs.cpp(68) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to '__int8', possible loss of data
+mp3.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(150) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(156) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(171) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(211) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(236) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(237) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(256) : warning C4804: '<<' : unsafe use of type 'bool' in operation
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\mp3.cpp(308) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+rfc2250.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc2250.cpp(95) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc2250.cpp(124) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc2250.cpp(131) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+rfc2429.cpp
+rfc3119.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(101) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(125) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(141) : warning C4244: 'return' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(154) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(156) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(162) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(164) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(166) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(255) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(290) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(327) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(328) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(360) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(371) : warning C4244: '+=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(482) : warning C4244: '=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(484) : warning C4244: 'initializing' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(496) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(496) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfc3119.cpp(510) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int8', possible loss of data
+rfc3267.cpp
+rfcavs.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(28) : warning C4101: 'pPict' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(29) : warning C4101: 'pPictSize' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(146) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(270) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(271) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(283) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavs.cpp(284) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+rfcavsm.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp(176) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp(300) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp(301) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp(313) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcavsm.cpp(314) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+rfcisma.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(80) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(85) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(86) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(137) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(138) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\rfcisma.cpp(156) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+Creating library...
+<h3>
+--------------------Configuration: libismacryp_st - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE02.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I "../../include" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "_WINDOWS" /D "NULL_ISMACRYP" /Fp"Release/libismacryp_st.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE02.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\libismacryp_st.lib"  .\Release\ismacryplib.obj "
+<h3>Output Window</h3>
+Compiling...
+ismacryplib.c
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(188) : warning C4101: 'kms_data_file' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(190) : warning C4101: 'temp' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(187) : warning C4101: 'i' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(186) : warning C4101: 'fp' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(189) : warning C4101: 'kms_data' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(603) : warning C4101: 'nonce' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(675) : warning C4101: 'nonce' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(724) : warning C4101: 'i' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(764) : warning C4101: 'nonce' : unreferenced local variable
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\ismacryplib.c(818) : warning C4101: 'fakedata' : unreferenced local variable
+Creating library...
+<h3>
+--------------------Configuration: AVScreator - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE03.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /I "." /I "..\include" /I "..\lib\mp4v2" /I "..\lib\mp4av" /I "..\lib\ismacryp" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "_WINDOWS" /Fp"Release/AVScreator.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp"
+"E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE03.tmp" 
+Creating temporary file "C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE04.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/AvsCreator.pdb" /machine:I386 /out:"../bin/AvsCreator.exe" 
+.\Release\avs.obj
+.\Release\avsm.obj
+.\Release\mp3.obj
+.\Release\mp4creator.obj
+\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4v2\ST_Release\libmp4v2_st60.lib
+\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\gnu\Release\libmissing60.lib
+\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\lib\mp4av\Release\libmp4av_st.lib
+\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\LIB\ISMACRYP\Release\libismacryp_st.lib
+]
+Creating command line "link.exe @C:\DOCUME~1\xzhao\LOCALS~1\Temp\RSPE04.tmp"
+<h3>Output Window</h3>
+Compiling...
+avs.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(420) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(420) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(455) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(599) : warning C4800: 'unsigned __int8' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(611) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(635) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(636) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(637) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avs.cpp(638) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+avsm.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(409) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(409) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(441) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(492) : warning C4800: 'unsigned __int8' : forcing value to bool 'true' or 'false' (performance warning)
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(504) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(511) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(536) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(537) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(538) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\avsm.cpp(539) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+mp3.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp(126) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp(127) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp(128) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp(129) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int8', possible loss of data
+mp4creator.cpp
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp3.cpp(292) : warning C4700: local variable 'ismaCrypSId' used without having been initialized
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(255) : warning C4244: '=' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(440) : warning C4244: 'argument' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(504) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(979) : warning C4244: 'argument' : conversion from 'unsigned __int32' to 'unsigned __int16', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(1038) : warning C4244: '+=' : conversion from 'unsigned __int64' to 'unsigned __int32', possible loss of data
+E:\transcoding\final\OpenSource_AVS_Transcoder_SDK\kernal\creator\AvsCreator_20081228\src\mp4creator.cpp(1039) : warning C4244: '=' : conversion from 'double' to 'unsigned __int64', possible loss of data
+Linking...
+
+
+
+<h3>Results</h3>
+AvsCreator.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
