@@ -2,7 +2,7 @@
 #define _DEVELOPERS_H_
 
 /*
-##################IDM AVS Video Transcoder Developers' List:##################
+################## AVS Video Transcoder Developers' List:##################
 Group Organizer: 
            Version 1: Jun Sun       <jsun@pku.edu.cn>
            Version 2: Jun Sun       <jsun@pku.edu.cn>
