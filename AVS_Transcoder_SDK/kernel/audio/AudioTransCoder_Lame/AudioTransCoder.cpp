@@ -35,8 +35,8 @@ DWORD		dwWrite=0;
 int			bit_rate;
 int			BUFFERLENGTH;
 int			buffer_start, buffer_end;
-CHAR		pFileInput[100];		//输入输出文件
-CHAR		pFileOutputAudio[100];
+CHAR		pFileInput[500];		//输入输出文件
+CHAR		pFileOutputAudio[500];
 FILE*		inputFile;
 FILE*		m2aFile;
 FILE*		fpErrorInfo;
@@ -291,9 +291,9 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	memcpy(pFileInput, argv[1], 100);
+	memcpy(pFileInput, argv[1], 500);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////Lirh 2008.10
-	memcpy(pFileOutputAudio, argv[2], 100);
+	memcpy(pFileOutputAudio, argv[2], 500);
 //	strcat(pFileOutputAudio, ".mp3");
 	bit_rate = 64;
 	Vbit_rate = 0;///Lirh 2008.10
@@ -465,7 +465,7 @@ int main(int argc, char* argv[])
 	{
 		beConfig.format.LHV1.dwReSampleRate	= ReSampleRate;					
 		SampleRate = ReSampleRate;
-		multiple = sqrt( pWF->nSamplesPerSec / ReSampleRate );
+		multiple = sqrt( (float)pWF->nSamplesPerSec / ReSampleRate );
 	}
 
 	if(mode == -1)
