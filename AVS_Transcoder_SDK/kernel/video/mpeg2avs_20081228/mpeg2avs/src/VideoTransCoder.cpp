@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
 {
   unsigned int iTime;
   int i, j;
-  char time_stamp_file[100];
+  char time_stamp_file[500];
 
 
   //MB_INFO ***pMBinfo;

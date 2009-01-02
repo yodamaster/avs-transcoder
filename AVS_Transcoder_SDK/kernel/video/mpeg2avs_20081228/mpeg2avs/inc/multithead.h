@@ -102,9 +102,9 @@ typedef struct tag_thread
     int       iThreadOrder;
     c_avs_enc *p_enc;
     //线程的参数
-    char rec_file_name[100];
-    char output_file_name[100];
-    char config_file_name[100];
+    char rec_file_name[500];
+    char output_file_name[500];
+    char config_file_name[500];
   }THREAD, *PTHREAD;
 typedef struct tag_wthread
 {
@@ -119,9 +119,9 @@ typedef struct tag_wthread
   int      nbit[4];
   int       order[8][2];
   //线程的参数
-  char rec_file_name[100];
-  char output_file_name[100];
-  char config_file_name[100];
+  char rec_file_name[500];
+  char output_file_name[500];
+  char config_file_name[500];
 }WTHREAD, *PWTHREAD;
 void mutithreads_test(int thread_num);
 void create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc);

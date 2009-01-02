@@ -281,10 +281,10 @@ typedef struct tag_InputParameters
               * prevent errors to propagate from the past */
   int_32_t  blc_size[9][2]; /* !< array for different block sizes */
   int_32_t  infile_header;  /* !< If input file has a header set this to the length of the header */
-  char    infile[100];  /* !< YUV 4:2:0 input format */
-  char    outfile[100];  /* !< H.26L compressed output bitstream */
-  char    ReconFile[100]; /* !< Reconstructed Pictures */
-  char    TraceFile[100]; /* !< Trace Outputs */
+  char    infile[500];  /* !< YUV 4:2:0 input format */
+  char    outfile[500];  /* !< H.26L compressed output bitstream */
+  char    ReconFile[500]; /* !< Reconstructed Pictures */
+  char    TraceFile[500]; /* !< Trace Outputs */
   int_32_t  intra_period;  /* !< Random Access period though intra */
   int_32_t  GopLength;
 
