@@ -1,4 +1,4 @@
- Welcome to use and join the AVSTranscoder opensource project
+ Welcome to use and join the AVSTransCoder opensource project
 
 = Introduction =
 
