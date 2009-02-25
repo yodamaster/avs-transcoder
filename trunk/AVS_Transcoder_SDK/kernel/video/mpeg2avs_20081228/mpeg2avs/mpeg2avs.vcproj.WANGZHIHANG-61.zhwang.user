@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory="../bin"
-				CommandArguments="mobile_sd_ibp_133.m2v x.avs"
+				CommandArguments="foreman_qcif_400.m2v out.avs -a 1 -s 180 -n 30"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory="../bin"
-				CommandArguments="mobile_sd_ibp_133.m2v x.avs"
+				CommandArguments="foreman_qcif_400.m2v x.avs -a 1 -b 150"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

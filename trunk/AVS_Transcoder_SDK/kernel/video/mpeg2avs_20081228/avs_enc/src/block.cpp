@@ -1,41 +1,11 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
+/*$T block.cpp GC 1.140 10/28/07 20:29:46 */
 
-/*
-*************************************************************************************
-* File name: 
-* Function: 
-*
-*************************************************************************************
-*/
+
+/*$6
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 
 #include <math.h>
 #include <stdio.h>
@@ -139,9 +109,30 @@ int_16_t c_avs_enc::scanquant_B8_recon
   int_16_t  curr_val;
   /* xzhao { 2007.10.09 */
   __m64    tmp;
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+  /*
+   * xzhao } ;
+   * if(img->current_mb_nr==263 && frame_no==5) ;
+   * { ;
+   * printf("block8x8: %d\n",block8x8);
+   * * for(jj=0;
+   * jj<8;
+   * jj++) ;
+   * { ;
+   * for(ii=0;
+   * ii<8;
+   * ii++) ;
+   * { ;
+   * printf("%3d ",curr_blk[jj][ii]);
+   * * } ;
+   * printf("\n");
+   * * } ;
+   * } ;
+   * Quantization ;
+   * quant_B8(qp, mode, curr_blk);
+   */
   avs_quant_sse(qp, mode, curr_blk);
-
   avs_const_initialize_block();
   /* General block information */
   ACLevel = img->cofAC[block8x8][0][0];
@@ -211,7 +202,7 @@ int_16_t c_avs_enc::scanquant_B8_recon
             for (i=0; i<8; i++)
               {
               //fprintf(pf_trace, "%5d ", curr_blk[j][i]);
-				  fprintf(pf_trace, "%5d ", img->mpr[b8_y +j][b8_x +i]);
+          fprintf(pf_trace, "%5d ", img->mpr[b8_y +j][b8_x +i]);
               }
             fprintf(pf_trace, "\n");
             }
@@ -219,8 +210,8 @@ int_16_t c_avs_enc::scanquant_B8_recon
           fclose(pf_trace);
           //exit(0);
           }
-#endif        
-        }      
+#endif
+        }
       for(yy = 0; yy < 8; yy++)
       {
         xmm0 = _mm_loadu_si128((const __m128i *) (img->mpr[b8_y + yy] + b8_x));
@@ -264,9 +255,11 @@ int_16_t c_avs_enc::scanquant_B8_recon
     }
     else
     {
+      /*~~~~~~~~~~~~~~~*/
       __m128i xmm0, xmm1;
       __m128i curr_val_w;
       __m64  curr_val_b;
+      /*~~~~~~~~~~~~~~~*/
 
       for(yy = 0; yy < 8; yy++)
       {
@@ -276,9 +269,16 @@ int_16_t c_avs_enc::scanquant_B8_recon
         curr_val_w = avs_clip_0_255_w(curr_val_w);
         _mm_storeu_si128((__m128i *) img->m7[yy], curr_val_w);
         curr_val_w = _mm_packus_epi16(curr_val_w, curr_val_w);
-        curr_val_b = _mm_movepi64_pi64(curr_val_w);
 
+        /*
+         * mm_storeu_si128(test_blk[yy], curr_val_w);
+         */
+        curr_val_b = _mm_movepi64_pi64(curr_val_w);
         *(__m64 *) (imgUV[block8x8 - 4][img->pix_c_y + yy] + img->pix_c_x) = curr_val_b;
+
+        /*
+         * (__m64 *)(rst_blk[yy])=curr_val_b;
+         */
       }
 
       _mm_empty();
@@ -317,6 +317,11 @@ int_16_t c_avs_enc::scanquant_B8_cost
   __m64    tmp;
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+  /*
+   * xzhao } ;
+   * Quantization ;
+   * quant_B8(qp, mode, curr_blk);
+   */
   avs_quant_sse(qp, mode, curr_blk);
 
   /* General block information */
@@ -858,7 +863,7 @@ int_32_t c_avs_enc::writeChromaCoeffAVS_B8(int_32_t b8)
   int_32_t    run, level, abs_level;
   int_16_t    *ACLevel;
   int_16_t    *ACRun;
-  int_32_t    tablenum;  
+  int_32_t    tablenum;
   int_32_t    symbol2D;
   int_32_t    escape_level_diff;
   TLS static const int_32_t  incVlc_chroma[5] = { 0, 1, 2, 4, 3000 };
@@ -986,10 +991,10 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
   Macroblock *currMB = &img->mb_data[mb_nr];  /*oliver*/
   int mb_left_available = (img_x >= MB_BLOCK_SIZE)?currMB->slice_nr == img->mb_data[mb_nr-1].slice_nr:0;  /*oliver*/
   int mb_up_available = (img_y >= MB_BLOCK_SIZE)?currMB->slice_nr == img->mb_data[mb_nr-MBRowSize].slice_nr:0;  /*oliver*/
-  int mb_up_right_available; 
+  int mb_up_right_available;
   int mb_left_down_available;
-  
-  
+
+
   if((img->mb_y==0)||(img->mb_x==img->width/MB_BLOCK_SIZE-1))
   mb_up_right_available =1;
   else if((img_y-img->pix_y)>0)
@@ -997,43 +1002,40 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
    else
   mb_up_right_available =((img_x-img->pix_x)>0? (currMB->slice_nr == img->mb_data[mb_nr-MBRowSize+1].slice_nr):(currMB->slice_nr== img->mb_data[mb_nr-MBRowSize].slice_nr));  /*oliver*/
 
-  
+
   if((img->mb_x==0)||(img->mb_y==img->height/MB_BLOCK_SIZE-1))
   mb_left_down_available = 1;
   else if(img_x-img->pix_x>0)
   mb_left_down_available =(img_y-img->pix_y)>0? (currMB->slice_nr == img->mb_data[mb_nr+MBRowSize].slice_nr):1;  /*oliver*/
   else
   mb_left_down_available =((img_y-img->pix_y)>0? (currMB->slice_nr == img->mb_data[mb_nr+MBRowSize-1].slice_nr):(currMB->slice_nr == img->mb_data[mb_nr-1].slice_nr));  /*oliver*/
- 
-  
-  
   b8_x=img_x>>3;
   b8_y=img_y>>3;
-  
+
   //check block up
-  
+
   block_available_up=( b8_y-1>=0 && (mb_up_available||(img_y/8)%2));
-  
+
   //check block up right
   block_available_up_right=( b8_x+1<(img->width>>3) && b8_y-1>=0 && mb_up_right_available);
-  
+
   //check block left
   block_available_left=( b8_x - 1 >=0 && (mb_left_available || (img_x/8)%2));
-  
+
   //check block left down
   block_available_left_down=( b8_x - 1>=0 && b8_y + 1 < (img->height>>3) && mb_left_down_available);
-	if( ((img_x/8)%2)  && ((img_y/8)%2))
-		block_available_up_right=0;
-		
-	if( ((img_x/8)%2)  || ((img_y/8)%2))
-		block_available_left_down=0;
+  if( ((img_x/8)%2)  && ((img_y/8)%2))
+    block_available_up_right=0;
+
+  if( ((img_x/8)%2)  || ((img_y/8)%2))
+    block_available_left_down=0;
 
   //get prediciton pixels
   if(block_available_up)
   {
     for(x=0;x<bs_x;x++)
       EP[x+1]=imgY[img_y-/*1*/off_up/*lgp*/][img_x+x];
-    
+
     if(block_available_up_right)
     {
       for(x=0;x<bs_x;x++)
@@ -1049,7 +1051,7 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
 
     for(;x<bs_y+2;x++)
       EP[1+x+bs_x]=EP[bs_x+x];
-    
+
     EP[0]=imgY[img_y-/*1*/off_up/*lgp*/][img_x];
   }
   if(block_available_left)
@@ -1077,7 +1079,7 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
   }
   if(block_available_up&&block_available_left)
     EP[0]=imgY[img_y-/*1*/off_y-off_up/*lgp*/][img_x-1];
-  
+
   //lowpass (Those emlements that are not needed will not disturb)
   last_pix=EP[-(bs_x+bs_y)];
   for(i=-(bs_x+bs_y);i<=(bs_x+bs_y);i++)
@@ -1093,51 +1095,51 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
   // 0 DC
   if(!block_available_up && !block_available_left)
   {
-	  img->available_intra_mode[DC_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DC_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DC_PRED][y][x]=128UL;
   }
 
   if(block_available_up && !block_available_left)
   {
-	  img->available_intra_mode[DC_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DC_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DC_PRED][y][x]=EP[1+x];
   }
 
   if(!block_available_up && block_available_left)
   {
-	  img->available_intra_mode[DC_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DC_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DC_PRED][y][x]=EP[-1-y];
   }
 
-  
+
   if(block_available_up && block_available_left)
   {
-	  img->available_intra_mode[DC_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DC_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DC_PRED][y][x]=(EP[1+x]+EP[-1-y])>>1;
   }
- 
+
   // 1 vertical
   if(block_available_up)
   {
-	  img->available_intra_mode[VERT_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[VERT_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[VERT_PRED][y][x]=imgY[img_y-1][img_x+x];
   }
-      
+
   // 2 horizontal
   if(block_available_left)
   {
-	  img->available_intra_mode[HOR_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[HOR_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[HOR_PRED][y][x]=imgY[img_y+y][img_x-1];
   }
@@ -1145,8 +1147,8 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
   // 3 down-right
   if(block_available_left&&block_available_up)
   {
-	  img->available_intra_mode[DOWN_RIGHT_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DOWN_RIGHT_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DOWN_RIGHT_PRED][y][x]=EP[x-y];
   }
@@ -1154,9 +1156,231 @@ void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
   // 4 up-right bidirectional
   if(block_available_left&&block_available_up)
   {
-	  img->available_intra_mode[DOWN_LEFT_PRED] = 1;
-	  for(y=0UL;y<bs_y;y++)
+    img->available_intra_mode[DOWN_LEFT_PRED] = 1;
+    for(y=0UL;y<bs_y;y++)
       for(x=0UL;x<bs_x;x++)
         img->mprr[DOWN_LEFT_PRED][y][x]=(EP[2+x+y]+EP[-2-(x+y)])>>1;
   }
+
+
 }
+
+//void c_avs_enc::intrapred_luma_AVS(int_32_t img_x, int_32_t img_y)
+//{
+//  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+//  byte        edgepixels[40];
+//  int_32_t  x, y, last_pix, new_pix;
+//  int_32_t  b8_x, b8_y;
+//  int_32_t  i;
+//  int_32_t  block_available_up, block_available_up_right;
+//  int_32_t  block_available_left, block_available_left_down;
+//  int_32_t  bs_x = 8;
+//  int_32_t  bs_y = 8;
+//  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+//
+//  b8_x = img_x >> 3;
+//  b8_y = img_y >> 3;
+//
+//  /* check block up */
+//  block_available_up = (b8_y - 1 >= 0 && img->ipredmode[1 + b8_x][b8_y] >= 0);
+//
+//  /* check block up right */
+//  block_available_up_right =
+//    (
+//      b8_x +
+//      1 < (img->width >> 3)
+//    &&  b8_y - 1 >= 0
+//    &&  img->ipredmode[b8_x + 2][b8_y] >= 0
+//    );
+//
+//  /* check block left */
+//  block_available_left = (b8_x - 1 >= 0 && img->ipredmode[b8_x][1 + b8_y] >= 0);
+//
+//  /* check block left down */
+//  block_available_left_down =
+//    (
+//      b8_x -
+//      1 >= 0
+//    &&  b8_y + 1 < (img->height >> 3)
+//    &&  img->ipredmode[b8_x][b8_y + 2] >= 0
+//    );
+//
+//  /*
+//   * xzhao { 2007.7.24 ;
+//   * if(((img_x/8)%2) && ((img_y/8)%2))
+//   */
+//  if((img_x & 8) && (img_y & 8)) block_available_up_right = 0;
+//
+//  /* if( ((img_x/8)%2) || ((img_y/8)%2)) */
+//  if((img_x & 8) || (img_y & 8)) block_available_left_down = 0;
+//
+//  /*
+//   * xzhao } ;
+//   * get prediction pixels
+//   */
+//  if(block_available_up)
+//  {
+//    /* xzhao { 2007.7.29 */
+//    EP[1] = imgY[img_y - 1][img_x];
+//    EP[2] = imgY[img_y - 1][img_x + 1];
+//    EP[3] = imgY[img_y - 1][img_x + 2];
+//    EP[4] = imgY[img_y - 1][img_x + 3];
+//    EP[5] = imgY[img_y - 1][img_x + 4];
+//    EP[6] = imgY[img_y - 1][img_x + 5];
+//    EP[7] = imgY[img_y - 1][img_x + 6];
+//    EP[8] = imgY[img_y - 1][img_x + 7];
+//
+//    if(block_available_up_right)
+//    {
+//      /* xzhao { 2007.7.29 */
+//      EP[9] = imgY[img_y - 1][img_x + 8];
+//      EP[10] = imgY[img_y - 1][img_x + 9];
+//      EP[11] = imgY[img_y - 1][img_x + 10];
+//      EP[12] = imgY[img_y - 1][img_x + 11];
+//      EP[13] = imgY[img_y - 1][img_x + 12];
+//      EP[14] = imgY[img_y - 1][img_x + 13];
+//      EP[15] = imgY[img_y - 1][img_x + 14];
+//      EP[16] = imgY[img_y - 1][img_x + 15];
+//    }
+//    else
+//    {
+//      /* xzhao { 2007.7.29 */
+//      EP[9] = EP[8];
+//      EP[10] = EP[8];
+//      EP[11] = EP[8];
+//      EP[12] = EP[8];
+//      EP[13] = EP[8];
+//      EP[14] = EP[8];
+//      EP[15] = EP[8];
+//      EP[16] = EP[8];
+//    }
+//
+//    EP[17] = EP[16];
+//    EP[18] = EP[17];
+//
+//    EP[0] = imgY[img_y - 1][img_x];
+//  }
+//
+//  if(block_available_left)
+//  {
+//    /* xzhao { 2007.7.29 */
+//    EP[-1] = imgY[img_y][img_x - 1];
+//    EP[-2] = imgY[img_y + 1][img_x - 1];
+//    EP[-3] = imgY[img_y + 2][img_x - 1];
+//    EP[-4] = imgY[img_y + 3][img_x - 1];
+//    EP[-5] = imgY[img_y + 4][img_x - 1];
+//    EP[-6] = imgY[img_y + 5][img_x - 1];
+//    EP[-7] = imgY[img_y + 6][img_x - 1];
+//    EP[-8] = imgY[img_y + 7][img_x - 1];
+//
+//    if(block_available_left_down)
+//    {
+//      /* xzhao { 2007.7.29 */
+//      EP[-9] = imgY[img_y + 8][img_x - 1];
+//      EP[-10] = imgY[img_y + 9][img_x - 1];
+//      EP[-11] = imgY[img_y + 10][img_x - 1];
+//      EP[-12] = imgY[img_y + 11][img_x - 1];
+//      EP[-13] = imgY[img_y + 12][img_x - 1];
+//      EP[-14] = imgY[img_y + 13][img_x - 1];
+//      EP[-15] = imgY[img_y + 14][img_x - 1];
+//      EP[-16] = imgY[img_y + 15][img_x - 1];
+//    }
+//    else
+//    {
+//      EP[-9] = EP[-8];
+//      EP[-10] = EP[-8];
+//      EP[-11] = EP[-8];
+//      EP[-12] = EP[-8];
+//      EP[-13] = EP[-8];
+//      EP[-14] = EP[-8];
+//      EP[-15] = EP[-8];
+//      EP[-16] = EP[-8];
+//    }
+//
+//    EP[-17] = EP[-16];
+//    EP[-18] = EP[-17];
+//
+//    EP[0] = imgY[img_y][img_x - 1];
+//  }
+//
+//  if(block_available_up && block_available_left) EP[0] = imgY[img_y - 1][img_x - 1];
+//
+//  /*
+//   * xzhao { 2007.7.29 ;
+//   * low pass (Those elements that are not needed will not disturb)
+//   */
+//  last_pix = EP[-(bs_x + bs_y)];
+//
+//  for(i = -(bs_x + bs_y); i <= (bs_x + bs_y); i++)
+//  {
+//    new_pix = (last_pix + (EP[i] << 1) + EP[i + 1] + 2) >> 2;
+//    last_pix = EP[i];
+//    EP[i] = (unsigned char) new_pix;
+//  }
+//
+//  for(i = 0; i < 5; i++)
+//    img->available_intra_mode[i] = -1;       //初始化为-1，为了在Mode_Decision_for_AVS_IntraBlocks中判断当前的mode是否可用
+//
+//  /* 2 DC */
+//  if(!block_available_up && !block_available_left)
+//  {
+//    img->available_intra_mode[DC_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[DC_PRED][y][x] = 128UL;
+//  }
+//
+//  if(block_available_up && !block_available_left)
+//  {
+//    img->available_intra_mode[DC_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[DC_PRED][y][x] = EP[1 + x];
+//  }
+//
+//  if(!block_available_up && block_available_left)
+//  {
+//    img->available_intra_mode[DC_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[DC_PRED][y][x] = EP[-1 - y];
+//  }
+//
+//  if(block_available_up && block_available_left)
+//  {
+//    img->available_intra_mode[DC_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[DC_PRED][y][x] = (EP[1 + x] + EP[-1 - y]) >> 1;
+//  }
+//
+//  /* 0 vertical */
+//  if(block_available_up)
+//  {
+//    img->available_intra_mode[VERT_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[VERT_PRED][y][x] = imgY[img_y - 1][img_x + x];
+//  }
+//
+//  /* 1 horizontal */
+//  if(block_available_left)
+//  {
+//    img->available_intra_mode[HOR_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[HOR_PRED][y][x] = imgY[img_y + y][img_x - 1];
+//  }
+//
+//  /* 4 down-right */
+//  if(block_available_left && block_available_up)
+//  {
+//    img->available_intra_mode[DOWN_RIGHT_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++) img->mprr[DOWN_RIGHT_PRED][y][x] = EP[x - y];
+//  }
+//
+//  /* 3 up-right bidirectional */
+//  if(block_available_left && block_available_up)
+//  {
+//    img->available_intra_mode[DOWN_LEFT_PRED] = 1;
+//    for(y = 0UL; y < bs_y; y++)
+//      for(x = 0UL; x < bs_x; x++)
+//        img->mprr[DOWN_LEFT_PRED][y][x] = (EP[2 + x + y] + EP[-2 - (x + y)]) >> 1;
+//  }
+//  /* xzhao } */
+//}

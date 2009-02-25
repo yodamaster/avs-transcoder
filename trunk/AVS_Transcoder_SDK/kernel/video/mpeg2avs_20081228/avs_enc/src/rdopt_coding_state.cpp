@@ -1,29 +1,29 @@
 /*
-*****************************************************************************
+***********************************************************************
 * COPYRIGHT AND WARRANTY INFORMATION
 *
 * Copyright 2003, Advanced Audio Video Coding Standard, Part II
 *
 * DISCLAIMER OF WARRANTY
 *
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
+* These software programs are available to the users without any
+* license fee or royalty on an "as is" basis. The AVS disclaims
+* any and all warranties, whether express, implied, or statutory,
+* including any implied warranties of merchantability or of fitness
+* for a particular purpose. In no event shall the contributors or 
+* the AVS be liable for any incidental, punitive, or consequential
+* damages of any kind whatsoever arising from the use of this program.
 *
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
+* This disclaimer of warranty extends to the user of this program
+* and user's customers, employees, agents, transferees, successors,
+* and assigns.
+*
+* The AVS does not represent or warrant that the program furnished
+* hereunder are free of infringement of any third-party patents.
 * Commercial implementations of AVS, including shareware, may be
 * subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
+* the AVS patent policy is available from the AVS Web site at
+* http://www.avs.org.cn
 *
 * THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
 ************************************************************************
