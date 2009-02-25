@@ -1,41 +1,3 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
-
-/*
-*************************************************************************************
-* File name: 
-* Function: 
-*
-*************************************************************************************
-*/
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -46,19 +8,19 @@
 #include <loopfilter.h>
 #include "global.h"
 void c_avs_enc:: stuffing_byte(int_32_t n)
-  {
+{
   int_32_t i;
   Bitstream *currStream;
 
   currStream = currBitStream;
 
   for(i=0; i<n; i++)
-    {
+  {
     currStream->streamBuffer[currStream->byte_pos++] = 0x80;
     currStream->bits_to_go = 8;
     currStream->byte_buf   = 0;
-    }
   }
+}
 
 int_32_t c_avs_enc:: start_slice()
 {
@@ -74,13 +36,12 @@ int_32_t c_avs_enc:: start_slice()
     currStream->bits_to_go = 8;
     currStream->byte_buf = 0;
   }
-   else		// cjw 20060321 
+  else
   {
-	  currStream->streamBuffer[currStream->byte_pos++] = 0x80;
-	  currStream->bits_to_go = 8;
-	  currStream->byte_buf = 0; 
+    currStream->streamBuffer[currStream->byte_pos++] = 0x80;
+    currStream->bits_to_go = 8;
+    currStream->byte_buf = 0;
   }
-
   return 0;
 }
 
@@ -90,7 +51,7 @@ int_32_t c_avs_enc:: start_slice()
 * Input:
 * Output:
 * Return: 0 if OK,                                                         \n
-      1 in case of error
+1 in case of error
 * Attention:
 *************************************************************************
 */
@@ -110,95 +71,128 @@ int_32_t c_avs_enc::terminate_picture()
 }
 
 void c_avs_enc:: picture_data( )
-  {
-  Boolean end_of_picture = FALSE;
+{
+  myboolean end_of_picture = myfalse;
   int_32_t CurrentMbNumber=0;
   int_32_t MBRowSize = img->img_width_in_mb;
   int_32_t slice_nr = 0;
   int_32_t slice_qp = img->qp;
-  int_32_t len, i, j;
+  int_32_t len, i;
   //init the intra pred mode
   for(i=0; i<img->width/B8_SIZE+100; i++)
   {
-    for(j=0; j<img->height/B8_SIZE+100; j++)
-    {
-      img->ipredmode[i][j] = -1;
-    }
+    memset(img->ipredmode[i], -1, (img->height/B8_SIZE+100)*sizeof(int_32_t));
   }
 
-  for(i=0; i<img->width*img->height/256; i++)
+  for(i=0; i<img->total_number_mb; i++)
   {
     img->mb_data[i].slice_nr = -1;
   }
   if (input->rdopt)
-    {
+  {
     switch(img->type)
-      {
-      case INTRA_IMG:
-        encode_one_macroblock = &c_avs_enc::encode_one_intra_macroblock_rdo;
-        break;
-      case INTER_IMG:
-        encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_rdo;
-        break;
-      case B_IMG:
-        encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_rdo;
-        break;
-      }
+    {
+    case INTRA_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_intra_macroblock_rdo;
+      break;
+    case INTER_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_rdo;
+      break;
+    case B_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_rdo;
+      break;
     }
+  }
   else
-    {
-      // xzhao
-      //img->type=INTRA_IMG;
+  {
+    // xzhao
+    //img->type=INTRA_IMG;
     switch(img->type)
-      {
-      case INTRA_IMG:
-          encode_one_macroblock = &c_avs_enc::encode_one_intra_macroblock_not_rdo;
-        break;
-      case INTER_IMG:
-          encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_not_rdo;
-        break;
-      case B_IMG:
-          encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_not_rdo;
-        break;
-      }
-    }
-
-  while (end_of_picture == FALSE) // loop over macroblocks
     {
+    case INTRA_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_intra_macroblock_not_rdo;
+      break;
+    case INTER_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_not_rdo;
+      break;
+    case B_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_not_rdo;
+      break;
+    }
+  }
+#ifdef _ME_FOR_RATE_CONTROL_
+  if (glb_me_for_rate_control_flag)
+  {
+    switch(img->type)
+    {
+    case INTRA_IMG:
+      printf("nothing to do for intra frame\n");
+      break;
+    case INTER_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_for_rate_control;
+      break;
+    case B_IMG:
+      encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_for_rate_control;
+      break;
+    }
+  }
+#endif
+  while (end_of_picture == myfalse) // loop over macroblocks
+  {
     set_MB_parameters(CurrentMbNumber);
     if (input->slice_row_nr && (img->current_mb_nr ==0 ||(img->current_mb_nr>0 && img->mb_data[img->current_mb_nr].slice_nr != img->mb_data[img->current_mb_nr-1].slice_nr)))
+    {
+#ifdef _ME_FOR_RATE_CONTROL_
+      if (glb_me_for_rate_control_flag)
       {
+        start_slice ();
+      }
+#else
       start_slice ();
+#endif
       img->current_slice_qp = img->qp;
       img->current_slice_start_mb = img->current_mb_nr;
-
+#ifdef _ME_FOR_RATE_CONTROL_
+      if (glb_me_for_rate_control_flag)
+      {
+        len = SliceHeader(slice_nr, slice_qp);
+      }
+#else
       len = SliceHeader(slice_nr, slice_qp);
-
+#endif
       img->current_slice_nr = slice_nr;
       stat->bit_slice += len;
       slice_nr++;
-      }
+    }
     start_macroblock();
     (this->*encode_one_macroblock)();
-
+#ifdef _ME_FOR_RATE_CONTROL_
+    if (glb_me_for_rate_control_flag)
+    {
+      write_one_macroblock(1);
+      terminate_macroblock (&end_of_picture);
+    }
+#else
     write_one_macroblock(1);
     terminate_macroblock (&end_of_picture);
-
+#endif
     proceed2nextMacroblock ();
     CurrentMbNumber++;
-    }
-
+  }
+#ifdef _ME_FOR_RATE_CONTROL_
+  if (glb_me_for_rate_control_flag)
+  {
+    terminate_picture ();
+    DeblockFrame (img, imgY, imgUV);
+  }
+#else
   terminate_picture ();
-
-  if(!input->loop_filter_disable)     //xzhao 20081227
-	  DeblockFrame (img, imgY, imgUV);  //wangyue
-
+  DeblockFrame (img, imgY, imgUV);
+#endif
 }
-
-
 void c_avs_enc:: top_field(Picture *pic)
 {
-  Boolean end_of_picture = FALSE;
+  myboolean end_of_picture = myfalse;
   int_32_t CurrentMbNumber=0;
   int_32_t MBRowSize = img->width / MB_BLOCK_SIZE;
   int_32_t slice_nr =0;
@@ -206,7 +200,7 @@ void c_avs_enc:: top_field(Picture *pic)
   int_32_t len;
 
   img->top_bot = 0;  // Yulj 2004.07.20
-  while (end_of_picture == FALSE) // loop over macroblocks
+  while (end_of_picture == myfalse) // loop over macroblocks
   {
     set_MB_parameters (CurrentMbNumber);
     if (input->slice_row_nr && (img->current_mb_nr ==0
@@ -231,8 +225,8 @@ void c_avs_enc:: top_field(Picture *pic)
     CurrentMbNumber++;
   }
 
-  if(!input->loop_filter_disable)     // xzhao 20081227
-	  DeblockFrame (img, imgY, imgUV);    // wangyue
+
+  DeblockFrame (img, imgY, imgUV);
 
   //rate control
   pic->bits_per_picture = 8 * (currBitStream->byte_pos);
@@ -240,7 +234,7 @@ void c_avs_enc:: top_field(Picture *pic)
 
 void c_avs_enc:: bot_field(Picture *pic)
 {
-  Boolean end_of_picture = FALSE;
+  myboolean end_of_picture = myfalse;
   int_32_t CurrentMbNumber=0;
   int_32_t MBRowSize = img->width / MB_BLOCK_SIZE;
   int_32_t slice_nr =0;
@@ -248,7 +242,7 @@ void c_avs_enc:: bot_field(Picture *pic)
   int_32_t len;
 
   img->top_bot = 1; //Yulj 2004.07.20
-  while (end_of_picture == FALSE) // loop over macroblocks
+  while (end_of_picture == myfalse) // loop over macroblocks
   {
     set_MB_parameters (CurrentMbNumber);
     if (input->slice_row_nr && (img->current_mb_nr ==0
@@ -274,38 +268,36 @@ void c_avs_enc:: bot_field(Picture *pic)
   }
 
   terminate_picture ();
-
-  if(!input->loop_filter_disable)     //xzhao 20081227
-	  DeblockFrame (img, imgY, imgUV); //wangyue
+  DeblockFrame (img, imgY, imgUV);
 
   pic->bits_per_picture = 8 * (currBitStream->byte_pos);
 }
 
 void c_avs_enc::store_field_MV ()
 {
-    int_32_t i, j;
+  int_32_t i, j;
 
-    if (img->type != B_IMG)     //all I- and P-frames
+  if (img->type != B_IMG)     //all I- and P-frames
   {
-        if (!img->picture_structure)
+    if (!img->picture_structure)
     {
-            for (i = 0; i < img->width / 8 + 4; i++)
+      for (i = 0; i < img->width / 8 + 4; i++)
       {
-                for (j = 0; j < img->height / 16; j++)
+        for (j = 0; j < img->height / 16; j++)
         {
-                    tmp_mv_frm[0][2 * j][i] = tmp_mv_frm[0][2 * j + 1][i] =
+          tmp_mv_frm[0][2 * j][i] = tmp_mv_frm[0][2 * j + 1][i] =
             tmp_mv_top[0][j][i];
-                    tmp_mv_frm[0][2 * j][i] = tmp_mv_frm[0][2 * j + 1][i] = tmp_mv_top[0][j][i];        // ??
-                    tmp_mv_frm[1][2 * j][i] = tmp_mv_frm[1][2 * j + 1][i] =
+          tmp_mv_frm[0][2 * j][i] = tmp_mv_frm[0][2 * j + 1][i] = tmp_mv_top[0][j][i];        // ??
+          tmp_mv_frm[1][2 * j][i] = tmp_mv_frm[1][2 * j + 1][i] =
             tmp_mv_top[1][j][i] * 2;
-                    tmp_mv_frm[1][2 * j][i] = tmp_mv_frm[1][2 * j + 1][i] = tmp_mv_top[1][j][i] * 2;    // ??
+          tmp_mv_frm[1][2 * j][i] = tmp_mv_frm[1][2 * j + 1][i] = tmp_mv_top[1][j][i] * 2;    // ??
 
-                    if (refFrArr_top[j][i] == -1)
+          if (refFrArr_top[j][i] == -1)
           {
             refFrArr_frm[2 * j][i] =
               refFrArr_frm[2 * j + 1][i] = -1;
           }
-                    else
+          else
           {
             refFrArr_frm[2 * j][i] =
               refFrArr_frm[2 * j + 1][i] =
@@ -314,15 +306,15 @@ void c_avs_enc::store_field_MV ()
         }
       }
     }
-        else
+    else
     {
-            for (i = 0; i < img->width / 8 + 4; i++)
+      for (i = 0; i < img->width / 8 + 4; i++)
       {
-                for (j = 0; j < img->height / 16; j++)
+        for (j = 0; j < img->height / 16; j++)
         {
-                    tmp_mv_top[0][j][i] = tmp_mv_bot[0][j][i] =
+          tmp_mv_top[0][j][i] = tmp_mv_bot[0][j][i] =
             (int_32_t) (tmp_mv_frm[0][2 * j][i]);
-                    tmp_mv_top[1][j][i] = tmp_mv_bot[1][j][i] =
+          tmp_mv_top[1][j][i] = tmp_mv_bot[1][j][i] =
             (int_32_t) ((tmp_mv_frm[1][2 * j][i]) / 2);
 
 
@@ -337,8 +329,8 @@ void c_avs_enc::store_field_MV ()
           }
         }
       }
-          }
-      }
+    }
+  }
 }
 
 /*

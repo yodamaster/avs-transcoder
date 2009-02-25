@@ -1,41 +1,3 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
-
-/*
-*************************************************************************************
-* File name: 
-* Function: 
-*
-*************************************************************************************
-*/
 #include <stdlib.h>
 #include <math.h>
 #include <memory.h>
@@ -174,7 +136,7 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
   int_32_t ipmode,best_ipmode,x,y;
   int_32_t c_nz, nonzero;
   __declspec(align(16)) byte rec4x4[8][8];
-  double rdcost;
+  double rdcost=0;
   int_32_t block_x;
   int_32_t block_y;
   int_32_t pic_pix_x;
@@ -193,17 +155,13 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
   int_32_t loc_cost = (int_32_t)floor(6.0 * lambda + 0.4999);//,best_AVS_cost;
 
   int_32_t rate,tmp_cbp,tmp_cbp_blk;
-  int_32_t distortion;
+  int_32_t distortion=0;
   __declspec(align(16)) int_16_t tmp_block_88_inv[8][8];
-  currMB=img->mb_data+img->current_mb_nr;
-  currSE   =&img->MB_SyntaxElements[currMB->currSEnr];
+  currMB =  img->mb_data+img->current_mb_nr;
+  currSE = &img->MB_SyntaxElements[currMB->currSEnr];
 
   for (min_cost=0, b8=0; b8<4; b8++)
   {
-    //loc_cost = (int_32_t)floor(6.0 * lambda + 0.4999);
-    //best_AVS_cost=0x7FFFFFFFL;  //max int_32_t value
-    //currMB=img->mb_data+img->current_mb_nr;
-
     block_x    = (b8&1) << 3;
     block_y    = (b8>>1) << 3;
     pic_pix_x  =img->pix_x+block_x;
@@ -361,15 +319,6 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
           movdqa      xmmword ptr [esi],    xmm3
         }
 
-      /*  for (j=0;j<8;j++)
-        {
-          for (i=0;i<8;i++)
-          {
-            img->mpr[block_y+j][block_x+i]=img->mprr[ipmode][j][i];
-            img->m7[j][i] = imgY_org[pic_pix_y+j][pic_pix_x+i] - img->mprr[ipmode][j][i] ;
-          }
-        }
-        */      //===== store the coding state =====
         store_coding_state (cs_cm);
         //展开RDCost_for_AVSIntraBlocks()
         //===== perform DCT, Q, IQ, IDCT, Reconstruction =====
@@ -499,11 +448,6 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
           mov      distortion, eax
         }
 
-        /*    distortion =0;
-        for (y=0; y<8; y++)
-          for (x=0; x<8; x++)
-            distortion += img->quad [imgY_org[pic_pix_y+y][pic_pix_x+x] - imgY[pic_pix_y+y][pic_pix_x+x]];
-        */
         //===== RATE for INTRA PREDICTION MODE  (SYMBOL MODE MUST BE SET TO UVLC) =====
         currSE->value1 = (mostProbableMode == ipmode) ? -1 : ipmode < mostProbableMode ? ipmode : ipmode-1;
 
@@ -610,15 +554,8 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
               cofAC4x4[y][x][64]=img->cofAC[b8][y][x][64];
             }
           }
-          //--- set coefficients ---
-          /*  for(k=0;k<4;k++)
-              for(j=0;j<2;j++)
-                for(i=0;i<65;i++)
-                  cofAC4x4[k][j][i] = img->cofAC[b8][k][j][i];
-          */
-
           //--- set reconstruction ---
-          d1 = &imgY[pic_pix_y][pic_pix_x];
+          d1 = &imgY[pic_pix_y  ][pic_pix_x];
           d2 = &imgY[pic_pix_y+1][pic_pix_x];
           d3 = &imgY[pic_pix_y+2][pic_pix_x];
           d4 = &imgY[pic_pix_y+3][pic_pix_x];
@@ -660,10 +597,6 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
             movdqa      rec4x4+48, xmm2
           }
 
-        /*  for(y=0; y<8; y++)
-            for(x=0; x<8; x++)
-              rec4x4[y][x]=imgY[pic_pix_y+y][pic_pix_x+x];
-        */
           //--- flag if dct-coefficients must be coded ---
           nonzero = c_nz;
 
@@ -673,7 +606,6 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
           best_ipmode = ipmode;
         }
         reset_coding_state (cs_cm);
-        //}
       }
     }
 
@@ -682,29 +614,6 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
     img->ipredmode[pic_block_x+1][pic_block_y+1] = best_ipmode;
     currMB->intra_pred_modes[b8] = mostProbableMode == best_ipmode ? -1 : best_ipmode < mostProbableMode ? best_ipmode : best_ipmode-1;
 
-  /*  if (!input->rdopt)
-    {
-    // get prediction and prediction error
-      for (j=0;j<8; j++)
-      {
-        for (i=0;i<8; i++)
-        {
-          img->mpr[block_y+j][block_x+i] = img->mprr[best_ipmode][j][i];
-          tmp_block_88[j][i] = imgY_org[pic_pix_y+j][pic_pix_x+i] - img->mprr[best_ipmode][j][i];
-        }
-      }
-      loc_cbp=loc_cbp_blk=0;
-
-      avs_dct_sse(tmp_block_88);
-      scanquant_B8   (img->qp,4,b8,tmp_block_88,0,&loc_cbp,&loc_cbp_blk); // '|4' indicate intra for quantization
-      //scanquant returns a SCR value!.....
-      nonzero=(loc_cbp!=0);
-      currMB->cbp|=loc_cbp;
-      currMB->cbp_blk|=loc_cbp_blk;
-    }
-    else
-    {
-    */      //===== restore coefficients =====
     for(y=0;y<4;y++)
     {
       for(x=0;x<2;x++)
@@ -834,18 +743,14 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
       emms
     }
 
-  /*  for(y=0; y<8; y++)
+  for(y=0; y<8; y++)
     {
       for(x=0; x<8; x++)
       {
-        imgY[pic_pix_y+y][pic_pix_x+x] = rec4x4[y][x];
-        img->mpr[block_y+j][block_x+i] = img->mprr[best_ipmode][j][i];
+        img->mpr[block_y+y][block_x+x] = img->mprr[best_ipmode][y][x];
       }
     }
-  */  //}
-    // xzhao { 2007.7.24
     min_cost += loc_cost;
-    // xzhao }
 
     if (nonzero)
     {
@@ -869,7 +774,7 @@ int_32_t c_avs_enc::Mode_Decision_for_AVSIntraMacroblock (double lambda,  int_32
 
 double c_avs_enc:: RDCost_for_8x8blocks (int_32_t*    cnt_nonz,   // --> number of nonzero coefficients
                              int_32_t*    cbp_blk,    // --> cbp blk
-                             double  lambda,     // <-- lagrange multiplier
+                             double  lambda,     // <-- Lagrange multiplier
                              int_32_t     block,      // <-- 8x8 block number
                              int_32_t     mode,       // <-- partitioning mode
                              int_32_t     pdir,       // <-- prediction direction
@@ -897,28 +802,27 @@ double c_avs_enc:: RDCost_for_8x8blocks (int_32_t*    cnt_nonz,   // --> number 
   int_32_t pix_y = img->pix_y;
   int_32_t pix_x = img->pix_x;
   byte **imgY_original  =  imgY_org;
-  int_32_t  incr_y=1,off_y=0;
 
   //=====  GET COEFFICIENTS, RECONSTRUCTIONS, CBP
   if (direct)
-    {
+  {
     *cnt_nonz = LumaResidualCoding8x8 (&cbp, cbp_blk, block, 0, 0,
       max(0,frefarr[block_y+j0][block_x+i0]), 0);
-    }
+  }
   else
-    {
+  {
     fw_mode   = (pdir==0||pdir==2 ? mode : 0);
     bw_mode   = (pdir==1||pdir==2 ? mode : 0);
     *cnt_nonz = LumaResidualCoding8x8 (&cbp, cbp_blk, block, fw_mode, bw_mode, ref, bwd_ref);
-    }
+  }
 
   for (j=0; j<8; j++)
-    {
+  {
     for (i=pax; i<pax+8; i++)
-      {
-      distortion += img->quad [imgY_original[pix_y+pay+/*j*/incr_y*j+off_y][pix_x+i] - imgY[img->pix_y+pay+/*j*/incr_y*j+off_y][img->pix_x+i]];
-      }
+    {
+      distortion += img->quad [imgY_original[pix_y+pay+j][pix_x+i] - imgY[img->pix_y+pay+j][img->pix_x+i]];
     }
+  }
 
   //=====   GET RATE
   //----- block 8x8 mode -----
@@ -927,23 +831,22 @@ double c_avs_enc:: RDCost_for_8x8blocks (int_32_t*    cnt_nonz,   // --> number 
 
   //----- motion information -----
   if (!direct)
-    {
+  {
     if (pdir==0 || pdir==2)
-      {
+    {
       rate  += writeMotionVector8x8 (i0, j0, i0+1, j0+1, ref, 0, 1, mode);
-      }
-    if (pdir==1 || pdir==2)
-      {
-      rate  += writeMotionVector8x8 (i0, j0, i0+1, j0+1, bwd_ref, 0, 0, mode);
-      }
     }
+    if (pdir==1 || pdir==2)
+    {
+      rate  += writeMotionVector8x8 (i0, j0, i0+1, j0+1, bwd_ref, 0, 0, mode);
+    }
+  }
   //----- luminance coefficients -----
   if (*cnt_nonz)
-    {
+  {
     currMB->cbp = cbp;
     rate += writeLumaCoeff8x8 (block, 0);
-
-    }
+  }
   return (double)distortion + lambda * (double)rate;
 }
 
@@ -1028,10 +931,7 @@ void c_avs_enc:: SetModesAndRefframeForBlocks (int_32_t mode)
             else
               {
               fwrefarr[(block_y>>1)+j][(block_x>>1)+i] = 0;
-              if(img->picture_structure)
-                bwrefarr[(block_y>>1)+j][(block_x>>1)+i] = 0;
-              else
-                bwrefarr[(block_y>>1)+j][(block_x>>1)+i] = 0;
+              bwrefarr[(block_y>>1)+j][(block_x>>1)+i] = 0;
               }
             }
           else
@@ -1137,7 +1037,7 @@ void c_avs_enc:: SetCoeffAndReconstruction8x8 (Macroblock* currMB)
 
     for (j=0; j<16; j++)
       for (i=0; i<16; i++)
-        imgY[img->pix_y+j][img->pix_x+i] = mpr8x8[j][i];
+        imgY[img->pix_y+j][img->pix_x+i] = (byte)mpr8x8[j][i];
 
   }
   else
@@ -1145,27 +1045,28 @@ void c_avs_enc:: SetCoeffAndReconstruction8x8 (Macroblock* currMB)
     currMB->cbp     = cbp8x8;
     currMB->cbp_blk = cbp_blk8x8;
 
-    for(k=stage_block8x8_pos/2;k<2;k++)
+    for(k=0;k<2;k++)
     {
       for (j=0; j<8; j++)
         for (i=0; i<16; i++)
-          imgY[img->pix_y+k*8+incr_y*j+off_y][img->pix_x+i] = rec_mbY8x8[k*8+incr_y*j+off_y][i];
+          imgY[img->pix_y+k*8+j][img->pix_x+i] = rec_mbY8x8[k*8+j][i];
     }
   }
 
   //===== restore intra prediction modes for 8x8+ macroblock mode =====
-  for (j=img->block8_y+1+stage_block8x8_pos/2; j<img->block8_y+3; j++)
-    for (     i=img->block8_x+1; i<img->block8_x+3; i++)
+  for (j=img->block8_y+1; j<img->block8_y+3; j++)
     {
+    for (i=img->block8_x+1; i<img->block8_x+3; i++)
+      {
       k = (j-img->block8_y-1)*2 + i -img->block8_x -1;
-      ipredmodes    [i][j] = b8_ipredmode       [k];
+      ipredmodes[i][j] = b8_ipredmode[k];
       currMB->intra_pred_modes[k] = b8_intra_pred_modes[k];
+      }
     }
-
 }
 
 void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
-  {
+{
   int_32_t i, j, k, mode8, pdir8, ref, by, bx, bxr, dref;
   int_32_t ***mv        = tmp_mv;
   int_32_t *****all_mv  = img->all_mv;
@@ -1183,22 +1084,22 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
   int_32_t  bw_ref;
 
   for (j=0;j<2;j++)
-    {
+  {
     for (i=0; i<2; i++)
-      {
+    {
       k=2*j+i;
       mode8 = currMB->b8mode[k];
       pdir8 = currMB->b8pdir[k];
       if(pdir8 == 2 && mode8 != 0)
-        {
+      {
         all_mv = img->all_omv;
         p_fwMV = img->omv;
-        }
+      }
       else
-        {
+      {
         all_mv = img->all_mv;
         imgmv = img->mv;
-        }
+      }
 
       by     = block_y + j;
       bxr    = block_x + i;
@@ -1207,22 +1108,22 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
       bw_ref = (bframe?brefar:refar)[by][bxr];
 
       if (!bframe)
-        {
+      {
         if (mode8!=IBLOCK && ref != -1)
-          {
+        {
           mv[0][by][bx] = all_mv[i][j][ref][mode8][0];
           mv[1][by][bx] = all_mv[i][j][ref][mode8][1];
-          }
+        }
         else
-          {
+        {
           mv[0][by][bx] = 0;
           mv[1][by][bx] = 0;
-          }
         }
+      }
       else
-        {
+      {
         if (pdir8==-1) // intra
-          {
+        {
           fwMV [0][by][bx] = 0;
           fwMV [1][by][bx] = 0;
           bwMV [0][by][bx] = 0;
@@ -1231,9 +1132,9 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
           dfMV [1][by][bx] = 0;
           dbMV [0][by][bx] = 0;
           dbMV [1][by][bx] = 0;
-          }
+        }
         else if (pdir8==0) // forward
-          {
+        {
           fwMV [0][by][bx] = all_mv [i][j][ ref][mode8][0];
           fwMV [1][by][bx] = all_mv [i][j][ ref][mode8][1];
           bwMV [0][by][bx] = 0;
@@ -1242,25 +1143,25 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
           dfMV [1][by][bx] = 0;
           dbMV [0][by][bx] = 0;
           dbMV [1][by][bx] = 0;
-          }
+        }
         else if (pdir8==1) // backward
-          {
+        {
           fwMV [0][by][bx] = 0;
           fwMV [1][by][bx] = 0;
-            {
+          {
             bwMV [0][by][bx] = all_bmv[i][j][bw_ref][mode8][0];
             bwMV [1][by][bx] = all_bmv[i][j][bw_ref][mode8][1];
-            }
-            dfMV[0][by][bx] = 0;
-            dfMV[1][by][bx] = 0;
-            dbMV[0][by][bx] = 0;
-            dbMV[1][by][bx] = 0;
           }
+          dfMV[0][by][bx] = 0;
+          dfMV[1][by][bx] = 0;
+          dbMV[0][by][bx] = 0;
+          dbMV[1][by][bx] = 0;
+        }
         else if (mode8!=0) // bidirect
-          {
+        {
           fwMV[0][by][bx] = all_mv [i][j][ ref][mode8][0];
           fwMV[1][by][bx] = all_mv [i][j][ ref][mode8][1];
-            {
+          {
             int_32_t delta_P,TRp,DistanceIndexFw,DistanceIndexBw,refframe,delta_PB;
             refframe = ref;
             delta_P = 2*(img->imgtr_next_P_frm - img->imgtr_last_P_frm);
@@ -1269,9 +1170,9 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
             if(img->picture_structure)
               TRp = (refframe+1)*delta_P;  //the lates backward reference
             else
-              {
+            {
               TRp = delta_P;//refframe == 0 ? delta_P-1 : delta_P+1;
-              }
+            }
             //rm52c
             //delta_PB = 2*(img->tr - img->imgtr_last_P_frm);
             //rm52j begin
@@ -1280,56 +1181,48 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
             delta_PB = (delta_PB + 512)%512;  // Added by Xiaozhen ZHENG, 2007.05.05
             //      end
             if(!img->picture_structure)
-              {
+            {
               if(img->current_mb_nr_fld < img->total_number_mb) //top field
                 DistanceIndexFw =  refframe == 0 ? delta_PB-1:delta_PB;
               else
                 DistanceIndexFw =  refframe == 0 ? delta_PB:delta_PB+1;
-              }
+            }
             else
               DistanceIndexFw = delta_PB;
-            //rm52c
-            //DistanceIndexBw    = TRp - DistanceIndexFw;
-            //rm52j
             DistanceIndexBw    = (TRp - DistanceIndexFw+512)%512; // Added by Zhijie Yang, 20070419, Broadcom
-            //rm52c
-            //bwMV [0][by][bx] = - ((all_mv[i][j][ref][mode8][0]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
-            //bwMV [1][by][bx] = - ((all_mv[i][j][ref][mode8][1]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
-            //rm52j
             bwMV [0][by][bx] = - ((all_mv[i][j][ref][mode8][0]*DistanceIndexBw*(512/DistanceIndexFw)+256)>>9);
             bwMV [1][by][bx] = - ((all_mv[i][j][ref][mode8][1]*DistanceIndexBw*(512/DistanceIndexFw)+256)>>9);
-            }
-
-            dfMV[0][by][bx] = 0;
-            dfMV[1][by][bx] = 0;
-            dbMV[0][by][bx] = 0;
-            dbMV[1][by][bx] = 0;
           }
+
+          dfMV[0][by][bx] = 0;
+          dfMV[1][by][bx] = 0;
+          dbMV[0][by][bx] = 0;
+          dbMV[1][by][bx] = 0;
+        }
         else // direct
-          {
+        {
           if(!img->picture_structure)
-            {
+          {
             dref = max(0,fw_refFrArr[by][bxr]);
             fwMV [0][by][bx] = dfMV[0][by][bx] = all_mv [i][j][dref][0][0];
             fwMV [1][by][bx] = dfMV[1][by][bx] = all_mv [i][j][dref][0][1];
             dref = max(0,bw_refFrArr[by][bxr]);
             bwMV [0][by][bx] = dbMV[0][by][bx] = all_bmv[i][j][dref][0][0];
             bwMV [1][by][bx] = dbMV[1][by][bx] = all_bmv[i][j][dref][0][1];
-            }
+          }
           else
-            {
+          {
             dref = 0;
             fwMV [0][by][bx] = dfMV[0][by][bx] = all_mv [i][j][dref][0][0];
             fwMV [1][by][bx] = dfMV[1][by][bx] = all_mv [i][j][dref][0][1];
-
             bwMV [0][by][bx] = dbMV[0][by][bx] = all_bmv[i][j][0][0][0];
             bwMV [1][by][bx] = dbMV[1][by][bx] = all_bmv[i][j][0][0][1];
-            }
           }
         }
       }
     }
   }
+}
 
 /*
 *************************************************************************
@@ -1341,15 +1234,13 @@ void c_avs_enc:: SetMotionVectorsMB (Macroblock* currMB, int_32_t bframe)
 *************************************************************************
 */
 
-int_32_t c_avs_enc:: RDCost_for_macroblocks (double   lambda,      // <-- lagrange multiplier
-                            int_32_t      mode,        // <-- modus (0-COPY/DIRECT, 1-16x16, 2-16x8, 3-8x16, 4-8x8(+), 5-Intra4x4, 6-Intra16x16)
-                            double*  min_rdcost)  // <-> minimum rate-distortion cost
+int_32_t c_avs_enc:: RDCost_for_macroblocks (double lambda, int_32_t mode, double*  min_rdcost)
 {
   int_32_t         i, j;
   int_32_t         rate=0, distortion=0;
   double      rdcost;
   Macroblock  *currMB       = &img->mb_data[img->current_mb_nr];
-  int_32_t         bframe        = (img->type==B_IMG);
+  int_32_t         bframe   = (img->type==B_IMG);
   int_32_t         tmp_cc;
   int_32_t         use_of_cc     =  (img->type!=INTRA_IMG);
   int_32_t         cc_rate, dummy;
@@ -1359,28 +1250,27 @@ int_32_t c_avs_enc:: RDCost_for_macroblocks (double   lambda,      // <-- lagran
   int_32_t         pix_c_y       = img->pix_c_y;
   int_32_t         pix_x         = img->pix_x;
   int_32_t         pix_c_x       = img->pix_c_x;
-
   int_32_t         rate_tmp,rate_total=0, distortion_blk, distortion_total = 0;
   int_32_t         block8x8,block_x,block_y;
-  int_32_t         c_distortion=0,lum_bits;
+  int_32_t         lum_bits;
   int_32_t         cp_table[2][6] = {{1,1,1,1,1,1},{0,0,1,1,0,1}};
   //=====  SET REFERENCE FRAMES AND BLOCK MODES
   SetModesAndRefframeForBlocks (mode);
-
   //=====  GET COEFFICIENTS, RECONSTRUCTIONS, CBP
   if (mode==I4MB)
-    {
+  {
     currMB->cbp = Mode_Decision_for_AVSIntraMacroblock (lambda, &dummy);
-    }
+  }
   else
-    {
+  {
     LumaResidualCoding ();
-    }
+  }
 
   //Rate control
-  for(i=0; i<16; i++)
-    for(j=0; j<16; j++)
-      pred[j][i] = img->mpr[j][i];
+  if (input->RCEnable)
+  {
+    memcpy(pred, img->mpr, 256*sizeof(int_16_t));
+  }
 
   dummy = 0;
   ChromaResidualCoding (&dummy);
@@ -1389,78 +1279,76 @@ int_32_t c_avs_enc:: RDCost_for_macroblocks (double   lambda,      // <-- lagran
   // LUMA
 
   for(block8x8=0; block8x8<4;block8x8++)
-    {
+  {
     block_y = (block8x8/2)*8;
     block_x = (block8x8%2)*8;
 
     distortion_blk =0;
 
     for (j=0; j<8; j++)
-      {
+    {
       for (i=0; i<8; i++)
-        {
+      {
         distortion_blk += img->quad [imgY_orig[block_y+j+pix_y][block_x+i+pix_x] - imgY[img->pix_y+block_y+j][img->pix_x+block_x+i]];
-        }
       }
+    }
     block_y = (block8x8/2)*4;
     block_x = (block8x8%2)*4;
 
     // CHROMA
     for (j=0; j<4; j++)
-      {
+    {
       for (i=0; i<4; i++)
-        {
+      {
         distortion_blk += img->quad [imgUV_orig[0][block_y+j+pix_c_y][block_x+i+pix_c_x] - imgUV[0][img->pix_c_y+block_y+j][img->pix_c_x+block_x+i]];
         distortion_blk += img->quad [imgUV_orig[1][block_y+j+pix_c_y][block_x+i+pix_c_x] - imgUV[1][img->pix_c_y+block_y+j][img->pix_c_x+block_x+i]];
-        c_distortion   += img->quad [imgUV_orig[0][block_y+j+pix_c_y][block_x+i+pix_c_x] - imgUV[0][img->pix_c_y+block_y+j][img->pix_c_x+block_x+i]];
-        c_distortion   += img->quad [imgUV_orig[1][block_y+j+pix_c_y][block_x+i+pix_c_x] - imgUV[1][img->pix_c_y+block_y+j][img->pix_c_x+block_x+i]];
-        }
       }
-    distortion_total += distortion_blk;
     }
+    distortion_total += distortion_blk;
+  }
 
   //=====   S T O R E   C O D I N G   S T A T E   =====
   store_coding_state (cs_cm);
   //=====   GET RATE
   //----- macroblock header -----
   if (use_of_cc)
-    {
+  {
     if (currMB->mb_type!=0 || (bframe && currMB->cbp!=0))
-      {
+    {
       // cod counter and macroblock mode are written ==> do not consider code counter
       tmp_cc = img->cod_counter;
       rate_total   = writeMBHeader (1);
       ue_linfo (tmp_cc, dummy, &cc_rate, &dummy);
       rate_total  -= cc_rate;
       img->cod_counter = tmp_cc;
-      }
+    }
     else
-      {
+    {
       // cod counter is just increased  ==> get additional rate
       ue_linfo (img->cod_counter+1, dummy, &rate_total,    &dummy);
       ue_linfo (img->cod_counter,   dummy, &cc_rate, &dummy);
       rate_total -= cc_rate;
-      }
     }
+  }
   else
-    {
+  {
     rate_total = writeMBHeader (1);
-    }
+  }
 
   if (mode)
-    {
+  {
     //----- motion information -----
     storeMotionInfo (0);
     writeReferenceIndex(&rate_total);
     writeMVD(&rate_total);
     writeCBPandDqp(&rate_total);
-    }
+  }
 
   if (mode || (bframe && (currMB->cbp!=0)))
-    {
+  {
     for(block8x8=0; block8x8<6;block8x8++)
       if(cp_table[0][block8x8])
-        {
+      {
         rate_tmp = writeBlockCoeff (block8x8);
 
         if(block8x8 < 2)
@@ -1474,22 +1362,18 @@ int_32_t c_avs_enc:: RDCost_for_macroblocks (double   lambda,      // <-- lagran
 
         if(block8x8 < 4)
           lum_bits = rate_total;
-        }
+      }
 
-    }
+  }
 
   //=====   R E S T O R E   C O D I N G   S T A T E   =====
   reset_coding_state (cs_cm);
-  if (mode)
-  {
   rdcost = (double)distortion_total + lambda * (double)rate_total;
-  }
-  else
-    rdcost = distortion_total;
+
   if (rdcost >= *min_rdcost)
-    {
+  {
     return 0;
-    }
+  }
   //=====   U P D A T E   M I N I M U M   C O S T   =====
   *min_rdcost = rdcost;
   return 1;
@@ -1623,38 +1507,36 @@ void c_avs_enc:: store_macroblock_parameters (int_32_t mode)
 */
 
 void c_avs_enc:: set_stored_macroblock_parameters ()
-  {
+{
   int_32_t  i, j, k;
   int_16_t ****i4p, ***i3p,l;
-  Macroblock  *currMB  = &img->mb_data[img->current_mb_nr];
-  int_32_t         mode     = best_mode;
-  int_32_t         bframe   = (img->type==B_IMG);
-  int_32_t         **frefar = ((img->type==B_IMG)? fw_refFrArr : refFrArr);
-  int_32_t         **brefar = bw_refFrArr;
+  Macroblock  *currMB   = &img->mb_data[img->current_mb_nr];
+  int_32_t     mode     = best_mode;
+  int_32_t     bframe   = (img->type==B_IMG);
+  int_32_t     **frefar = ((img->type==B_IMG)? fw_refFrArr : refFrArr);
+  int_32_t     **brefar = bw_refFrArr;
   int_32_t     **ipredmodes = img->ipredmode;
   int_32_t     block_x = img->block_x;
   int_32_t     block_y = img->block_y;
-
   int_32_t     cp_table[2][6] = {{1,1,1,1,1,1},{0,0,1,1,0,1}};
-  int_32_t    temp_chroma;
-
+  int_32_t     temp_chroma;
   //===== reconstruction values =====
   for (j=0; j<16; j++)
-    {
+  {
     for (i=0; i<16; i++)
-      {
+    {
       imgY[img->pix_y+j][img->pix_x+i] = rec_mbY[j][i];
-      }
     }
+  }
 
   for (j=0; j<8; j++)
-    {
+  {
     for (i=0; i<8; i++)
-      {
+    {
       imgUV[0][img->pix_c_y+j][img->pix_c_x+i] = rec_mbU[j][i];
       imgUV[1][img->pix_c_y+j][img->pix_c_x+i] = rec_mbV[j][i];
-      }
     }
+  }
 
   //===== coefficients and cbp =====
   i4p=cofAC; cofAC=img->cofAC; img->cofAC=i4p;
@@ -1667,11 +1549,11 @@ void c_avs_enc:: set_stored_macroblock_parameters ()
   img->mbweightflag = best_weight_flag ;
 
   for(j=0;j<4;j++)
-    {
+  {
     for(k=0;k<2;k++)
-      {
+    {
       for(l=0;l<17;l++)
-        {
+      {
         temp_chroma = chromacofAC4x4[0][j][k][l];
         chromacofAC4x4[0][j][k][l] = img->chromacofAC[0][j][k][l];
         img->chromacofAC[0][j][k][l] = temp_chroma;
@@ -1679,91 +1561,89 @@ void c_avs_enc:: set_stored_macroblock_parameters ()
         temp_chroma = chromacofAC4x4[1][j][k][l];
         chromacofAC4x4[1][j][k][l] = img->chromacofAC[1][j][k][l];
         img->chromacofAC[1][j][k][l] = temp_chroma;
-        }
       }
     }
+  }
   for (i=0; i<4; i++)
-    {
+  {
     currMB->b8mode[i]   = b8mode[i];
     currMB->b8pdir[i]   = b8pdir[i];
-    }
+  }
   //==== reference frames =====
   for (j=0; j<2; j++)
-    {
+  {
     for (i=0; i<2; i++)
-      {
+    {
       frefar[(block_y>>1)+j][(block_x>>1)+i] = frefframe[j][i];
-      }
     }
+  }
 
   if (bframe)
-    {
+  {
     for (j=0; j<2; j++)
-      {
+    {
       for (i=0; i<2; i++)
-        {
+      {
         brefar[(block_y>>1)+j][(block_x>>1)+i] = brefframe[j][i];
-        }
       }
     }
+  }
 
   if(currMB->mb_type == I4MB)
-    {
+  {
     for(i=0; i<4; i++)
-      {
+    {
       currMB->intra_pred_modes[i]=best_intra_pred_modes_tmp[i];
-      }
+    }
 
     for(j=0;j<2;j++)
-      {
+    {
       for(i=0;i<2;i++)
-        {
-        img->ipredmode[ 1 + (img->mb_x<<1) + i ][ 1 + (img->mb_y<<1) + j ]=best_ipredmode_tmp[i][j];
-        }
-      }
-
-    for(j=0;j<16;j++)
       {
-      for(i=0;i<16;i++)
-        {
-        img->mpr[j][i]=best_mpr_tmp[j][i];
-        }
+        img->ipredmode[ 1 + (img->mb_x<<1) + i ][ 1 + (img->mb_y<<1) + j ]=best_ipredmode_tmp[i][j];
       }
     }
+
+    for(j=0;j<16;j++)
+    {
+      for(i=0;i<16;i++)
+      {
+        img->mpr[j][i]=best_mpr_tmp[j][i];
+      }
+    }
+  }
 
   //==== intra prediction modes ====
   currMB->c_ipred_mode = best_c_imode;
 
   if (mode==P8x8)
-    {
+  {
     for (j=img->block8_y+1; j<img->block8_y+3; j++)
-      {
+    {
       for ( i=img->block8_x+1; i<img->block8_x+3; i++)
-        {
+      {
         k = 2*(j-img->block8_y-1)+i-img->block8_x-1;
         ipredmodes[i][j] = b8_ipredmode[k];
         currMB->intra_pred_modes[k] = b8_intra_pred_modes[k];
-        }
       }
     }
+  }
   else if (mode!=I4MB)
-    {
+  {
     for (j=img->block8_y+1; j<img->block8_y+3; j++)
-      {
+    {
       for ( i=img->block8_x+1; i<img->block8_x+3; i++)
-        {
+      {
         k = 2*(j-img->block8_y-1)+i-img->block8_x-1;
-        //rm52c
-        //ipredmodes    [i][j] = DC_PRED;
         ipredmodes    [i][j] = -1;
         currMB->intra_pred_modes[k] = DC_PRED;
-        }
       }
     }
+  }
   //==== motion vectors =====
   SetMotionVectorsMB (currMB, bframe);
   storeMotionInfo(0);
-  }
+}
 
 /*
 *************************************************************************
@@ -1786,9 +1666,7 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
   int_32_t     i1           = i0 + (input->blc_size[pmode][0]>>3);
   int_32_t**   frefArr      = (bframe ? fw_refFrArr : refFrArr);
   int_32_t**   brefArr      = bw_refFrArr;
-  //int_32_t***  fmvArr       = (bframe ? tmp_fwMV    : tmp_mv);
   int_32_t***  bmvArr       = tmp_bwMV;
-  //int_32_t***** all_mv_arr  = img->all_mv;
   int_32_t***** all_bmv_arr = img->all_bmv;
   int_32_t   block_x        = img->block_x>>1;
   int_32_t   block_y        = img->block_y>>1;
@@ -1799,22 +1677,25 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
   if ((pdir==0 || pdir==2) && (mode!=IBLOCK && mode!=0))
   {
     for (j=j0; j<j1; j++)
+    {
       for (i=i0; i<i1; i++)
       {
         fmvArr[0][block_y+j][block_x+i+4] = all_mv_arr[i][j][ref][mode][0];
         fmvArr[1][block_y+j][block_x+i+4] = all_mv_arr[i][j][ref][mode][1];
         frefArr  [block_y+j][block_x+i  ] = ref;
       }
+    }
   }
   else
   {
     if(!mode&&bframe)
     {
       for (j=j0; j<j0+1; j++)
+      {
         for (i=i0; i<i0+1; i++)
         {
-      if(img->picture_structure)
-          ref = 0;
+          if(img->picture_structure)
+            ref = 0;
           if(ref==-1)
           {
             fmvArr[0][block_y+j][block_x+i+4] = 0;
@@ -1825,11 +1706,12 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
           {
             fmvArr[0][block_y+j][block_x+i+4] = all_mv_arr[i][j][ref][mode][0];
             fmvArr[1][block_y+j][block_x+i+4] = all_mv_arr[i][j][ref][mode][1];
-      if(img->picture_structure)
-        ref = 0;
-            frefArr  [block_y+j][block_x+i  ] = ref;//???????for direct mode with ref;
+            if(img->picture_structure)
+              ref = 0;
+            frefArr  [block_y+j][block_x+i  ] = ref;
           }
         }
+      }
     }
     else
       for (j=j0; j<j0+1; j++)
@@ -1844,54 +1726,45 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
   if ((pdir==1 || pdir==2) && (mode!=IBLOCK && mode!=0))
   {
     for (j=j0; j<j0+1; j++)
-    for (i=i0; i<i0+1; i++)
-    {
-      if(pdir == 2)
+      for (i=i0; i<i0+1; i++)
       {
+        if(pdir == 2)
         {
-          int_32_t delta_P,TRp,DistanceIndexFw,DistanceIndexBw,refframe,delta_PB;
-          refframe = ref;
-          delta_P = 2*(img->imgtr_next_P_frm - img->imgtr_last_P_frm);
-          //rm52j
-          delta_P = (delta_P + 512)%512;   // Added by Xiaozhen ZHENG, 2007.05.05
-          if(img->picture_structure)
-            TRp = (refframe+1)*delta_P;  //the lates backward reference
-          else
           {
-            TRp = delta_P;//refframe == 0 ? delta_P-1 : delta_P+1;
-          }
-          //rm52c
-          //delta_PB = 2*(img->tr - img->imgtr_last_P_frm);
-          //rm52j begin
-          delta_PB = 2*(picture_distance - img->imgtr_last_P_frm);
-          TRp = (TRp + 512)%512;
-          delta_PB = (delta_PB + 512)%512;
-          //rm52j end
-          if(!img->picture_structure)
-          {
-            if(img->current_mb_nr_fld < img->total_number_mb) //top field
-              DistanceIndexFw =  refframe == 0 ? delta_PB-1:delta_PB;
+            int_32_t delta_P,TRp,DistanceIndexFw,DistanceIndexBw,refframe,delta_PB;
+            refframe = ref;
+            delta_P = 2*(img->imgtr_next_P_frm - img->imgtr_last_P_frm);
+            delta_P = (delta_P + 512)%512;
+            if(img->picture_structure)
+              TRp = (refframe+1)*delta_P;
             else
-              DistanceIndexFw =  refframe == 0 ? delta_PB:delta_PB+1;
+            {
+              TRp = delta_P;
+            }
+            delta_PB = 2*(picture_distance - img->imgtr_last_P_frm);
+            TRp = (TRp + 512)%512;
+            delta_PB = (delta_PB + 512)%512;
+            if(!img->picture_structure)
+            {
+              if(img->current_mb_nr_fld < img->total_number_mb) //top field
+                DistanceIndexFw =  refframe == 0 ? delta_PB-1:delta_PB;
+              else
+                DistanceIndexFw =  refframe == 0 ? delta_PB:delta_PB+1;
+            }
+            else
+              DistanceIndexFw = delta_PB;
+            DistanceIndexBw    = (TRp - DistanceIndexFw+512)%512;
+            bmvArr[0][block_y+j][block_x+i+4] = - ((all_mv_arr[i][j][ref][mode][0]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
+            bmvArr[1][block_y+j][block_x+i+4] = - ((all_mv_arr[i][j][ref][mode][1]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
           }
-          else
-            DistanceIndexFw = delta_PB;
-          //rm52c
-          //DistanceIndexBw    = TRp - DistanceIndexFw;
-          //rm52j
-          DistanceIndexBw    = (TRp - DistanceIndexFw+512)%512;
-
-        bmvArr[0][block_y+j][block_x+i+4] = - ((all_mv_arr[i][j][ref][mode][0]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
-        bmvArr[1][block_y+j][block_x+i+4] = - ((all_mv_arr[i][j][ref][mode][1]*DistanceIndexBw*(256/DistanceIndexFw)+128)>>8);
         }
+        else
+        {
+          bmvArr[0][block_y+j][block_x+i+4] = all_bmv_arr[i][j][bw_ref][mode][0];
+          bmvArr[1][block_y+j][block_x+i+4] = all_bmv_arr[i][j][bw_ref][mode][1];
+        }
+        brefArr  [block_y+j][block_x+i  ] = bw_ref;/*lgp*13*/
       }
-      else
-      {
-        bmvArr[0][block_y+j][block_x+i+4] = all_bmv_arr[i][j][bw_ref][mode][0];
-        bmvArr[1][block_y+j][block_x+i+4] = all_bmv_arr[i][j][bw_ref][mode][1];
-      }
-      brefArr  [block_y+j][block_x+i  ] = bw_ref;/*lgp*13*/
-    }
   }
   else if (bframe)
   {
@@ -1920,7 +1793,6 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
                 brefArr  [block_y+j][block_x+i  ] = 0;
               if(refFrArr[block_y+j][block_x+i] < 0)
                 brefArr  [block_y+j][block_x+i  ] = 1;
-
             }
             else
             {
@@ -1938,20 +1810,20 @@ void c_avs_enc::SetRefAndMotionVectors (int_32_t block, int_32_t mode, int_32_t 
     else
     {
       for (j=j0; j<j0+1; j++)
-        {
+      {
         for (i=i0; i<i0+1; i++)
-          {
+        {
           bmvArr[0][block_y+j][block_x+i+4] = 0;
           bmvArr[1][block_y+j][block_x+i+4] = 0;
           brefArr  [block_y+j][block_x+i  ] = -1;
-          }
         }
+      }
     }
   }
 }
 void c_avs_enc::encode_one_intra_macroblock_rdo()
-  {
-  Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
+{
+  Macroblock* currMB = &img->mb_data[img->current_mb_nr];
   double      qp, lambda_mode, min_rdcost;
   int_32_t         i, j;
   int_32_t         max_mcost=(1<<30);
@@ -1977,21 +1849,22 @@ void c_avs_enc::encode_one_intra_macroblock_rdo()
     SetModesAndRefframeForBlocks (I4MB);
     if (RDCost_for_macroblocks (lambda_mode, I4MB, &min_rdcost))
       {
-      //Rate control
-      for (j=0; j<16; j++)
-        {
-        for(i=0; i<16; i++)
+      if (input->RCEnable)
+      {
+        //Rate control
+        for (j=0; j<16; j++)
           {
-          diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
+          for(i=0; i<16; i++)
+            {
+            diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
+            }
           }
-        }
+      }
       store_macroblock_parameters (I4MB);
       }
     }
   set_stored_macroblock_parameters ();
-  //if (img->type==INTER_IMG && IS_INTRA(currMB))
-  //  intras++;
-  }
+}
 
 void c_avs_enc::encode_one_intra_macroblock_not_rdo()
   {
@@ -2015,34 +1888,30 @@ void c_avs_enc::encode_one_intra_macroblock_not_rdo()
   ChromaResidualCoding (&dummy);
   if (img->current_mb_nr==0)
     intras=0;
-  //if (img->type==INTER_IMG && IS_INTRA(currMB))
-  //  intras++;
   }
-void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
-  {
+void c_avs_enc::encode_one_inter_macroblock_rdo()
+{
   TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
-
-  Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
-  double      qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
-  int_32_t         valid[MAXMODE];
-  int_32_t         block, index, mode, i0, i1, j0, j1, ref, i, j, k;
-  int_32_t         lambda_motion_factor;
-  int_32_t         fw_mcost, mcost, max_mcost=(1<<30);
-  int_32_t         curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
-  int_32_t         cost, min_cost, cost8x8, cost_direct=0, have_direct=0;
-  int_32_t         write_ref   = input->no_multpred>1;
-  int_32_t         max_ref     = img->nb_references;
-  int_32_t         **ipredmodes = img->ipredmode;
-  int_32_t         block_x   = img->block_x;
-  int_32_t         block_y   = img->block_y;
-  int_32_t         ***tmpmvs = tmp_mv;
-  int_32_t         *****allmvs = img->all_mv;
-  int_32_t         **refar     = refFrArr;
-  int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-  int_32_t         min_cost_8x8;
-
+  Macroblock* currMB = &img->mb_data[img->current_mb_nr];
+  double   qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
+  int_32_t valid[MAXMODE];
+  int_32_t block, index, mode, i0, i1, j0, j1, ref, i, j, k;
+  int_32_t lambda_motion_factor;
+  int_32_t fw_mcost, mcost, max_mcost=(1<<30);
+  int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
+  int_32_t cost, min_cost, cost8x8, cost_direct=0, have_direct=0;
+  int_32_t write_ref   = input->no_multpred>1;
+  int_32_t max_ref     = img->nb_references;
+  int_32_t **ipredmodes = img->ipredmode;
+  int_32_t block_x   = img->block_x;
+  int_32_t block_y   = img->block_y;
+  int_32_t ***tmpmvs = tmp_mv;
+  int_32_t *****allmvs = img->all_mv;
+  int_32_t **refar     = refFrArr;
+  int_32_t bid_best_fw_ref = 0, bid_best_bw_ref = 0;
+  int_32_t min_cost_8x8;
+  int_32_t mb_available_up, mb_available_left, mb_available_up_left;
   max_ref = img->nb_references;
-
   if (img->number % input->intra_period == 1)//for close GOP
   {
     max_ref = 1;
@@ -2053,7 +1922,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 #endif
 
   //===== SET VALID MODES =====
-  valid[I4MB]   = 0;
+  valid[I4MB]   = 1;
   valid[I16MB]  = 0;
   valid[0]      = 1;
   valid[1]      = (input->InterSearch16x16);
@@ -2089,22 +1958,22 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
   mode = INTER16x16;
   if (valid[mode])
-    {
+  {
     cost = 0;
     block = 0;
     PartitionMotionSearch (mode, block, lambda_motion);
     //--- get cost and reference frame for forward prediction ---
     fw_mcost=max_mcost;
     for (ref=0; ref<max_ref-adjust_ref; ref++)
-      {
+    {
       mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
       mcost += motion_cost[mode][ref+1][block];
       if (mcost < fw_mcost)
-        {
+      {
         fw_mcost    = mcost;
         best_fw_ref = ref;
-        }
       }
+    }
     best_bw_ref = 0;
     best_pdir  = 0;
     cost += fw_mcost;
@@ -2115,31 +1984,31 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
     best8x8symref [1][0][0] = best8x8symref [1][1][0] = best8x8symref [1][2][0] = best8x8symref [1][3][0] = bid_best_fw_ref;
     best8x8symref [1][0][1] = best8x8symref [1][1][1] = best8x8symref [1][2][1] = best8x8symref [1][3][1] = bid_best_bw_ref;
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER16x8;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
       //--- get cost and reference frame for forward prediction ---
       fw_mcost=max_mcost;
       for (ref=0; ref<max_ref-adjust_ref; ref++)
-        {
+      {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       best_bw_ref = 0;
       best_pdir  = 0;
       cost      += fw_mcost;
@@ -2153,33 +2022,33 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER8x16;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
       //--- get cost and reference frame for forward prediction ---
       fw_mcost=max_mcost;
       for (ref=0; ref<max_ref-adjust_ref; ref++)
-        {
+      {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       best_bw_ref = 0;
       best_pdir  = 0;
       cost      += fw_mcost;
@@ -2193,18 +2062,18 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
 #endif
 
   if (valid[P8x8])
-    {
+  {
     cost8x8 = 0;
     min_cost = (1<<20);
     cbp8x8 = cnt_nonz_8x8 = 0;
@@ -2214,7 +2083,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
     store_coding_state (cs_mb);
     //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
     for (block=0; block<4; block++)
-      {
+    {
       //--- set coordinates ---
       j0 = ((block/2)<<3);    j1 = (j0>>2);
       i0 = ((block%2)<<3);    i1 = (i0>>2);
@@ -2227,15 +2096,15 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
       //--- get cost and reference frame for forward prediction ---
       fw_mcost=max_mcost;
       for (ref=0; ref<max_ref; ref++)
-        {
+      {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       cost = fw_mcost;
       //--- store coding state before coding with current mode ---
       store_coding_state (cs_cm);
@@ -2245,7 +2114,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
       //--- set variables if best mode has changed ---
       if (rdcost < min_rdcost)
-        {
+      {
         min_cost_8x8                  = cost;
         min_rdcost                    = rdcost;
         best8x8mode           [block] = mode;
@@ -2261,65 +2130,68 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
         //--- store reconstruction and prediction ---
         for (j=0; j<8; j++)
-          {
+        {
           for (i=i0; i<i0+8; i++)
-            {
+          {
             rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-            mpr8x8    [j+j0][i] = img->mpr[j+j0][i];
-            }
+            mpr8x8    [j+j0][i] = (byte)img->mpr[j+j0][i];
           }
-          //--- store coding state ---
-          store_coding_state (cs_b8);
-        } // if (rdcost <= min_rdcost)
+        }
+        //--- store coding state ---
+        store_coding_state (cs_b8);
+      } // if (rdcost <= min_rdcost)
       //--- re-set coding state as it was before coding with current mode was performed ---
       reset_coding_state (cs_cm);
       cost8x8 += min_cost_8x8;
 
       //----- set cbp and count of nonzero coefficients ---
       if (best_cnt_nonz)
-        {
+      {
         cbp8x8        |= (1<<block);
         cnt_nonz_8x8  += best_cnt_nonz;
-        }
+      }
       if (block<3)
-        {
+      {
         //===== set motion vectors and reference frames (prediction) =====
         SetRefAndMotionVectors (block, mode, best8x8ref[P8x8][block], best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
         //===== re-set reconstructed block =====
         j0   = 8*(block/2);
         i0   = 8*(block%2);
         for (j=0; j<8; j++)
-          {
+        {
           for (i=i0; i<i0+8; i++)
-            {
+          {
             imgY[img->pix_y+j0+j][img->pix_x+i] = rec_mbY8x8[j0+j][i];
-            }
           }
-        } // if (block<3)
+        }
+      } // if (block<3)
 
       //===== set the coding state after current block =====
       reset_coding_state (cs_b8);
-      }
+    }
     //--- re-set coding state (as it was before 8x8 block coding) ---
     reset_coding_state (cs_mb);
-    //Rate control
-    for (j=0; j<16; j++)
+    if (input->RCEnable)
+    {
+      //Rate control
+      for (j=0; j<16; j++)
       {
-      for(i=0; i<16; i++)
+        for(i=0; i<16; i++)
         {
-        diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i]-img->mpr[j][i]; //gai jfhuang
+          diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i]-img->mpr[j][i];
         }
       }
+    }
     if(cost8x8<min_cost)
-      {
-      best_mode = P8x8;
-      min_cost = best_mode;
-      }
-    }
-  else // if (valid[P8x8])
     {
-    cost8x8 = (1<<20);
+      best_mode = P8x8;
+      min_cost = cost8x8;
     }
+  }
+  else // if (valid[P8x8])
+  {
+    cost8x8 = (1<<20);
+  }
 #ifndef FastME
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
   min_cost=cost8x8;
@@ -2327,22 +2199,22 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 
   mode = INTER16x16; //INTER16x16
   if (valid[mode])
-    {
+  {
     cost = 0;
     block = 0;
     PartitionMotionSearch (mode, block, lambda_motion);
     fw_mcost=max_mcost;
     for (ref=0; ref<max_ref; ref++)
-      {
+    {
       mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
       mcost += motion_cost[mode][ref+1][block];
 
       if (mcost < fw_mcost)
-        {
+      {
         fw_mcost    = mcost;
         best_fw_ref = ref;
-        }
       }
+    }
     best_pdir  = 0;
     cost      += fw_mcost;
 
@@ -2351,31 +2223,31 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
     best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
 
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
-    }//INTER16x16
+    }
+  }//INTER16x16
 
   mode = INTER16x8; //INTER16x8
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
       fw_mcost=max_mcost;
       for (ref=0; ref<max_ref; ref++)
-        {
+      {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
 
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       best_pdir  = 0;
       cost      += fw_mcost;
 
@@ -2386,33 +2258,33 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
 
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
-    }//INTER16x8
+    }
+  }//INTER16x8
 
   mode = INTER8x16; //INTER8x16
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
       fw_mcost=max_mcost;
       for (ref=0; ref<max_ref; ref++)
-        {
+      {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
 
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
 
       best_pdir  = 0;
       cost      += fw_mcost;
@@ -2424,13 +2296,13 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
 
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
-    }//INTER8x16
+    }
+  }//INTER8x16
 
 #endif
   // Find a motion vector for the Skip mode
@@ -2438,65 +2310,66 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
   min_rdcost = max_rdcost;
   //===== GET BEST MACROBLOCK MODE =====
   img->NoResidueDirect = 0;
-  for (index=0; index<5; index++)
-    {
+  if (valid[I4MB])
+  {
+    IntraChromaPrediction8x8(&mb_available_up, &mb_available_left, &mb_available_up_left);
+  }
+  for (index=0; index<7; index++)
+  {
     mode = mb_mode_table[index];
     //--- for INTER16x16 check all prediction directions ---
-
     if (valid[mode])
-      {
+    {
       // bypass if c_ipred_mode not used
       SetModesAndRefframeForBlocks (mode);
 
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
+      {
+        if (input->RCEnable)
         {
-        //Rate control
-        if(mode == P8x8)
+          //Rate control
+          if(mode == P8x8)
           {
-          for (j=0; j<16; j++)
+            for (j=0; j<16; j++)
             {
-            for(i=0; i<16; i++)
+              for(i=0; i<16; i++)
               {
-              diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - mpr8x8[j][i];
+                diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - mpr8x8[j][i];
               }
             }
           }
-        else
+          else
           {
-          for (j=0; j<16; j++)
+            for (j=0; j<16; j++)
             {
-            for(i=0; i<16; i++)
+              for(i=0; i<16; i++)
               {
-              diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
+                diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
               }
             }
           }
-        store_macroblock_parameters (mode);
         }
+        store_macroblock_parameters (mode);
       }
     }
-
-  // Rate control
+  }
   if(input->RCEnable)
-    {
+  {
     img->MADofMB[img->current_mb_nr] = calc_MAD();
-
-    if(input->basicunit<img->Frame_Total_Number_MB)
-      {
+    if(input->basicunit<img->total_number_mb)
+    {
       img->TotalMADBasicUnit +=img->MADofMB[img->current_mb_nr];
-
-      /* delta_qp is present only for non-skipped macroblocks*/
       if ((cbp!=0 || best_mode==I16MB))
         currMB->prev_cbp = 1;
       else
-        {
+      {
         img->qp -= currMB->delta_qp;
         currMB->delta_qp = 0;
         currMB->qp = img->qp;
         currMB->prev_cbp = 0;
-        }
       }
     }
+  }
   set_stored_macroblock_parameters ();
 
   if (img->current_mb_nr==0)
@@ -2507,7 +2380,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()    //jfhuang
 #ifdef FastME
   skip_intrabk_SAD(best_mode, max_ref);
 #endif
-  }
+}
 void c_avs_enc::encode_one_inter_macroblock_not_rdo()
 {
   TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
@@ -2753,7 +2626,7 @@ void c_avs_enc::encode_one_inter_macroblock_not_rdo()
       min_cost = cost[P8x8];
       }
     }
-  
+
   //INTRA
   mode = I4MB;
   if (valid[mode])
@@ -2779,10 +2652,40 @@ final:
   //===== set parameters for chosen mode =====
   SetModesAndRefframeForBlocks (best_mode);
   storeMotionInfo (0);
+  ////Rate control
+  //if (input->RCEnable)
+  //  {
+  //  for (j=0; j<16; j++)
+  //    {
+  //    for(i=0; i<16; i++)
+  //      {
+  //      diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - img->mpr[j][i];
+  //      }
+  //    }
+  //  }
 
-  // xzhao {
+  //// Rate control
+  //if(input->RCEnable)
+  //  {
+  //  img->MADofMB[img->current_mb_nr] = calc_MAD();
+  //  if(input->basicunit<img->total_number_mb)
+  //    {
+  //    img->TotalMADBasicUnit +=img->MADofMB[img->current_mb_nr];
+
+  //    /* delta_qp is present only for non-skipped macroblocks*/
+  //    if ((cbp!=0 || best_mode==I16MB))
+  //      currMB->prev_cbp = 1;
+  //    else
+  //      {
+  //      img->qp -= currMB->delta_qp;
+  //      currMB->delta_qp = 0;
+  //      currMB->qp = img->qp;
+  //      currMB->prev_cbp = 0;
+  //      }
+  //    }
+  //  }
+
   img->reconflag=1;
-  // xzhao }
   if (!IS_INTRA(currMB))
   {
     LumaResidualCoding ();
@@ -2811,7 +2714,7 @@ final:
     intras=0;
   if (IS_INTRA(currMB))
   {
-	  intras++;
+    intras++;
   }
 }
 void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
@@ -2942,7 +2845,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
             for (i=i0; i<i0+8; i++)
               {
               rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-              mpr8x8    [j+j0][i] = img->mpr[j+j0][i];
+              mpr8x8    [j+j0][i] = (byte)img->mpr[j+j0][i];
               }
 
             //--- store coding state ---
@@ -3044,7 +2947,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
             for (i=i0; i<i0+8; i++)
               {
               rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-              mpr8x8    [j+j0][i] = img->mpr[j+j0][i];
+              mpr8x8    [j+j0][i] = (byte)img->mpr[j+j0][i];
               }
 
             //--- store coding state ---
@@ -3306,49 +3209,46 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
   }
 
 void c_avs_enc::encode_one_b_frame_macroblock_rdo()
-  {
+{
   TLS static const int_32_t  b8_mode_table[2]  = {0, 4};         // DO NOT CHANGE ORDER !!!
   TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8}; // DO NOT CHANGE ORDER !!!
 
   Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
-  double      qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
-  int_32_t         valid[MAXMODE];
-  int_32_t         block, index, mode, i0, i1, j0, j1, ref, i, j, k, ctr16x16;
-  int_32_t         lambda_motion_factor;
-  int_32_t         fw_mcost, bw_mcost, bid_mcost, mcost, max_mcost=(1<<30);
-  int_32_t         curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
-  int_32_t         cost, min_cost, cost8x8, cost_direct=0, have_direct=0;
-  int_32_t         write_ref   = input->no_multpred>1;
-  int_32_t         max_ref     = img->nb_references;
-  int_32_t         adjust_ref;
-  int_32_t         **ipredmodes = img->ipredmode;
-  int_32_t         block_x   = img->block_x;
-  int_32_t         block_y   = img->block_y;
-  int_32_t         ***tmpmvs = tmp_mv;
-  int_32_t         *****allmvs = img->all_mv;
-  int_32_t         **refar     = refFrArr;
-  int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-  int_32_t         min_cost_8x8;
+  double   qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
+  int_32_t valid[MAXMODE];
+  int_32_t block, index, mode, i0, j0, i, j, k, ctr16x16;
+  int_32_t lambda_motion_factor;
+  int_32_t fw_mcost, bw_mcost, bid_mcost, mcost, max_mcost=(1<<30);
+  int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
+  int_32_t cost, min_cost, cost8x8, cost_direct=0, have_direct=0;
+  int_32_t write_ref   = input->no_multpred>1;
+  int_32_t max_ref     = img->nb_references;
+  int_32_t **ipredmodes = img->ipredmode;
+  int_32_t block_x   = img->block_x;
+  int_32_t block_y   = img->block_y;
+  int_32_t ***tmpmvs = tmp_mv;
+  int_32_t *****allmvs = img->all_mv;
+  int_32_t **refar     = refFrArr;
+  int_32_t bid_best_fw_ref = 0, bid_best_bw_ref = 0;
+  int_32_t mb_available_up, mb_available_left, mb_available_up_left;
   max_ref = min (img->nb_references, img->buf_cycle);
-  adjust_ref = 0;
   if(!img->picture_structure)
-    {
+  {
     if (max_ref > 2)
       max_ref = 2;
     if(img->old_type != img->type)
       max_ref = 1;
-    }
+  }
   else
-    {
+  {
     if (max_ref > 1)
       max_ref = 1;
-    }
+  }
 #ifdef FastME
   decide_intrabk_SAD();
 #endif
-
   //===== SET VALID MODES =====
-  valid[I4MB]   = 0;
+  valid[I4MB]   = 1;
   valid[I16MB]  = 0;
   valid[0]      = 1;
   valid[1]      = (input->InterSearch16x16);
@@ -3364,17 +3264,13 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 
   qp = (double)img->qp - SHIFT_QP;
 
-  if (input->successive_Bframe>0)
-    lambda_mode   = 0.68 * pow (2, qp/4.0) * (max(2.00,min(4.00,(qp / 8.0))));
-  else
-    lambda_mode   = 0.85 * pow (2, qp/4.0) * 4.0;
-
+  lambda_mode   = 0.68 * pow (2, qp/4.0) * (max(2.00,min(4.00,(qp / 8.0))));
   lambda_motion = sqrt(lambda_mode);
 
   lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
   // reset chroma intra predictor to default
   currMB->c_ipred_mode = DC_PRED_8;
-
+  memset(best8x8symref, 0, MAXMODE*4*2*sizeof(int_32_t));
   //===== set direct motion vectors =====
   Get_IP_direct();
 
@@ -3386,21 +3282,21 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 
   mode = INTER16x16;
   if (valid[mode])
-    {
+  {
     cost=0;
     block=0;
     PartitionMotionSearch (mode, block, lambda_motion);
     //--- get cost and reference frame for forward prediction ---
     fw_mcost=max_mcost;
     for (ref=0; ref<max_ref-adjust_ref; ref++)
-      {
+    {
       mcost = motion_cost[mode][img->picture_structure ? ref+1 : ref+2][block];
       if (mcost < fw_mcost)
-        {
+      {
         fw_mcost    = mcost;
         best_fw_ref = ref;
-        }
       }
+    }
     best_bw_ref = 0;
 
     if (img->number % input->intra_period == 0)  //for close GOP
@@ -3410,47 +3306,47 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
     }
     else
     {
-    //--- get cost for bidirectional prediction ---
-    PartitionMotionSearch_bid (mode, block, lambda_motion);
-    best_bw_ref = 0;
-    bw_mcost   = motion_cost[mode][0][block];
-    for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+      //--- get cost for bidirectional prediction ---
+      PartitionMotionSearch_bid (mode, block, lambda_motion);
+      best_bw_ref = 0;
+      bw_mcost   = motion_cost[mode][0][block];
+      for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
       {
-      mcost = motion_cost[mode][ref][block];
-      if (mcost < bw_mcost)
+        mcost = motion_cost[mode][ref][block];
+        if (mcost < bw_mcost)
         {
-        bw_mcost    = mcost;
-        best_bw_ref = ref;
+          bw_mcost    = mcost;
+          best_bw_ref = ref;
         }
       }
 
-    for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+      for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
       {
-      mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
-      if (mcost < bid_mcost)
+        mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
+        if (mcost < bid_mcost)
         {
-        bid_mcost    = mcost;
-        bid_best_fw_ref = ref;
-        bid_best_bw_ref = ref;
+          bid_mcost    = mcost;
+          bid_best_fw_ref = ref;
+          bid_best_bw_ref = ref;
         }
       }
-    //--- get prediction direction ----
-    if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
+      //--- get prediction direction ----
+      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
       {
-      best_pdir = 0;
-      best_bw_ref = 0;
-      cost += fw_mcost;
+        best_pdir = 0;
+        best_bw_ref = 0;
+        cost += fw_mcost;
       }
-    else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
       {
-      best_pdir = 1;
-      cost += bw_mcost;
-      best_fw_ref = 0;
+        best_pdir = 1;
+        cost += bw_mcost;
+        best_fw_ref = 0;
       }
-    else
+      else
       {
-      best_pdir = 2;
-      cost += bid_mcost;
+        best_pdir = 2;
+        cost += bid_mcost;
       }
     }
     //----- set reference frame and direction parameters -----
@@ -3462,30 +3358,30 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 
     //--- set reference frames and motion vectors ---
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER16x8;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
 
       //--- get cost and reference frame for forward prediction ---
       for (fw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
-        {
+      {
         mcost = motion_cost[mode][img->picture_structure ? ref+1 : ref+2][block];
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       best_bw_ref = 0;
 
       if (img->number % input->intra_period == 0)  //for close GOP
@@ -3495,47 +3391,47 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       }
       else
       {
-      //--- get cost for bidirectional prediction ---
-      PartitionMotionSearch_bid (mode, block, lambda_motion);
-      best_bw_ref = 0;
-      bw_mcost   = motion_cost[mode][0][block];
-      for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+        //--- get cost for bidirectional prediction ---
+        PartitionMotionSearch_bid (mode, block, lambda_motion);
+        best_bw_ref = 0;
+        bw_mcost   = motion_cost[mode][0][block];
+        for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
         {
-        mcost = motion_cost[mode][ref][block];
-        if (mcost < bw_mcost)
+          mcost = motion_cost[mode][ref][block];
+          if (mcost < bw_mcost)
           {
-          bw_mcost    = mcost;
-          best_bw_ref = ref;
+            bw_mcost    = mcost;
+            best_bw_ref = ref;
           }
         }
 
-      for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+        for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
         {
-        mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
-        if (mcost < bid_mcost)
+          mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
+          if (mcost < bid_mcost)
           {
-          bid_mcost    = mcost;
-          bid_best_fw_ref = ref;
-          bid_best_bw_ref = ref;
+            bid_mcost    = mcost;
+            bid_best_fw_ref = ref;
+            bid_best_bw_ref = ref;
           }
         }
-      //--- get prediction direction ----
-      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
+        //--- get prediction direction ----
+        if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
         {
-        best_pdir = 0;
-        best_bw_ref = 0;
-        cost += fw_mcost;
+          best_pdir = 0;
+          best_bw_ref = 0;
+          cost += fw_mcost;
         }
-      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+        else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
         {
-        best_pdir = 1;
-        cost += bw_mcost;
-        best_fw_ref = 0;
+          best_pdir = 1;
+          cost += bw_mcost;
+          best_fw_ref = 0;
         }
-      else
+        else
         {
-        best_pdir = 2;
-        cost += bid_mcost;
+          best_pdir = 2;
+          cost += bid_mcost;
         }
       }
       //----- set reference frame and direction parameters -----
@@ -3549,32 +3445,32 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_pdir==2?bid_best_fw_ref:best_fw_ref,
         best_pdir==2?bid_best_bw_ref:best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER8x16;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
 
       //--- get cost and reference frame for forward prediction ---
       for (fw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
-        {
+      {
         mcost = motion_cost[mode][img->picture_structure ? ref+1 : ref+2][block];
         if (mcost < fw_mcost)
-          {
+        {
           fw_mcost    = mcost;
           best_fw_ref = ref;
-          }
         }
+      }
       best_bw_ref = 0;
       if (img->number % input->intra_period == 0)  //for close GOP
       {
@@ -3583,47 +3479,47 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       }
       else
       {
-      //--- get cost for bidirectional prediction ---
-      PartitionMotionSearch_bid (mode, block, lambda_motion);
-      best_bw_ref = 0;
-      bw_mcost   = motion_cost[mode][0][block];
-      for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+        //--- get cost for bidirectional prediction ---
+        PartitionMotionSearch_bid (mode, block, lambda_motion);
+        best_bw_ref = 0;
+        bw_mcost   = motion_cost[mode][0][block];
+        for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
         {
-        mcost = motion_cost[mode][ref][block];
-        if (mcost < bw_mcost)
+          mcost = motion_cost[mode][ref][block];
+          if (mcost < bw_mcost)
           {
-          bw_mcost    = mcost;
-          best_bw_ref = ref;
+            bw_mcost    = mcost;
+            best_bw_ref = ref;
           }
         }
 
-      for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+        for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
         {
-        mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
-        if (mcost < bid_mcost)
+          mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
+          if (mcost < bid_mcost)
           {
-          bid_mcost    = mcost;
-          bid_best_fw_ref = ref;
-          bid_best_bw_ref = ref;
+            bid_mcost    = mcost;
+            bid_best_fw_ref = ref;
+            bid_best_bw_ref = ref;
           }
         }
-      //--- get prediction direction ----
-      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
+        //--- get prediction direction ----
+        if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
         {
-        best_pdir = 0;
-        best_bw_ref = 0;
-        cost += fw_mcost;
+          best_pdir = 0;
+          best_bw_ref = 0;
+          cost += fw_mcost;
         }
-      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+        else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
         {
-        best_pdir = 1;
-        cost += bw_mcost;
-        best_fw_ref = 0;
+          best_pdir = 1;
+          cost += bw_mcost;
+          best_fw_ref = 0;
         }
-      else
+        else
         {
-        best_pdir = 2;
-        cost += bid_mcost;
+          best_pdir = 2;
+          cost += bid_mcost;
         }
       }
       //----- set reference frame and direction parameters -----
@@ -3637,17 +3533,17 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_pdir==2?bid_best_fw_ref:best_fw_ref,
         best_pdir==2?bid_best_bw_ref:best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 #endif
 
   if (valid[P8x8])
-    {
+  {
     cost8x8 = 0;
     min_cost = (1<<20);
     //===== store coding state of macroblock =====
@@ -3655,31 +3551,25 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
     //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
     cbp8x8 = cbp_blk8x8 = cnt_nonz_8x8 = 0;
     for (block=0; block<4; block++)
-      {
+    {
       //--- set coordinates ---
-      j0 = ((block/2)<<3);    j1 = (j0>>2);
-      i0 = ((block%2)<<3);    i1 = (i0>>2);
+      j0 = ((block/2)<<3); i0 = ((block%2)<<3);
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
-      min_cost_8x8=(1<<20);
       min_rdcost=1e30;
-
       //check DIRECT mode rdcost
       mode = 0;
       if (valid[mode])
-        {
+      {
         //for B frame
         best_pdir = 2;
         curr_cbp_blk = 0;
         //--- store coding state before coding with current mode ---
         store_coding_state (cs_cm);
-
         //--- get and check rate-distortion cost ---
         rdcost = RDCost_for_8x8blocks (&cnt_nonz, &curr_cbp_blk, lambda_mode,block, mode, best_pdir, bid_best_fw_ref,bid_best_bw_ref);
-
         //--- set variables if best mode has changed ---
         if (rdcost < min_rdcost)
-          {
-          min_cost_8x8                  = cost;
+        {
           min_rdcost                    = rdcost;
           best8x8mode           [block] = mode;
           best8x8pdir     [P8x8][block] = best_pdir;
@@ -3701,39 +3591,31 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
                 cofAC8x8[block][k][j][i] = img->cofAC[block][k][j][i]; // 18->65 for ABT
 
           //--- store reconstruction and prediction ---
-          for (j=0; j<8; j++)
-            for (i=i0; i<i0+8; i++)
-              {
-              rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-              mpr8x8    [j+j0][i] = img->mpr[j+j0][i];
-              }
-
-            //--- store coding state ---
-            store_coding_state (cs_b8);
-          } // if (rdcost <= min_rdcost)
+          for (j=j0; j<j0+8; j++)
+          {
+            memcpy(&mpr8x8[j][i0], &img->mpr[j][i0], 8*sizeof(int_16_t));
+            memcpy(&rec_mbY8x8[j][i0], &imgY[img->pix_y+j][img->pix_x+i0], 8*sizeof(byte));
+          }
+          //--- store coding state ---
+          store_coding_state (cs_b8);
+        } // if (rdcost <= min_rdcost)
         //--- re-set coding state as it was before coding with current mode was performed ---
         reset_coding_state (cs_cm);
-        }
+      }
 
       mode = 4;
       if (valid[mode])
-        {
+      {
         curr_cbp_blk = 0;
+        //forward
         //--- motion estimation for all reference frames ---
         PartitionMotionSearch (mode, block, lambda_motion);
         //--- get cost and reference frame for forward prediction ---
-        fw_mcost=max_mcost;
-        for (ref=0; ref<max_ref-adjust_ref; ref++)
-          {
-          mcost = motion_cost[mode][img->picture_structure ? ref+1 : ref+2][block];
-          if (mcost < fw_mcost)
-            {
-            fw_mcost    = mcost;
-            best_fw_ref = ref;
-            }
-          }
+        fw_mcost = motion_cost[mode][1][block];
+        bw_mcost = motion_cost[mode][0][block];
+        best_fw_ref = 0;
+        //backward
         best_bw_ref = 0;
-
         if (img->number % input->intra_period == 0)  //for close GOP
         {
           best_pdir = 0;
@@ -3741,58 +3623,37 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
         }
         else
         {
-        PartitionMotionSearch_bid (mode, block, lambda_motion);
-        best_bw_ref = 0;
-        bw_mcost   = motion_cost[mode][0][block];
-        for (bw_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+          PartitionMotionSearch_bid (mode, block, lambda_motion);
+          bid_mcost = motion_cost_bid[mode][1][block];
+          bid_best_fw_ref = bid_best_bw_ref = 0;
+          //--- get prediction direction ----
+          if(fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
           {
-          mcost = motion_cost[mode][ref][block];
-          if (mcost < bw_mcost)
-            {
-            bw_mcost    = mcost;
-            best_bw_ref = ref;
-            }
+            best_pdir = 0;
+            cost = fw_mcost;
+            best_bw_ref = 0;
           }
-        for (bid_mcost=max_mcost, ref=0; ref<max_ref-adjust_ref; ref++)
+          else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
           {
-          mcost = motion_cost_bid[mode][img->picture_structure ? ref+1 : ref+2][block];
-          if (mcost < bid_mcost)
-            {
-            bid_mcost    = mcost;
-            bid_best_fw_ref = ref;
-            bid_best_bw_ref = ref;
-            }
+            best_pdir = 1;
+            cost = bw_mcost;
+            best_fw_ref = 0;
           }
-        //--- get prediction direction ----
-        if(fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
+          else
           {
-          best_pdir = 0;
-          cost = fw_mcost;
-          best_bw_ref = 0;
-          }
-        else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-          {
-          best_pdir = 1;
-          cost = bw_mcost;
-          best_fw_ref = 0;
-          }
-        else
-          {
-          best_pdir = 2;
-          cost = bid_mcost;
+            best_pdir = 2;
+            cost = bid_mcost;
           }
         }
         //--- store coding state before coding with current mode ---
         store_coding_state (cs_cm);
 
         //--- get and check rate-distortion cost ---
-        rdcost = RDCost_for_8x8blocks (&cnt_nonz, &curr_cbp_blk, lambda_mode,block, mode, best_pdir,
-          best_pdir==2?bid_best_fw_ref:best_fw_ref,best_pdir==2?bid_best_bw_ref:best_bw_ref);
+        rdcost = RDCost_for_8x8blocks (&cnt_nonz, &curr_cbp_blk, lambda_mode,block, mode, best_pdir, best_pdir==2?bid_best_fw_ref:best_fw_ref,best_pdir==2?bid_best_bw_ref:best_bw_ref);
 
         //--- set variables if best mode has changed ---
         if (rdcost < min_rdcost)
-          {
-          min_cost_8x8                  = cost;
+        {
           min_rdcost                    = rdcost;
           best8x8mode           [block] = mode;
           best8x8pdir     [P8x8][block] = best_pdir;
@@ -3813,73 +3674,69 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
               for (i=0; i<65; i++)  cofAC8x8[block][k][j][i] = img->cofAC[block][k][j][i]; // 18->65 for ABT
 
           //--- store reconstruction and prediction ---
-          for (j=0; j<8; j++)
-            for (i=i0; i<i0+8; i++)
-              {
-              rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-              mpr8x8    [j+j0][i] = img->mpr[j+j0][i];
-              }
-
-            //--- store coding state ---
-            store_coding_state (cs_b8);
-          } // if (rdcost <= min_rdcost)
+          for (j=j0; j<j0+8; j++)
+          {
+            memcpy(&mpr8x8[j][i0], &img->mpr[j][i0], 8*sizeof(int_16_t));
+            memcpy(&rec_mbY8x8[j][i0], &imgY[img->pix_y+j][img->pix_x+i0], 8*sizeof(byte));
+          }
+          //--- store coding state ---
+          store_coding_state (cs_b8);
+        } // if (rdcost <= min_rdcost)
         //--- re-set coding state as it was before coding with current mode was performed ---
         reset_coding_state (cs_cm);
-        } // if (valid[mode=b8_mode_table[index]])*/
+      } // if (valid[mode=b8_mode_table[index]])*/
 
-      cost8x8 += min_cost_8x8;
+      cost8x8 += (int_32_t)min_rdcost;
 
       //----- set cbp and count of nonzero coefficients ---
       if (best_cnt_nonz)
-        {
+      {
         cbp8x8        |= (1<<block);
         cnt_nonz_8x8  += best_cnt_nonz;
-        }
+      }
 
       mode=best8x8mode[block];
 
       if (block<3)
-        {
+      {
         //===== set motion vectors and reference frames (prediction) =====
-        SetRefAndMotionVectors (block, mode,best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][0]:
-          best8x8ref[P8x8][block],best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][1]:
-          best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
-      //===== re-set reconstructed block =====
-      j0   = 8*(block/2);
-      i0   = 8*(block%2);
-      for (j=0; j<8; j++)
+        SetRefAndMotionVectors (block, mode,best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][0]:best8x8ref[P8x8][block],best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][1]:best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
+        //===== re-set reconstructed block =====
+        j0   = 8*(block/2);
+        i0   = 8*(block%2);
+        for (j=j0; j<j0+8; j++)
         {
-        for (i=i0; i<i0+8; i++)
-          {
-          imgY[img->pix_y+j0+j][img->pix_x+i] = rec_mbY8x8[j0+j][i];
-          }
+          memcpy(&imgY[img->pix_y+j][img->pix_x+i0], &rec_mbY8x8[j][i0], 8*sizeof(byte));
         }
-        } // if (block<3)
+      } // if (block<3)
 
       //===== set the coding state after current block =====
       reset_coding_state (cs_b8);
-      } // for (cbp8x8=cbp_blk8x8=cnt_nonz_8x8=0, block=0; block<4; block++)
+    } // for (cbp8x8=cbp_blk8x8=cnt_nonz_8x8=0, block=0; block<4; block++)
 
     //--- re-set coding state (as it was before 8x8 block coding) ---
     reset_coding_state (cs_mb);
     //Rate control
-    for (j=0; j<16; j++)
+    if (input->RCEnable)
+    {
+      for (j=0; j<16; j++)
       {
-      for(i=0; i<16; i++)
+        for(i=0; i<16; i++)
         {
-        diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i]-img->mpr[j][i];
+          diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i]-img->mpr[j][i];
         }
       }
+    }
     if(cost8x8<min_cost)
-      {
-      best_mode = P8x8;
-      min_cost = best_mode;
-      }
-    }
-  else // if (valid[P8x8])
     {
-    cost8x8 = (1<<20);
+      best_mode = P8x8;
+      min_cost = cost8x8;
     }
+  }
+  else // if (valid[P8x8])
+  {
+    cost8x8 = (1<<20);
+  }
 #ifndef FastME
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
   min_cost=cost8x8;
@@ -3887,13 +3744,12 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 
   mode = INTER16x16;
   if (valid[mode])
-    {
+  {
     cost = 0;
     block = 0;
     PartitionMotionSearch (mode, block, lambda_motion);
     //--- get cost and reference frame for forward prediction ---
     mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, 0) : 0);
-
     mcost += motion_cost[mode][1][block];
     fw_mcost    = mcost;
     best_fw_ref = 0;
@@ -3905,29 +3761,29 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
     }
     else
     {
-    //--- get cost for bidirectional prediction ---
-    PartitionMotionSearch_bid (mode, block, lambda_motion);
+      //--- get cost for bidirectional prediction ---
+      PartitionMotionSearch_bid (mode, block, lambda_motion);
 
-    best_bw_ref = 0;
-    bw_mcost   = motion_cost[mode][0][block];
-    bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
-    //--- get prediction direction ----
-    if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-      {
-      best_pdir = 0;
       best_bw_ref = 0;
-      cost += fw_mcost;
-      }
-    else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+      bw_mcost   = motion_cost[mode][0][block];
+      bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
+      //--- get prediction direction ----
+      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
       {
-      best_pdir = 1;
-      cost += bw_mcost;
-      best_fw_ref = 0;
+        best_pdir = 0;
+        best_bw_ref = 0;
+        cost += fw_mcost;
       }
-    else
+      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
       {
-      best_pdir = 2;
-      cost += bid_mcost;
+        best_pdir = 1;
+        cost += bw_mcost;
+        best_fw_ref = 0;
+      }
+      else
+      {
+        best_pdir = 2;
+        cost += bid_mcost;
       }
     }
     //----- set reference frame and direction parameters -----
@@ -3936,25 +3792,22 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
     best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
 
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER16x8;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
 
       //--- get cost and reference frame for forward prediction ---
-      mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, 0) : 0);
-
-      mcost += motion_cost[mode][1][block];
-      fw_mcost    = mcost;
+      fw_mcost = motion_cost[mode][1][block];
       best_fw_ref = 0;
       if (img->number % input->intra_period == 0)  //for close GOP
       {
@@ -3964,29 +3817,28 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       }
       else
       {
-      //--- get cost for bidirectional prediction ---
-      PartitionMotionSearch_bid (mode, block, lambda_motion);
-
-      best_bw_ref = 0;
-      bw_mcost   = motion_cost[mode][0][block];
-      bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
-      //--- get prediction direction ----
-      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-        {
-        best_pdir = 0;
+        //--- get cost for bidirectional prediction ---
+        PartitionMotionSearch_bid (mode, block, lambda_motion);
         best_bw_ref = 0;
-        cost += fw_mcost;
-        }
-      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+        bw_mcost  = motion_cost[mode][0][block];
+        bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
+        //--- get prediction direction ----
+        if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
         {
-        best_pdir = 1;
-        cost += bw_mcost;
-        best_fw_ref = 0;
+          best_pdir = 0;
+          best_bw_ref = 0;
+          cost += fw_mcost;
         }
-      else
+        else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
         {
-        best_pdir = 2;
-        cost += bid_mcost;
+          best_pdir = 1;
+          cost += bw_mcost;
+          best_fw_ref = 0;
+        }
+        else
+        {
+          best_pdir = 2;
+          cost += bid_mcost;
         }
       }
       //----- set reference frame and direction parameters -----
@@ -3997,20 +3849,20 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       if (block==0)
         SetRefAndMotionVectors(block, mode, best_pdir==2? bid_best_fw_ref: best_fw_ref,
         best_pdir==2? bid_best_bw_ref: best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 
   mode = INTER8x16;
   if (valid[mode])
-    {
+  {
     cost = 0;
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch (mode, block, lambda_motion);
 
       //--- get cost and reference frame for forward prediction ---
@@ -4027,29 +3879,29 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       }
       else
       {
-      //--- get cost for bidirectional prediction ---
-      PartitionMotionSearch_bid (mode, block, lambda_motion);
+        //--- get cost for bidirectional prediction ---
+        PartitionMotionSearch_bid (mode, block, lambda_motion);
 
-      best_bw_ref = 0;
-      bw_mcost   = motion_cost[mode][0][block];
-      bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
-      //--- get prediction direction ----
-      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-        {
-        best_pdir = 0;
         best_bw_ref = 0;
-        cost += fw_mcost;
-        }
-      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+        bw_mcost   = motion_cost[mode][0][block];
+        bid_mcost = motion_cost_bid[mode][best_fw_ref+1][block];
+        //--- get prediction direction ----
+        if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
         {
-        best_pdir = 1;
-        cost += bw_mcost;
-        best_fw_ref = 0;
+          best_pdir = 0;
+          best_bw_ref = 0;
+          cost += fw_mcost;
         }
-      else
+        else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
         {
-        best_pdir = 2;
-        cost += bid_mcost;
+          best_pdir = 1;
+          cost += bw_mcost;
+          best_fw_ref = 0;
+        }
+        else
+        {
+          best_pdir = 2;
+          cost += bid_mcost;
         }
       }
       //----- set reference frame and direction parameters -----
@@ -4060,80 +3912,86 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       if (block==0)
         SetRefAndMotionVectors(block, mode, best_pdir==2? bid_best_fw_ref: best_fw_ref,
         best_pdir==2? bid_best_bw_ref: best_bw_ref, best_pdir);
-      }
+    }
     if (cost < min_cost)
-      {
+    {
       best_mode = mode;
       min_cost  = cost;
-      }
     }
+  }
 #endif
 
   min_rdcost = max_rdcost;
 
   //===== GET BEST MACROBLOCK MODE =====
+  if (valid[I4MB])
+  {
+    IntraChromaPrediction8x8(&mb_available_up, &mb_available_left, &mb_available_up_left);
+  }
   for (ctr16x16=0, index=0; index<7; index++)
-    {
+  {
     mode = mb_mode_table[index];
     //--- for INTER16x16 check all prediction directions ---
     if (mode==1)
-      {
+    {
       best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = ctr16x16;
       if (img->number % input->intra_period != 0)  //for close GOP
       {
         if (ctr16x16 < 2) index--;
         ctr16x16++;
       }
-      }
+    }
     img->NoResidueDirect = 0;
     if (valid[mode])
-      {
+    {
       // bypass if c_ipred_mode not used
       SetModesAndRefframeForBlocks (mode);
 
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
-        {
-        //Rate control
-        if(mode == P8x8)
-          {
-          for (j=0; j<16; j++)
-            {
-            for(i=0; i<16; i++)
-              {
-              diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - mpr8x8[j][i];
-              }
-            }
-          }
-        else
-          {
-          for (j=0; j<16; j++)
-            {
-            for(i=0; i<16; i++)
-              {
-              diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
-              }
-            }
-          }
-        store_macroblock_parameters (mode);
-        }
-
-      }
-
-    if (mode == 0 && currMB->cbp && (currMB->cbp&15) != 15)
       {
-      img->NoResidueDirect = 1;
-      if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
+        if (input->RCEnable)
         {
-        //Rate control
-        for (j=0; j<16; j++)
-          for(i=0; i<16; i++)
-            diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
-        store_macroblock_parameters (mode);
+          if(mode == P8x8)
+          {
+            for (j=0; j<16; j++)
+            {
+              for(i=0; i<16; i++)
+              {
+                diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - mpr8x8[j][i];
+              }
+            }
+          }
+          else
+          {
+            for (j=0; j<16; j++)
+            {
+              for(i=0; i<16; i++)
+              {
+                diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
+              }
+            }
+          }
         }
+        store_macroblock_parameters (mode);
       }
     }
 
-  // Rate control
+    if (mode == 0 && currMB->cbp && (currMB->cbp&15) != 15)
+    {
+      img->NoResidueDirect = 1;
+      if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
+      {
+        if (input->RCEnable)
+        {
+          //Rate control
+          for (j=0; j<16; j++)
+            for(i=0; i<16; i++)
+              diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - pred[j][i];
+        }
+        store_macroblock_parameters (mode);
+      }
+    }
+  }
   set_stored_macroblock_parameters ();
 
   if (img->current_mb_nr==0)
@@ -4142,10 +4000,10 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 #ifdef FastME
   skip_intrabk_SAD(best_mode, max_ref-adjust_ref);
 #endif
-  }
+}
 
 void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
-  {
+{
   TLS static const int_32_t  b8_mode_table[2]  = {0, 4};         // DO NOT CHANGE ORDER !!!
   TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8}; // DO NOT CHANGE ORDER !!!
 
@@ -4174,12 +4032,12 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
   int_32_t i0;
 #define _DIRECT_THRESHOLD_COST_  200
   for (i0=0; i0<5; i0++)
-    {
+  {
     only_motion_cost[i0][0] = 99999;
     only_motion_cost[i0][1] = 99999;
     only_motion_cost[i0][2] = 99999;
     only_motion_cost[i0][3] = 99999;
-    }
+  }
   if (img->current_mb_nr == 0)
   {
     fast_count = 0;
@@ -4222,24 +4080,24 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
     cost[DIRECT]  = Get_Direct_CostMB (lambda_mode);
     cost[DIRECT] -= (int_32_t)floor(16*lambda_motion+0.4999);
     if (cost[DIRECT] <= min_cost)
-      {
+    {
       min_cost  = cost[DIRECT];
-      best_mode = 0;
-      }
+      best_mode = DIRECT;
+    }
 #ifdef _FAST_MODE_DECISION_
     if (min_cost < _DIRECT_THRESHOLD_COST_)
-      {
+    {
       ////设置最优的mode为direct mode
       fast_count++;
       goto final;
-      }
+    }
 #endif
   }
   ////===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
   mode = INTER16x16;
   //valid[mode] = 0;
   if (valid[mode])
-    {
+  {
     block = 0;
     PartitionMotionSearch     (mode, block, lambda_motion);
     PartitionMotionSearch_bid (mode, block, lambda_motion);
@@ -4250,20 +4108,20 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
     bid_mcost = motion_cost_bid[mode][1][block];
     //--- get prediction direction ----
     if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-      {
+    {
       best_pdir = 0;
       cost[INTER16x16] = fw_mcost;
-      }
+    }
     else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-      {
+    {
       best_pdir = 1;
       cost[INTER16x16] = bw_mcost;
-      }
+    }
     else
-      {
+    {
       best_pdir = 2;
       cost[INTER16x16] = bid_mcost;
-      }
+    }
     //----- set reference frame and direction parameters -----
     best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
     best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
@@ -4271,18 +4129,18 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
     best8x8symref[1][0][0] = best8x8symref[1][1][0] = best8x8symref[1][2][0] = best8x8symref[1][3][0] = bid_best_fw_ref;
     best8x8symref[1][0][1] = best8x8symref[1][1][1] = best8x8symref[1][2][1] = best8x8symref[1][3][1] = bid_best_bw_ref;
     if (cost[INTER16x16] < min_cost)
-      {
+    {
       best_mode = INTER16x16;
       min_cost  = cost[INTER16x16];
-      }
     }
+  }
 
   mode = INTER16x8;
   //valid[mode] = 0;
   if (valid[mode])
-    {
+  {
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch     (mode, block, lambda_motion);
       PartitionMotionSearch_bid (mode, block, lambda_motion);
       fw_mcost  = motion_cost[mode][1][block];
@@ -4290,20 +4148,20 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
       bid_mcost = motion_cost_bid[mode][1][block];
       //--- get prediction direction ----
       if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-        {
+      {
         best_pdir = 0;
         cost[INTER16x8] += fw_mcost;
-        }
+      }
       else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-        {
+      {
         best_pdir = 1;
         cost[INTER16x8] += bw_mcost;
-        }
+      }
       else
-        {
+      {
         best_pdir = 2;
         cost[INTER16x8] += bid_mcost;
-        }
+      }
       //----- set reference frame and direction parameters -----
       best8x8ref [2][2*block] = best8x8ref [2][2*block+1] = best_fw_ref;
       best8x8pdir[2][2*block] = best8x8pdir[2][2*block+1] = best_pdir;
@@ -4314,13 +4172,13 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
       if (block==0)
         SetRefAndMotionVectors(block, mode, best_pdir==2? bid_best_fw_ref: best_fw_ref,
         best_pdir==2? bid_best_bw_ref: best_bw_ref, best_pdir);
-      }
+    }
     if (cost[INTER16x8] < min_cost)
-      {
+    {
       best_mode = INTER16x8;
       min_cost  = cost[INTER16x8];
-      }
     }
+  }
   //比较16x16的cost和16x8的cost
 #ifdef _FAST_MODE_DECISION_
   if (abs(only_motion_cost[INTER16x16][0]-(only_motion_cost[INTER16x8][0]+only_motion_cost[INTER16x8][1])) < _COST_THRESHOLD_)
@@ -4332,9 +4190,9 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
   mode = INTER8x16;
   //valid[mode] = 0;
   if (valid[mode])
-    {
+  {
     for (block=0; block<2; block++)
-      {
+    {
       PartitionMotionSearch     (mode, block, lambda_motion);
       PartitionMotionSearch_bid (mode, block, lambda_motion);
       fw_mcost = motion_cost[mode][1][block];
@@ -4342,20 +4200,20 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
       bid_mcost = motion_cost_bid[mode][1][block];
       //--- get prediction direction ----
       if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-        {
+      {
         best_pdir = 0;
         cost[INTER8x16] += fw_mcost;
-        }
+      }
       else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-        {
+      {
         best_pdir = 1;
         cost[INTER8x16] += bw_mcost;
-        }
+      }
       else
-        {
+      {
         best_pdir = 2;
         cost[INTER8x16] += bid_mcost;
-        }
+      }
       //----- set reference frame and direction parameters -----
       best8x8ref [3][  block] = best8x8ref [3][  block+2] = best_fw_ref;
       best8x8pdir[3][  block] = best8x8pdir[3][  block+2] = best_pdir;
@@ -4366,38 +4224,38 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
       if (block==0)
         SetRefAndMotionVectors(block, mode, best_pdir==2? bid_best_fw_ref: best_fw_ref,
         best_pdir==2? bid_best_bw_ref: best_bw_ref, best_pdir);
-      }
+    }
     if (cost[INTER8x16] < min_cost)
-      {
+    {
       best_mode = INTER8x16;
       min_cost  = cost[INTER8x16];
-      }
     }
+  }
 #ifdef _FAST_MODE_DECISION_
   if (abs(only_motion_cost[INTER16x16][0]-(only_motion_cost[INTER8x16][0]+only_motion_cost[INTER8x16][1])) < _COST_THRESHOLD_)
-    {
+  {
     fast_count++;
     goto final;
-    }
+  }
 #endif
   mode = P8x8;
   //valid[mode] = 0;
   if (valid[P8x8])
-    {
+  {
     //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
     for (block=0; block<4; block++)
-      {
+    {
       mode = DIRECT;
       if (valid[mode])
-        {
+      {
         //--- Direct Mode ---
         best_pdir = 2;
         cost_8x8[0] = Get_Direct_Cost8x8 ( block, lambda_mode );
         cost_8x8[0]+= (REF_COST (lambda_motion_factor, B8Mode2Value (mode, best_pdir)) - 1);
-        }
+      }
       mode = 4;
       if (valid[mode])
-        {
+      {
         PartitionMotionSearch     (mode, block, lambda_motion);
         PartitionMotionSearch_bid (mode, block, lambda_motion);
         fw_mcost = motion_cost[mode][1][block];
@@ -4405,64 +4263,64 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
         bid_mcost = motion_cost_bid[mode][1][block];
         //--- get prediction direction ----
         if(fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-          {
+        {
           best_pdir   = 0;
           cost_8x8[1] = fw_mcost;
-          }
+        }
         else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-          {
+        {
           best_pdir = 1;
           cost_8x8[1] = bw_mcost;
-          }
+        }
         else
-          {
+        {
           best_pdir   = 2;
           cost_8x8[1] = bid_mcost;
-          }
-        cost_8x8[1] += (REF_COST (lambda_motion_factor, B8Mode2Value (mode, best_pdir)) - 1);
         }
+        cost_8x8[1] += (REF_COST (lambda_motion_factor, B8Mode2Value (mode, best_pdir)) - 1);
+      }
       best8x8ref      [P8x8][block] = best_fw_ref;
       best8x8bwref    [P8x8][block] = best_bw_ref;
       best8x8symref[P8x8][block][0] = bid_best_fw_ref;
       best8x8symref[P8x8][block][1] = bid_best_bw_ref;
       //--- set variables if best mode has changed ---
       if (cost_8x8[0] < cost_8x8[1])
-        {
+      {
         cost[P8x8] += cost_8x8[0];
         best8x8mode           [block] = 0;
         best8x8pdir     [P8x8][block] = 2;
-        } // if (rdcost <= min_rdcost)
+      } // if (rdcost <= min_rdcost)
       else
-        {
+      {
         cost[P8x8] += cost_8x8[1];
         best8x8mode[block] = 4;
         best8x8pdir[P8x8][block] = best_pdir;
-        }
+      }
       mode = best8x8mode[block];
       pdir = best8x8pdir[P8x8][block];
       if (block<3)
-        {
+      {
         //===== set motion vectors and reference frames (prediction) =====
         SetRefAndMotionVectors (block, mode,best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][0]:
           best8x8ref[P8x8][block],best8x8pdir[P8x8][block]==2?best8x8symref[P8x8][block][1]:
           best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
-        } // if (block<3)
-      } // for (cbp8x8=cbp_blk8x8=cnt_nonz_8x8=0, block=0; block<4; block++)
+      } // if (block<3)
+    } // for (cbp8x8=cbp_blk8x8=cnt_nonz_8x8=0, block=0; block<4; block++)
     if(cost[P8x8] < min_cost)
-      {
+    {
       best_mode = P8x8;
       min_cost  = cost[P8x8];
-      }
     }
+  }
   //INTRA
   mode = I4MB;
   if (valid[mode])
-    {
+  {
     currMB->c_ipred_mode = DC_PRED_8;
     /*currMB->cbp = */
     Mode_Decision_for_AVSIntraMacroblock_not_rdo (lambda_mode, &intra_cost);
     if (intra_cost < min_cost)
-      {
+    {
       min_cost = intra_cost;
       //===== set parameters for chosen mode =====
       SetModesAndRefframeForBlocks (I4MB);
@@ -4472,8 +4330,8 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
       img->NoResidueDirect = 0;
       ChromaResidualCoding (&dummy);
       best_mode = I4MB;
-      }
     }
+  }
 final:
   //===== set parameters for chosen mode =====
   SetModesAndRefframeForBlocks (best_mode);
@@ -4492,7 +4350,7 @@ final:
     intras=0;
   if (IS_INTRA(currMB))
     intras++;
-  }
+}
 int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda,  int_32_t* total_cost)
 {
   int_32_t  cbp=0, b8;
@@ -4650,13 +4508,13 @@ int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda
         if (frame_no ==2 && img->current_mb_nr == 25 && b8==0)
           {
           pf_trace = fopen("enc_trace.txt", "a");
-		  fprintf(pf_trace, "best_ipmode: %5d\n", best_ipmode);
+      fprintf(pf_trace, "best_ipmode: %5d\n", best_ipmode);
           for (j=0; j<8; j++)
             {
             for (i=0; i<8; i++)
               {
               //fprintf(pf_trace, "%5d ", curr_blk[j][i]);
-				  fprintf(pf_trace, "%5d ", img->mpr[block_y +j][block_x +i]);
+          fprintf(pf_trace, "%5d ", img->mpr[block_y +j][block_x +i]);
               }
             fprintf(pf_trace, "\n");
             }
@@ -4664,7 +4522,7 @@ int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda
           fclose(pf_trace);
           //exit(0);
           }
-#endif   
+#endif
     currMB->intra_pred_modes[b8] = mostProbableMode == best_ipmode ? -1 : best_ipmode < mostProbableMode ? best_ipmode : best_ipmode-1;
     d1 = &imgY_org[pic_pix_y][pic_pix_x];
     d2 = &imgY_org[pic_pix_y+1][pic_pix_x];
@@ -4833,3 +4691,251 @@ int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda
   }
   return cbp;
 }
+#ifdef _ME_FOR_RATE_CONTROL_
+void c_avs_enc::encode_one_inter_macroblock_for_rate_control()
+  {
+  TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
+  Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
+  double      lambda_mode, lambda_motion, min_rdcost=99999, rdcost = 0, max_rdcost=1e30;
+  int_32_t         valid[MAXMODE];
+  int_32_t         block, mode, i0, i1, j0, j1, ref, dummy;
+  int_32_t         lambda_motion_factor;
+  int_32_t         fw_mcost, mcost, max_mcost=(1<<30);
+  int_32_t         cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir;
+  int_32_t         min_cost=99999;
+  int_32_t         cost[MAXMODE];
+  int_32_t         write_ref   = input->no_multpred>1;
+  int_32_t         max_ref     = img->nb_references;
+  int_32_t         adjust_ref;
+  int_32_t         **ipredmodes = img->ipredmode;
+  int_32_t         block_x   = img->block_x;
+  int_32_t         block_y   = img->block_y;
+  int_32_t         ***tmpmvs = tmp_mv;
+  int_32_t         *****allmvs = img->all_mv;
+  int_32_t         **refar     = refFrArr;
+  int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
+  int_32_t         min_cost_8x8;
+  static int_32_t  fast_count=0;
+#define _OUTPUT_TRACE_1
+#ifdef _OUTPUT_TRACE_
+  FILE *pf_trace;
+  pf_trace = NULL;
+  if (frame_no < 14)
+    {
+    pf_trace = fopen("enc_trace.txt", "a");
+    }
+#endif
+
+  for (i0=0; i0<5; i0++)
+    {
+    only_motion_cost[i0][0] = 99999;
+    only_motion_cost[i0][1] = 99999;
+    only_motion_cost[i0][2] = 99999;
+    only_motion_cost[i0][3] = 99999;
+    }
+  max_ref = img->nb_references;
+  if (img->number % input->intra_period == 1)//for close GOP
+    {
+    max_ref = 1;
+    }
+  adjust_ref = 0;
+#ifdef FastME
+  decide_intrabk_SAD();
+#endif
+
+  //===== SET VALID MODES =====
+  memset(valid, 0, MAXMODE*sizeof(int));
+  memset(cost,  0, MAXMODE*sizeof(int));
+  valid[I4MB]   = 0;
+  valid[I16MB]  = 0;
+  valid[0]      = 1;
+  valid[1]      = (input->InterSearch16x16);
+  valid[2]      = (input->InterSearch16x8);
+  valid[3]      = (input->InterSearch8x16);
+  valid[4]      = (input->InterSearch8x8);
+  valid[5]      = 0;
+  valid[6]      = 0;
+  valid[7]      = 0;
+  valid[P8x8]   = valid[4];
+  //===== SET LAGRANGE PARAMETERS =====
+  lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
+  lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
+  // reset chroma intra predictor to default
+  currMB->c_ipred_mode = DC_PRED_8;
+  best_pdir  = 0;
+  mode = INTER16x16; //INTER16x16
+  if (valid[mode])
+    {
+    block = 0;
+    PartitionMotionSearch (mode, block, lambda_motion);
+    fw_mcost=max_mcost;
+    for (ref=0; ref<max_ref; ref++)
+      {
+      mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
+      mcost += motion_cost[mode][ref+1][block];
+      if (mcost < fw_mcost)
+        {
+        fw_mcost    = mcost;
+        best_fw_ref = ref;
+        }
+      }
+    cost[INTER16x16] = fw_mcost;
+    best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
+    best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
+    best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
+
+    if (cost[INTER16x16] < min_cost)
+      {
+      best_mode = mode;
+      min_cost  = cost[INTER16x16];
+      }
+    }//INTER16x16
+final:
+  best_mode = INTER16x16;
+  //////////////////////////////////////////////////////////////////////////
+  // 处理dct系数，目前没有考虑色度
+  //////////////////////////////////////////////////////////////////////////
+  //===== set parameters for chosen mode =====
+  SetModesAndRefframeForBlocks (best_mode);
+  storeMotionInfo (0);
+
+  // xzhao {
+  img->reconflag=1;
+  // xzhao }
+  LumaResidualCoding ();
+  dummy = 0;
+  img->NoResidueDirect = 0;
+  ChromaResidualCoding (&dummy);
+  SetMotionVectorsMB (currMB, 0);
+  }
+
+  void c_avs_enc::encode_one_b_frame_macroblock_for_rate_control()
+    {
+    TLS static const int_32_t  b8_mode_table[2]  = {0, 4};         // DO NOT CHANGE ORDER !!!
+    TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8}; // DO NOT CHANGE ORDER !!!
+
+    Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
+    double      lambda_mode, lambda_motion;
+    int_32_t         valid[MAXMODE];
+    int_32_t         cost[MAXMODE];
+    int_32_t         cost_8x8[2] = {0, 0};
+    int_32_t         block, mode,pdir, dummy;
+    int_32_t         lambda_motion_factor;
+    int_32_t         fw_mcost, bw_mcost, bid_mcost, max_mcost=(1<<30);
+    int_32_t         best_fw_ref = 0, best_bw_ref = 0, best_pdir;
+    int_32_t         min_cost=99999, cost_direct=0;
+    int_32_t         write_ref   = input->no_multpred>1;
+    int_32_t         max_ref     = img->nb_references;
+    int_32_t         adjust_ref;
+    int_32_t         **ipredmodes = img->ipredmode;
+    int_32_t         block_x   = img->block_x;
+    int_32_t         block_y   = img->block_y;
+    int_32_t         ***tmpmvs = tmp_mv;
+    int_32_t         *****allmvs = img->all_mv;
+    int_32_t         **refar     = refFrArr;
+    int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
+    static int_32_t         fast_count=0;
+    int_32_t i0;
+#define _DIRECT_THRESHOLD_COST_  200
+    for (i0=0; i0<5; i0++)
+      {
+      only_motion_cost[i0][0] = 99999;
+      only_motion_cost[i0][1] = 99999;
+      only_motion_cost[i0][2] = 99999;
+      only_motion_cost[i0][3] = 99999;
+      }
+    if (img->current_mb_nr == 0)
+      {
+      fast_count = 0;
+      }
+    output_flag = 0;
+    adjust_ref = 0;
+    max_ref = 1;
+#ifdef FastME
+    decide_intrabk_SAD();
+#endif
+    //===== SET VALID MODES =====
+    memset(valid, 0, MAXMODE*sizeof(int));
+    memset(cost,  0, MAXMODE*sizeof(int));
+    valid[I4MB]   = 0;
+    valid[I16MB]  = 0;
+    valid[0]      = 1;
+    valid[1]      = (input->InterSearch16x16);
+    valid[2]      = (input->InterSearch16x8);
+    valid[3]      = (input->InterSearch8x16);
+    valid[4]      = (input->InterSearch8x8);
+    valid[5]      = 0;
+    valid[6]      = 0;
+    valid[7]      = 0;
+    valid[P8x8]   = valid[4];
+    //===== SET LAGRANGE PARAMETERS =====
+    lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
+    lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
+    // reset chroma intra predictor to default
+    currMB->c_ipred_mode = DC_PRED_8;
+
+    best_fw_ref = 0;
+    best_bw_ref = 0;
+    bid_best_fw_ref = bid_best_bw_ref = 0;
+    ////===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
+    mode = INTER16x16;
+    //valid[mode] = 0;
+    if (valid[mode])
+      {
+      block = 0;
+      PartitionMotionSearch     (mode, block, lambda_motion);
+      //--- get cost and reference frame for forward prediction ---
+      fw_mcost = motion_cost[mode][1][block];
+      bw_mcost = motion_cost[mode][0][block];
+      bid_mcost = motion_cost_bid[mode][1][block];
+      //--- get prediction direction ----
+      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
+        {
+        best_pdir = 0;
+        cost[INTER16x16] = fw_mcost;
+        }
+      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
+        {
+        best_pdir = 1;
+        cost[INTER16x16] = bw_mcost;
+        }
+      else
+        {
+        best_pdir = 2;
+        cost[INTER16x16] = bid_mcost;
+        }
+      //----- set reference frame and direction parameters -----
+      best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
+      best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
+      best8x8bwref[1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
+      best8x8symref[1][0][0] = best8x8symref[1][1][0] = best8x8symref[1][2][0] = best8x8symref[1][3][0] = bid_best_fw_ref;
+      best8x8symref[1][0][1] = best8x8symref[1][1][1] = best8x8symref[1][2][1] = best8x8symref[1][3][1] = bid_best_bw_ref;
+      if (cost[INTER16x16] < min_cost)
+        {
+        best_mode = INTER16x16;
+        min_cost  = cost[INTER16x16];
+        }
+      }
+
+final:
+    best_mode = INTER16x16;
+    //////////////////////////////////////////////////////////////////////////
+    // 处理dct系数，目前没有考虑色度
+    //////////////////////////////////////////////////////////////////////////
+    //===== set parameters for chosen mode =====
+    SetModesAndRefframeForBlocks (best_mode);
+    storeMotionInfo (0);
+
+    // xzhao {
+    img->reconflag=1;
+    LumaResidualCoding ();
+    dummy = 0;
+    img->NoResidueDirect = 0;
+    ChromaResidualCoding (&dummy);
+    SetMotionVectorsMB (currMB, 1);
+    if (img->current_mb_nr == img->width*img->height/256-1)
+      {
+      //printf("\n b fast:%4d, percent:%6.2f\n", fast_count, fast_count/(float)(img->width*img->height/256)*100);
+      }
+    }
+#endif

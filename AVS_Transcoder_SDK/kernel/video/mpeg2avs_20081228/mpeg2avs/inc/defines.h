@@ -1,42 +1,21 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
+/*$T defines.h GC 1.140 10/28/07 15:38:24 */
+
+
+/*$6
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 
 #ifndef _DEFINES_H_
 #define _DEFINES_H_
+//#define ROI_ENABLE
 #define AVS
 #define TRACE  0  /* !< 0:Trace off 1:Trace on */
 #define snprintf  _snprintf
-#define _THREE_STEP_MOTION_SEARCH_       // zhwang
-                                         // Notice: Using Three-step-motion-search to accelerate the 
-                                         //         ME process
+//#define _THREE_STEP_MOTION_SEARCH_
+#define _OUTPUT_DEC_IMG_
+//#define _ME_FOR_RATE_CONTROL_
 /*
  * define FastME ;
  * #define FIELDINTE
@@ -91,11 +70,7 @@
 #define _LUMA_COEFF_COST_  4        /* !< threshold for luma coeffs */
 #define _CHROMA_COEFF_COST_  4        /* !< threshold for chroma coeffs, used to be 7 */
 
-#define IMG_PAD_SIZE    16        /* !< Number of pixels padded around the reference
-                 * frame (>=4) */
-#define MAX_IMG_HEIGHT    576
-#define MAX_IMG_WEIGHT    720
-
+#define IMG_PAD_SIZE    16
 #define absm(A)      ((A) < (0) ? (-(A)) : (A))  /* !< abs macro, faster than procedure */
 #define MAX_VALUE1    9999    /* !< used for start value for some variables */
 
@@ -174,7 +149,9 @@
              * coded, e.g. "IBBPBBPBB" */
 
 /* define _USE_TRANSCODING_SEARCH_RANGE_ */
+#define _DISABLE_INTRA_IN_INTER_
 #define SVA_START_CODE_EMULATION
+#define ZHANG_PENG_TEST
 
 /* end zhang peng */
 #ifdef SVA_START_CODE_EMULATION

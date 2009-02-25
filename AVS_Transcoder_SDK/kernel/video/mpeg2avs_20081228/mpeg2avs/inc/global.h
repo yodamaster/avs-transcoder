@@ -1,39 +1,19 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
+/*$T global.h GC 1.140 10/28/07 11:45:05 */
+
+
+/*$6
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
+
+
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
 #include <stdio.h>
 #include <emmintrin.h>
 #include <xmmintrin.h>
+#include <Windows.h>
 
 #include "defines.h"
 #include "typedef.h"
@@ -42,17 +22,22 @@
 #ifdef WIN32
 #pragma warning(disable : 4996)
 #endif
+#ifdef ROI_ENABLE
+#pragma comment(lib,"../bin/TextDet")
+#endif
 
 class  __declspec(dllexport)  c_avs_enc;
 
-/* ! Boolean Type */
-typedef enum { FALSE, TRUE } Boolean;
+typedef int_32_t (*LocateTextRegions_t)(byte* YCbCr[3],int_32_t w[3],int_32_t h[3],byte* ROIArray);
+
+/* ! myboolean Type */
+typedef enum { myfalse, mytrue } myboolean;
 
 typedef enum { FRAME_CODING, FIELD_CODING, PAFF_CODING } CodingType;
 
 /* ! definition of H.26L syntax elements */
 typedef enum
-  {
+{
   SE_HEADER,
   SE_PTYPE,
   SE_MBTYPE,
@@ -74,10 +59,10 @@ typedef enum
   SE_BFRAME,
   SE_EOS,
   SE_MAX_ELEMENTS /* !< number of maximum syntax elements */
-  } SE_type;    /* substituting the definitions in elements.h */
+} SE_type;    /* substituting the definitions in elements.h */
 
 typedef enum
-  {
+{
   BITS_HEADER,
   BITS_TOTAL_MB,
   BITS_MB_MODE,
@@ -88,7 +73,7 @@ typedef enum
   BITS_COEFF_UV_MB,
   BITS_DELTA_QUANT_MB,
   MAX_BITCOUNTER_MB
-  } BitCountType;
+} BitCountType;
 
 typedef enum { FRAME, TOP_FIELD, BOTTOM_FIELD } PictureType;  /* !< New enum for field processing */
 
@@ -98,7 +83,7 @@ typedef enum { FRAME, TOP_FIELD, BOTTOM_FIELD } PictureType;  /* !< New enum for
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_syntaxelement
-  {
+{
   int_32_t  type;      /* !< type of syntax element for data part. */
   int_32_t  value1;      /* !< numerical value of syntax element */
   int_32_t  value2;      /* !< for blocked symbols, e.g. run/level */
@@ -116,7 +101,7 @@ typedef struct tag_syntaxelement
 #endif
   /* !< for mapping of syntaxElement to UVLC */
   void (c_avs_enc:: *mapping) (int_32_t value1, int_32_t value2, int_32_t * len_ptr, int_32_t * info_ptr);
-  } SyntaxElement;
+} SyntaxElement;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -124,15 +109,15 @@ typedef struct tag_syntaxelement
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_macroblock
-  {
+{
   int_32_t    currSEnr;    /* !< number of current syntax element */
   int_32_t    slice_nr;
   int_32_t    delta_qp;
   int_32_t    qp;
   int_32_t    bitcounter[MAX_BITCOUNTER_MB];
   struct tag_macroblock  *mb_available[3][3];  /* !< pointer to neighboring MBs in a 3x3 window of current MB,
-                          * which is located at [1][1] \n NULL pointer identifies
-                          * neighboring MBs which are unavailable */
+                                               * which is located at [1][1] \n NULL pointer identifies
+                                               * neighboring MBs which are unavailable */
 
   /* some storage of macroblock syntax elements for global access */
   int_32_t    mb_type;
@@ -141,7 +126,7 @@ typedef struct tag_macroblock
   int_32_t    intra_pred_modes[4];
   int_32_t    cbp, scbp;
   int_32_t    cbp_blk;    /* !< 1 bit set for every 4x4 block with coefs (not implemented
-                  * for INTRA) */
+                          * for INTRA) */
   int_32_t    b8mode[4];
   int_32_t    b8pdir[4];
   unsigned long   cbp_bits;
@@ -154,8 +139,8 @@ typedef struct tag_macroblock
   int_32_t    IntraChromaPredModeFlag;
   int_32_t    mb_field;
   int_32_t    ****cofAC;    /* lgp*dct*modify *//* !< AC coefficients
-                            * [8x8block][4x4block][level/run][scan_pos]
-                            * */
+                                                * [8x8block][4x4block][level/run][scan_pos]
+                                                * */
   int_32_t    ****chromacofAC;
   int_32_t    c_ipred_mode_2;    /* !< chroma intra prediction mode */
 
@@ -164,7 +149,7 @@ typedef struct tag_macroblock
   int_32_t    prev_qp;
   int_32_t    predict_qp;
   int_32_t    predict_error;
-  } Macroblock;
+} Macroblock;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -172,7 +157,7 @@ typedef struct tag_macroblock
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_bitstream
-  {
+{
   int_32_t  byte_pos;    /* !< current position in bitstream;* */
   int_32_t  bits_to_go;    /* !< current bitcounter */
   byte    byte_buf;    /* !< current buffer for last written byte */
@@ -185,9 +170,9 @@ typedef struct tag_bitstream
   int_32_t  bits_to_go_skip;  /* !< storage for bitcounter */
 
   byte    *streamBuffer;    /* !< actual buffer for written bytes */
-  } Bitstream;
+} Bitstream;
 typedef struct tag_csobj
-  {
+{
   Bitstream  *bitstream;
   /* syntax element number and bitcounters */
   int_32_t  currSEnr;
@@ -196,29 +181,29 @@ typedef struct tag_csobj
   /* elements of current macroblock */
   int_32_t  mvd[2][BLOCK_MULTIPLE][BLOCK_MULTIPLE][2];
   unsigned long  cbp_bits;
-  } CSobj, *CSptr;
+} CSobj, *CSptr;
 
 typedef struct tag_picture
-  {
+{
   int_32_t  no_slices;
   int_32_t  bits_per_picture;
   float    distortion_y;
   float    distortion_u;
   float    distortion_v;
-  } Picture;
+} Picture;
 
 typedef struct tag_copyright
-  {
+{
   int_32_t  extension_id;
   int_32_t  copyright_flag;
   int_32_t  copyright_id;
   int_32_t  original_or_copy;
   int_32_t  reserved;
   int_32_t  copyright_number;
-  } CopyRight;
+} CopyRight;
 
 typedef struct tag_CameraParamters
-  {
+{
   int_32_t  reserved;
   int_32_t  camera_id;
   int_32_t  height_of_image_device;
@@ -234,14 +219,14 @@ typedef struct tag_CameraParamters
   int_32_t  image_plane_vertical_x;
   int_32_t  image_plane_vertical_y;
   int_32_t  image_plane_vertical_z;
-  } CameraParamters;
+} CameraParamters;
 /*
 -----------------------------------------------------------------------------------------------------------------------
 ! SNRParameters
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_SNRParameters
-  {
+{
   float  snr_y;  /* !< current Y SNR */
   float  snr_u;  /* !< current U SNR */
   float  snr_v;  /* !< current V SNR */
@@ -251,7 +236,7 @@ typedef struct tag_SNRParameters
   float  snr_ya; /* !< Average SNR Y(dB) remaining frames */
   float  snr_ua; /* !< Average SNR U(dB) remaining frames */
   float  snr_va; /* !< Average SNR V(dB) remaining frames */
-  } SNRParameters;
+} SNRParameters;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -259,38 +244,35 @@ typedef struct tag_SNRParameters
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_InputParameters
-  {
+{
   int_32_t  no_frames;  /* !< number of frames to be encoded */
   int_32_t  qp0;    /* !< QP of first frame */
   int_32_t  qpN;    /* !< QP of remaining frames */
   int_32_t  thread_num;
-  /*
-  * int_32_t jumpd;
-  * //!< number of frames to skip in input sequence (e.g 2 takes frame 0,3,6,9...)
-  */
   int_32_t  hadamard;  /* !< 0: 'normal' SAD in 1/3 pixel search. 1: use 4x4 Haphazard transform and '
-              * Sum of absolute transform difference' in 1/3 pixel search */
+                       * Sum of absolute transform difference' in 1/3 pixel search */
   int_32_t  search_range;  /* !< search range - integer pel search and 16x16 blocks. The search window is
-                * generally around the predicted vector. Max vector is 2xmcrange. For 8x8 and
-                * 4x4 block sizes the search range is 1/2 of that for 16x16 blocks. */
+                           * generally around the predicted vector. Max vector is 2xmcrange. For 8x8 and
+                           * 4x4 block sizes the search range is 1/2 of that for 16x16 blocks. */
   int_32_t  no_multpred;  /* !< 1: prediction from the last frame only. 2: prediction from the last or
-                * second last frame etc. Maximum 5 frames */
+                          * second last frame etc. Maximum 5 frames */
   int_32_t  img_width;  /* !< GH: if CUSTOM image format is chosen, use this size */
   int_32_t  img_height;  /* !< GH: width and height must be a multiple of 16 pels */
   int_32_t  yuv_format;  /* !< GH: YUV format (0=4:0:0, 1=4:2:0, 2=4:2:2, 3=4:4:4,currently only 4:2:0
-              * is supported) */
+                         * is supported) */
   int_32_t  color_depth;  /* !< GH: YUV color depth per component in bit/pel (currently only 8 bit/pel is
-                * supported) */
+                          * supported) */
   int_32_t  intra_upd;  /* !< For error robustness. 0: no special action. 1: One GOB/frame is intra
-              * coded as regular 'update'. 2: One GOB every 2 frames is intra coded etc. In
-              * connection with this intra update, restrictions is put on motion vectors to
-              * prevent errors to propagate from the past */
+                        * coded as regular 'update'. 2: One GOB every 2 frames is intra coded etc. In
+                        * connection with this intra update, restrictions is put on motion vectors to
+                        * prevent errors to propagate from the past */
   int_32_t  blc_size[9][2]; /* !< array for different block sizes */
   int_32_t  infile_header;  /* !< If input file has a header set this to the length of the header */
-  char    infile[500];  /* !< YUV 4:2:0 input format */
-  char    outfile[500];  /* !< H.26L compressed output bitstream */
-  char    ReconFile[500]; /* !< Reconstructed Pictures */
-  char    TraceFile[500]; /* !< Trace Outputs */
+  char    infile[100];  /* !< YUV 4:2:0 input format */
+  char    outfile[100];  /* !< H.26L compressed output bitstream */
+  char    ReconFile[100]; /* !< Reconstructed Pictures */
+  char    TraceFile[100]; /* !< Trace Outputs */
+  char   DecRecFile[100];
   int_32_t  intra_period;  /* !< Random Access period though intra */
   int_32_t  GopLength;
 
@@ -368,7 +350,7 @@ typedef struct tag_InputParameters
   int_32_t  frame_rate;
   int_32_t  stuff_height;
   int_32_t  stuff_width;
-  } InputParameters;
+} InputParameters;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -376,7 +358,7 @@ typedef struct tag_InputParameters
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_ImageParameters
-  {
+{
   int_32_t  number;      /* !< current image number to be encoded */
   int_32_t  lindex;      /* !< next long term index to be used */
   int_32_t  max_lindex;    /* !< max long term index */
@@ -385,14 +367,9 @@ typedef struct tag_ImageParameters
   int_32_t  total_number_mb;
   int_32_t  current_slice_nr;
   int_32_t  type;
-  int_32_t  types;      /* !< This is for SP-Pictures, since all the syntax elements for
-                * SP-Pictures are the same as P-pictures, we keep the img->type as
-                * P_IMG but indicate SP-Pictures by img->types */
   int_32_t  no_multpred;    /* !< 1: prediction from the last frame only. 2: prediction from the
-                  * last or second last frame etc. */
+                            * last or second last frame etc. */
   int_32_t  qp;      /* !< quant for the current frame */
-  // xzhao 20081022
-  //int_32_t  framerate;
   float       framerate;
 
   int_32_t  width;      /* !< Number of pels */
@@ -409,8 +386,8 @@ typedef struct tag_ImageParameters
   int_32_t  block_c_x;    /* !< current block chroma vertical */
   int_32_t  pix_c_x;    /* !< current pixel chroma horizontal */
   int_32_t  **ipredmode;    /* !< GH
-                  * ipredmode[90][74];
-                  * prediction mode for inter frames */
+                            * ipredmode[90][74];
+                            * prediction mode for inter frames */
   int_32_t  cod_counter;    /* !< Current count of number of skipped macroblocks in a row */
   int_32_t  reconflag;
   __declspec(align(16)) byte    mprr[5][16][16];
@@ -428,7 +405,7 @@ typedef struct tag_ImageParameters
 
   Macroblock  *mb_data;    /* !< array containing all MBs of a whole frame */
   SyntaxElement  MB_SyntaxElements[MAX_SYMBOLS_PER_MB];  /* !< temporal storage for all chosen syntax elements
-                              * of one MB */
+                                                         * of one MB */
 
   int_32_t  *quad;      /* !< Array containing square values,used for snr computation */
   int_32_t  **intra_block;
@@ -540,14 +517,13 @@ typedef struct tag_ImageParameters
   int_32_t  TopFieldFlag;
   int_32_t  FieldControl;
   int_32_t  FieldFrame;
-  int_32_t  Frame_Total_Number_MB;
   int_32_t  IFLAG;
   int_32_t  NumberofCodedMacroBlocks;
   int_32_t  BasicUnit;
   int_32_t  bot_MB;
   int_32_t  img_width_in_mb;
   int_32_t  img_height_in_mb;
-  } ImageParameters;
+} ImageParameters;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -555,7 +531,7 @@ typedef struct tag_ImageParameters
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_StatParameters
-  {
+{
   int_32_t  quant0;    /* !< quant for the first frame */
   int_32_t  quant1;    /* !< average quant for the remaining frames */
   float    bitr;    /* !< bit rate for current frame, used only for output til terminal */
@@ -571,7 +547,7 @@ typedef struct tag_StatParameters
   int_32_t  mode_use_inter[2][MAXMODE];
 
   int_32_t  mb_use_mode[2];
-
+  int_32_t  sequence_header;
   /* B pictures */
   int_32_t  *mode_use_Bframe;
   int_32_t  *bit_use_mode_Bframe;
@@ -592,7 +568,7 @@ typedef struct tag_StatParameters
   uint_32_t  em_prev_bits_fld;
   int_32_t  *em_prev_bits;
   uint_32_t  bit_ctr_parametersets;
-  } StatParameters;
+} StatParameters;
 
 /*
 -----------------------------------------------------------------------------------------------------------------------
@@ -601,7 +577,7 @@ typedef struct tag_StatParameters
 -----------------------------------------------------------------------------------------------------------------------
 */
 typedef struct tag_RD_DATA
-  {
+{
   double    min_rdcost;
   int_32_t  tmp_mv[2][2][2];    /* to hold the motion vectors for each block */
   int_32_t  tmp_fwMV[2][2][2];    /* to hold forward motion vectors for B MB's */
@@ -624,9 +600,9 @@ typedef struct tag_RD_DATA
   int_32_t  *****all_mv;
   int_32_t  *****all_bmv;
   int_32_t  c_ipred_mode;
-  } RD_DATA;
+} RD_DATA;
 typedef struct tag_OutputStream
-  {
+{
   FILE    *f;
   byte        buf[SVA_STREAM_BUF_SIZE];  /* 流缓冲区 */
   uint_32_t  uPreBytes;      /* 最近写入的3个字节，初始值是0xFFFFFFFF */
@@ -634,718 +610,716 @@ typedef struct tag_OutputStream
   int_32_t  iBitOffset;      /* 当前位偏移，0表示最高位 */
   int_32_t  iNumOfStuffBits;    /* 已插入的填充位的个数，遇到开始码时置0 */
   int_32_t  iBitsCount;      /* 码流总位数 */
-  } OutputStream;
+} OutputStream;
+
 class __declspec(dllexport) c_avs_enc
-  {
+{
   /*
   -----------------------------------------------------------------------------------------------------------------------
   -----------------------------------------------------------------------------------------------------------------------
   */
-  public:
-    c_avs_enc();
-    /*
-    ===============================================================================================================
-    ===============================================================================================================
-    */
-    ~c_avs_enc(){};
+public:
+  c_avs_enc();
+  /*
+  ===============================================================================================================
+  ===============================================================================================================
+  */
+  ~c_avs_enc(){};
+
 #ifdef _THREE_STEP_MOTION_SEARCH_
-    int_32_t three_step_pattern_x[9], three_step_pattern_y[9];
-    void init_3_step_search();
-    int_32_t TSSMotionSearch(pel_t **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double   lambda, int_32_t block_index);
+  int_32_t three_step_pattern_x[9], three_step_pattern_y[9];
+  void init_3_step_search();
+  int_32_t TSSMotionSearch(pel_t **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double   lambda, int_32_t block_index);
 #endif
-    pel_t****   interpolation; // [288+16*2][352+16*2] 
-    __m128i clip0;
-    __m128i clip255;
-    __m128i round1;
-    __m128i round4;
-    __m128i round8;
-    __m128i round16;
-    __m128i round32;
-    __m128i round64;
-    __m128i round512;
+  pel_t****   interpolation; // [288+16*2][352+16*2] 
+  __m128i clip0;
+  __m128i clip255;
+  __m128i round1;
+  __m128i round4;
+  __m128i round8;
+  __m128i round16;
+  __m128i round32;
+  __m128i round64;
+  __m128i round512;
 
-    Picture      *frame_pic;
-    Picture      *top_pic;
-    Picture      *bot_pic;
+  Picture      *frame_pic;
+  Picture      *top_pic;
+  Picture      *bot_pic;
 
-    byte      *imgY_org_buffer;    /* !< Reference luma image */
-    byte      *imgY_org_buffer_restore;  /* to restore the allocated memory address, in case of
-                          * free */
+  byte      *imgY_org_buffer;    /* !< Reference luma image */
+  byte      *imgY_org_buffer_restore;
+  int_32_t    ***tmp_mv_frm;      /* !< motion vector buffer */
+  int_32_t    **refFrArr_frm;      /* !< Array for reference frames of each block */
+  byte      **imgY;      /* !< Encoded luma images */
+  byte      ***imgUV;    /* !< Encoded croma images */
+  byte      **imgY_org;    /* !< Reference luma image */
+  byte      ***imgUV_org;    /* !< Reference croma image */
+  byte      **imgY_pf;    /* !< Post filter luma image */
+  byte      ***imgUV_pf;    /* !< Post filter croma image */
+#ifdef _OUTPUT_DEC_IMG_
+  byte **org_nextP_imgY;
+  byte ***org_nextP_imgUV;
+#endif
+  byte      ****mref[2];
+  byte      **mcef[4][2];    /* !< pix chroma */
 
-    /* global picture format dependend buffers, mem allocation in image.c */
-    int_32_t    ***tmp_mv_frm;      /* !< motion vector buffer */
-    int_32_t    **refFrArr_frm;      /* !< Array for reference frames of each block */
+  int_16_t    **tmp02;    /* !< for quarter pel interpolation */
+  int_16_t    **tmp20;
+  int_16_t    **tmp22;
+  int_32_t    ***tmp_mv;    /* !< motion vector buffer */
+  int_32_t    **refFrArr;    /* !< Array for reference frames of each block */
 
-    byte      **imgY;      /* !< Encoded luma images */
-    byte      ***imgUV;    /* !< Encoded croma images */
-    byte      **imgY_org;    /* !< Reference luma image */
-    byte      ***imgUV_org;    /* !< Reference croma image */
-    byte      **imgY_pf;    /* !< Post filter luma image */
-    byte      ***imgUV_pf;    /* !< Post filter croma image */
+  /* B pictures */
+  int_32_t    ***tmp_fwMV;
+  int_32_t    ***tmp_bwMV;
+  int_32_t    ***tmp_fwMV_top;  /* !< For MB level field/frame coding tools */
+  int_32_t    ***tmp_fwMV_bot;  /* !< For MB level field/frame coding tools */
+  int_32_t    ***tmp_bwMV_top;  /* !< For MB level field/frame coding tools */
+  int_32_t    ***tmp_bwMV_bot;  /* !< For MB level field/frame coding tools */
+  int_32_t    **field_mb;    /* !< For MB level field/frame coding tools */
+  int_32_t    WriteFrameFieldMBInHeader;  /* ! For MB level field/frame coding tools */
+  int_32_t    ***tmp_fwMV_fld;    /* !< For MB level field/frame coding tools */
+  int_32_t    ***tmp_bwMV_fld;    /* !< For MB level field/frame coding tools */
 
-    /*
-    * byte **mref[4];
-    * //!< 1/4 pix luma
-    */
-    byte      ****mref[2];
-    byte      **mcef[4][2];    /* !< pix chroma */
+  int_32_t    ***dfMV;
+  int_32_t    ***dbMV;
+  int_32_t    **fw_refFrArr;
+  int_32_t    **bw_refFrArr;
+  byte      **nextP_imgY;
+  byte      ***nextP_imgUV;
+  pel_t      *Refbuf11[4];      /* !< 1/1th pel (full pel) reference frame buffer */
 
-    /*
-    * int_32_t **img4Y_tmp;
-    */
-    int_16_t    **tmp02;    /* !< for quarter pel interpolation */
-    int_16_t    **tmp20;
-    int_16_t    **tmp22;
+  /*
+  * global picture format depended buffers, mem allocation in image.c (field
+  * picture)
+  */
+  byte      **imgY_org_top;
+  byte      ***imgUV_org_top;
+  byte      **imgY_org_bot;
+  byte      ***imgUV_org_bot;
+  byte      **imgY_top;      /* !< Encoded luma images */
+  byte      ***imgUV_top;      /* !< Encoded croma images */
+  byte      **imgY_bot;      /* !< Encoded luma images */
+  byte      ***imgUV_bot;      /* !< Encoded croma images */
+  pel_t      **Refbuf11_fld;      /* !< 1/1th pel (full pel) reference frame buffer */
+  int_32_t    **refFrArr_top;      /* !< Array for reference frames of each block */
+  int_32_t    **refFrArr_bot;      /* !< Array for reference frames of each block */
+  byte      **imgY_com;      /* !< Encoded luma images */
+  byte      ***imgUV_com;      /* !< Encoded croma images */
+  int_32_t    **refFrArr_fld;      /* !< Array for reference frames of each block */
+  int_32_t    *parity_fld;
 
-    int_32_t    ***tmp_mv;    /* !< motion vector buffer */
+  /*
+  * global picture format dependend buffers, mem allocation in image.c (field
+  * picture)
+  */
+  byte      **mref_fld[4];      /* !< 1/4 pix luma */
+  byte      ***mref_mbfld;      /* !< For MB level field/frame coding tools */
 
-    int_32_t    **refFrArr;    /* !< Array for reference frames of each block */
+  /*
+  * global picture format dependend buffers, mem allocation in image.c (frame
+  * buffer)
+  */
+  byte      ****mref_frm[2];    /* !< 1/4 pix luma //[2:ref_index] */
 
-    /* B pictures */
-    int_32_t    ***tmp_fwMV;
-    int_32_t    ***tmp_bwMV;
-    int_32_t    ***tmp_fwMV_top;  /* !< For MB level field/frame coding tools */
-    int_32_t    ***tmp_fwMV_bot;  /* !< For MB level field/frame coding tools */
-    int_32_t    ***tmp_bwMV_top;  /* !< For MB level field/frame coding tools */
-    int_32_t    ***tmp_bwMV_bot;  /* !< For MB level field/frame coding tools */
-    int_32_t    **field_mb;    /* !< For MB level field/frame coding tools */
-    int_32_t    WriteFrameFieldMBInHeader;  /* ! For MB level field/frame coding tools */
-    int_32_t    ***tmp_fwMV_fld;    /* !< For MB level field/frame coding tools */
-    int_32_t    ***tmp_bwMV_fld;    /* !< For MB level field/frame coding tools */
+  /*
+  * B pictures ;
+  * motion vector : forward, backward, direct
+  */
+  int_32_t    **fw_refFrArr_top;
+  int_32_t    **bw_refFrArr_top;
+  int_32_t    **fw_refFrArr_bot;
+  int_32_t    **bw_refFrArr_bot;
+  int_32_t    ***tmp_mv_top;
+  int_32_t    ***tmp_mv_bot;
 
-    int_32_t    ***dfMV;
-    int_32_t    ***dbMV;
-    int_32_t    **fw_refFrArr;
-    int_32_t    **bw_refFrArr;
-    byte      **nextP_imgY;
-    byte      ***nextP_imgUV;
-    pel_t      *Refbuf11[4];      /* !< 1/1th pel (full pel) reference frame buffer */
+  int_32_t    **fwdir_refFrArr;    /* !< direct mode forward reference buffer */
+  int_32_t    **bwdir_refFrArr;    /* !< direct mode backward reference buffer */
 
-    /*
-    * global picture format dependend buffers, mem allocation in image.c (field
-    * picture)
-    */
-    byte      **imgY_org_top;
-    byte      ***imgUV_org_top;
-    byte      **imgY_org_bot;
-    byte      ***imgUV_org_bot;
-    byte      **imgY_top;      /* !< Encoded luma images */
-    byte      ***imgUV_top;      /* !< Encoded croma images */
-    byte      **imgY_bot;      /* !< Encoded luma images */
-    byte      ***imgUV_bot;      /* !< Encoded croma images */
-    pel_t      **Refbuf11_fld;      /* !< 1/1th pel (full pel) reference frame buffer */
-    int_32_t    **refFrArr_top;      /* !< Array for reference frames of each block */
-    int_32_t    **refFrArr_bot;      /* !< Array for reference frames of each block */
-    byte      **imgY_com;      /* !< Encoded luma images */
-    byte      ***imgUV_com;      /* !< Encoded croma images */
-    int_32_t    **refFrArr_fld;      /* !< Array for reference frames of each block */
-    int_32_t    *parity_fld;
+  /*
+  * global picture format dependend buffers, mem allocation in image.c (frame
+  * buffer)
+  */
+  byte      **imgY_org_frm;
+  byte      ***imgUV_org_frm;
+  byte      **imgY_frm;      /* !< Encoded luma images */
+  byte      ***imgUV_frm;      /* !< Encoded croma images */
+  int_32_t    direct_mode;
 
-    /*
-    * global picture format dependend buffers, mem allocation in image.c (field
-    * picture)
-    */
-    byte      **mref_fld[4];      /* !< 1/4 pix luma */
-    byte      ***mref_mbfld;      /* !< For MB level field/frame coding tools */
+  /*
+  * B pictures ;
+  * motion vector : forward, backward, direct
+  */
+  int_32_t    **fw_refFrArr_frm;
+  int_32_t    **bw_refFrArr_frm;
+  int_32_t    **fw_refFrArr_fld;
+  int_32_t    **bw_refFrArr_fld;
+  int_32_t    ***tmp_mv_fld;      /* !< motion vector buffer */
 
-    /*
-    * global picture format dependend buffers, mem allocation in image.c (frame
-    * buffer)
-    */
-    byte      ****mref_frm[2];    /* !< 1/4 pix luma //[2:ref_index] */
+  int_32_t    intras;      /* !< Counts the intra updates in each frame. */
 
-    /*
-    * B pictures ;
-    * motion vector : forward, backward, direct
-    */
-    int_32_t    **fw_refFrArr_top;
-    int_32_t    **bw_refFrArr_top;
-    int_32_t    **fw_refFrArr_bot;
-    int_32_t    **bw_refFrArr_bot;
-    int_32_t    ***tmp_mv_top;
-    int_32_t    ***tmp_mv_bot;
+  int_32_t    Bframe_ctr, frame_no, nextP_tr_frm, nextP_tr,  gframe_no; // gframe_no added by xzhao 20080324;
+#ifdef _ME_FOR_RATE_CONTROL_
+  int_32_t    glb_me_for_rate_control_flag;
+#endif
+  int_32_t        frames_GOP;//xzhao 20080331
+  int_32_t    tot_time;
+  int_32_t    tmp_buf_cycle;
+  char      errortext[ET_SIZE];  /* !< buffer for error message for exit with error() */
+  RD_DATA      *rdopt;
 
-    int_32_t    **fwdir_refFrArr;    /* !< direct mode forward reference buffer */
-    int_32_t    **bwdir_refFrArr;    /* !< direct mode backward reference buffer */
+  int_32_t    *allalpha_lum, *allbelta_lum;
 
-    /*
-    * global picture format dependend buffers, mem allocation in image.c (frame
-    * buffer)
-    */
-    byte      **imgY_org_frm;
-    byte      ***imgUV_org_frm;
-    byte      **imgY_frm;      /* !< Encoded luma images */
-    byte      ***imgUV_frm;      /* !< Encoded croma images */
-    int_32_t    direct_mode;
+  /* files */
+  FILE      *p_org_dec; //org dec img
+  FILE      *p_rec;  /* recon img*/
+  FILE      *p_stat;      /* !< status file for the last encoding session */
+  FILE      *p_log;    /* !< SNR file */
+  FILE      *p_in;    /* !< YUV */
+  FILE      *p_datpart;  /* !< file to write bitlength and id of all partitions */
+  FILE      *p_trace;  /* !< Trace file */
+  int_32_t    *refbits;
+  int_32_t    ***motion_cost;
+  int_32_t    ***motion_cost_bid;
+  int_32_t    ipdirect_x, ipdirect_y;
 
-    /*
-    * B pictures ;
-    * motion vector : forward, backward, direct
-    */
-    int_32_t    **fw_refFrArr_frm;
-    int_32_t    **bw_refFrArr_frm;
-    int_32_t    **fw_refFrArr_fld;
-    int_32_t    **bw_refFrArr_fld;
-    int_32_t    ***tmp_mv_fld;      /* !< motion vector buffer */
+  /* reference frame buffer */
+  unsigned char    **reference_frame[3][3];  /* [refnum][yuv][height][width] */
+  unsigned char    **reference_field[6][3];  /* [refnum][yuv][height/2][width] */
+  unsigned char    ***ref[4];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
+  unsigned char    ***ref_frm[2];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
+  unsigned char    ***ref_fld[6];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
+  unsigned char    ***b_ref[2], ***f_ref[2];
+  unsigned char    ***b_ref_frm[2], ***f_ref_frm[2];
+  unsigned char    ***b_ref_fld[2], ***f_ref_fld[2];
+  unsigned char    ***current_frame;    /* [yuv][height][width] */
+  unsigned char    ***current_field;    /* [yuv][height/2][width] */
+  MB_INFO          *pAVSMbInfo;
+  unsigned char    *pInputImage;
+#ifdef _ME_FOR_RATE_CONTROL_
+  unsigned char    *pPreImage;
+#endif
 
-    int_32_t    intras;      /* !< Counts the intra updates in each frame. */
+  int_32_t    bytes_y;
+  int_32_t    bytes_uv;
+  int_32_t    framesize_in_bytes;
+  int_32_t    total_encoded_frame;
+  int_32_t    current_encoded_frame;
+  int_32_t    output_flag;
+  InputParameters   inputs, *input;
+  ImageParameters   images, *img;
+  SNRParameters   snrs, *snr;
+  StatParameters   stats, *stat;
+  CopyRight     CopyRights, *cp;
+  CameraParamters   CameraParameter, *camera;
+  unsigned char    pOutBuffer[AVS_OUT_BUFFER_SIZE];
+  Bitstream    *currBitStream;
+  int_32_t    nOutBufPtr;
+  OutputStream  ORABS, *pORABS;
+  double      GBIM_value;
+  double      GBIM_value_frm;
+  void      init_img();
+  void      report();
+  void      LumaPrediction4x4(int_32_t, int_32_t, int_32_t, int_32_t, int_32_t, int_32_t);
+  int_32_t    SATD(int_16_t *, int_32_t);
 
-    int_32_t    Bframe_ctr, frame_no, nextP_tr_frm, nextP_tr,  gframe_no; // gframe_no added by xzhao 20080324;
+  void      LumaResidualCoding();
+  void      ChromaResidualCoding(int_32_t *);
+  void      IntraChromaPrediction8x8(int_32_t *, int_32_t *, int_32_t *);
+  int_32_t    writeMBHeader(int_32_t rdopt);
 
-    int_32_t        frames_GOP;//xzhao 20080331
-    int_32_t    tot_time;
-    int_32_t    tmp_buf_cycle;
-    char      errortext[ET_SIZE];  /* !< buffer for error message for exit with error() */
-    RD_DATA      *rdopt;
+  int_32_t    LumaResidualCoding8x8(int_32_t *,int_32_t *,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t);
+  int_32_t    writeLumaCoeff8x8(int_32_t, int_32_t);
+  int_32_t    writeMotionVector8x8(int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t);
+  int_32_t    writeIntra4x4Modes(int_32_t);
+  int_32_t    writeChromaIntraPredMode();
+  int_32_t    B8Mode2Value(int_32_t b8mode, int_32_t b8pdir);
 
-    int_32_t    *allalpha_lum, *allbelta_lum;
+  /* dynamic memory allocation */
+  int_32_t    init_global_buffers();
+  void      free_global_buffers();
+  void      no_mem_exit(char *where);
 
-    /* files */
-    FILE      *p_dec, *p_dec_u, *p_dec_v;  /* !< internal decoded image for debugging */
-    FILE      *p_stat;      /* !< status file for the last encoding session */
-    FILE      *p_log;    /* !< SNR file */
-    FILE      *p_in;    /* !< YUV */
-    FILE      *p_datpart;  /* !< file to write bitlength and id of all partitions */
-    FILE      *p_trace;  /* !< Trace file */
-    int_32_t    *refbits;
-    int_32_t    ***motion_cost;
-    int_32_t    ***motion_cost_bid;
-    int_32_t    ipdirect_x, ipdirect_y;
+  int_32_t    get_mem_mv(int_32_t ******);
+  void      free_mem_mv(int_32_t *****);
+  void      free_img();
 
-    /* reference frame buffer */
-    unsigned char    **reference_frame[3][3];  /* [refnum][yuv][height][width] */
-    unsigned char    **reference_field[6][3];  /* [refnum][yuv][height/2][width] */
-    unsigned char    ***ref[4];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
-    unsigned char    ***ref_frm[2];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
-    unsigned char    ***ref_fld[6];      /* [refnum(4 for filed)][yuv][height(height/2)][width] */
-    unsigned char    ***b_ref[2], ***f_ref[2];
-    unsigned char    ***b_ref_frm[2], ***f_ref_frm[2];
-    unsigned char    ***b_ref_fld[2], ***f_ref_fld[2];
-    unsigned char    ***current_frame;    /* [yuv][height][width] */
-    unsigned char    ***current_field;    /* [yuv][height/2][width] */
-    MB_INFO          *pAVSMbInfo;
-    unsigned char    *pInputImage;
+  int_32_t    get_mem_ACcoeff(int_16_t *****);
+  int_32_t    get_mem_DCcoeff(int_16_t ****);
+  int_32_t    get_mem_ref(byte *****);
+  void      free_mem_ACcoeff(int_16_t ****);
+  void      free_mem_DCcoeff(int_16_t ***);
+  void      free_mem_ref(byte ****);
 
-    int_32_t    bytes_y;
-    int_32_t    bytes_uv;
-    int_32_t    framesize_in_bytes;
-    int_32_t    total_encoded_frame;
-    int_32_t    current_encoded_frame;
-    int_32_t    output_flag;
-    InputParameters   inputs, *input;
-    ImageParameters   images, *img;
-    SNRParameters   snrs, *snr;
-    StatParameters   stats, *stat;
-    CopyRight     CopyRights, *cp;
-    CameraParamters   CameraParameter, *camera;
-    unsigned char    pOutBuffer[AVS_OUT_BUFFER_SIZE];
-    Bitstream    *currBitStream;
-    int_32_t    nOutBufPtr;
-    OutputStream  ORABS, *pORABS;
-    double      GBIM_value;
-    double      GBIM_value_frm;
-    void      init_img();
-    void      report();
-    void      LumaPrediction4x4(int_32_t, int_32_t, int_32_t, int_32_t, int_32_t, int_32_t);
-    int_32_t    SATD(int_16_t *, int_32_t);
+  void      split_field_top();
+  void      split_field_bot();
 
-    void      LumaResidualCoding();
-    void      ChromaResidualCoding(int_32_t *);
-    void      IntraChromaPrediction8x8(int_32_t *, int_32_t *, int_32_t *);
-    int_32_t    writeMBHeader(int_32_t rdopt);
+  void      intrapred_luma_AVS(int_32_t img_x, int_32_t img_y);
 
-    int_32_t    LumaResidualCoding8x8(int_32_t *,int_32_t *,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t);
-    int_32_t    writeLumaCoeff8x8(int_32_t, int_32_t);
-    int_32_t    writeMotionVector8x8(int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t,int_32_t);
-    int_32_t    writeIntra4x4Modes(int_32_t);
-    int_32_t    writeChromaIntraPredMode();
-    int_32_t    B8Mode2Value(int_32_t b8mode, int_32_t b8pdir);
+  Picture      *malloc_picture();
+  void      free_picture(Picture *pic);
+  int_32_t    encode_one_slice(Picture *pic); /* ! returns the number of MBs in the slice */
 
-    /* dynamic memory allocation */
-    int_32_t    init_global_buffers();
-    void      free_global_buffers();
-    void      no_mem_exit(char *where);
+  void      start_macroblock();
+  void      set_MB_parameters(int_32_t mb);
 
-    int_32_t    get_mem_mv(int_32_t ******);
-    void      free_mem_mv(int_32_t *****);
-    void      free_img();
+  void      terminate_macroblock(myboolean *end_of_picture);
+  void      write_one_macroblock(int_32_t eos_bit);
+  void      proceed2nextMacroblock();
 
-    int_32_t    get_mem_ACcoeff(int_16_t *****);
-    int_32_t    get_mem_DCcoeff(int_16_t ****);
-    int_32_t    get_mem_ref(byte *****);
-    void      free_mem_ACcoeff(int_16_t ****);
-    void      free_mem_DCcoeff(int_16_t ***);
-    void      free_mem_ref(byte ****);
+  void      CheckAvailabilityOfNeighbors();
 
-    void      split_field_top();
-    void      split_field_bot();
-
-    void      intrapred_luma_AVS(int_32_t img_x, int_32_t img_y);
-
-    Picture      *malloc_picture();
-    void      free_picture(Picture *pic);
-    int_32_t    encode_one_slice(Picture *pic); /* ! returns the number of MBs in the slice */
-
-    void      start_macroblock();
-    void      set_MB_parameters(int_32_t mb);
-
-    void      terminate_macroblock(Boolean *end_of_picture);
-    void      write_one_macroblock(int_32_t eos_bit);
-    void      proceed2nextMacroblock();
-
-    void      CheckAvailabilityOfNeighbors();
-
-    void      free_slice_list(Picture *currPic);
+  void      free_slice_list(Picture *currPic);
 
 #if TRACE
-    void      trace2out(SyntaxElement *se);
+  void      trace2out(SyntaxElement *se);
 #endif
-    void      error(char *text, int_32_t code);
-    int_32_t    start_sequence();
-    int_32_t    terminate_sequence();
-    int_32_t    writeCBPandLumaCoeff();
-    int_32_t    writeChromaCoeff();
+  void      error(char *text, int_32_t code);
+  int_32_t    start_sequence();
+  int_32_t    terminate_sequence();
+  int_32_t    writeCBPandLumaCoeff();
+  int_32_t    writeChromaCoeff();
 
-    void      FreeBitstream();
-    void      AllocateBitstream();
-    void      PatchInp();
-    int_32_t    avs_enc_create();
-    int_32_t    avs_enc_destroy();
-    int_32_t    avs_enc_encode();
-    void      Configure(char *av);
-    int_32_t    init_global_variables();    
-    int_32_t    avs_enc_frame(avs_enc_frame_t *pFrame);
-    void      information_init();
-    int_32_t    write_start_code(OutputStream *p, unsigned char code);
-    void      CloseBitStreamFile();
-    void      OpenBitStreamFile(char *Filename);
-    int_32_t    WriteSequenceHeader();
-    int_32_t    WriteSequenceDisplayExtension();
-    int_32_t    WriteUserData(char *userdata);
-    int_32_t    WriteSequenceEnd();
-    void      WriteBitstreamtoFile();
-    void      WriteSlicetoFile();
-    int_32_t    WriteCopyrightExtension();
-    int_32_t    WriteCameraParametersExtension();
-    void      quant_B8(int_32_t qp, int_32_t mode, int_16_t curr_blk[B8_SIZE][B8_SIZE]);
-    int_16_t    scanquant_B8(int_32_t qp,int_32_t  mode,int_32_t  b8, int_16_t  curr_blk[B8_SIZE][B8_SIZE], int_32_t  scrFlag, int_32_t  *cbp, int_32_t  *cbp_blk);
-    int_16_t    scanquant_B8_recon(int_32_t  qp,int_32_t  mode,int_32_t  b8,int_16_t  curr_blk[B8_SIZE][B8_SIZE],int_32_t  scrFlag,int_32_t  *cbp,int_32_t  *cbp_blk);
-    int_16_t    scanquant_B8_cost(int_32_t qp,int_32_t mode,int_32_t b8,int_16_t curr_blk[B8_SIZE][B8_SIZE],int_32_t scrFlag,int_32_t *cbp,int_32_t *cbp_bl);
-    int_32_t    find_sad_8x8(int_32_t iMode, int_32_t iSizeX,int_32_t iSizeY, int_32_t iOffX,int_32_t iOffY, int_32_t m7[MB_BLOCK_SIZE][MB_BLOCK_SIZE]);
-    int_32_t    sad_hadamard(int_32_t iSizeX, int_32_t iSizeY,int_32_t iOffX, int_32_t iOffY,int_32_t m7[MB_BLOCK_SIZE][MB_BLOCK_SIZE]);
-    int_32_t    writeLumaCoeffAVS_B8(int_32_t b8, int_32_t intra);
-    int_32_t    writeChromaCoeffAVS_B8(int_32_t b8);
-    void      idct_transform(int_16_t *mb, int_16_t *temp);
-    char      *GetConfigFileContent(char *Filename);
-    void      ParseContent(char *buf, int_32_t bufsize);
-    int_32_t    ParameterNameToMapIndex(char *s);
+  void      FreeBitstream();
+  void      AllocateBitstream();
+  void      PatchInp();
+  int_32_t    avs_enc_create();
+  int_32_t    avs_enc_destroy();
+  int_32_t    avs_enc_encode();
+  void      Configure(char *av);
+  int_32_t    init_global_variables();    
+  int_32_t    avs_enc_frame(avs_enc_frame_t *pFrame);
+  void      information_init();
+  int_32_t    write_start_code(OutputStream *p, unsigned char code);
+  void      CloseBitStreamFile();
+  void      OpenBitStreamFile(char *Filename);
+  int_32_t    WriteSequenceHeader();
+  int_32_t    WriteSequenceDisplayExtension();
+  int_32_t    WriteUserData(char *userdata);
+  int_32_t    WriteSequenceEnd();
+  void      WriteBitstreamtoFile();
+  void      WriteSlicetoFile();
+  int_32_t    WriteCopyrightExtension();
+  int_32_t    WriteCameraParametersExtension();
+  void      quant_B8(int_32_t qp, int_32_t mode, int_16_t curr_blk[B8_SIZE][B8_SIZE]);
+  int_16_t    scanquant_B8(int_32_t qp,int_32_t  mode,int_32_t  b8, int_16_t  curr_blk[B8_SIZE][B8_SIZE], int_32_t  scrFlag, int_32_t  *cbp, int_32_t  *cbp_blk);
+  int_16_t    scanquant_B8_recon(int_32_t  qp,int_32_t  mode,int_32_t  b8,int_16_t  curr_blk[B8_SIZE][B8_SIZE],int_32_t  scrFlag,int_32_t  *cbp,int_32_t  *cbp_blk);
+  int_16_t    scanquant_B8_cost(int_32_t qp,int_32_t mode,int_32_t b8,int_16_t curr_blk[B8_SIZE][B8_SIZE],int_32_t scrFlag,int_32_t *cbp,int_32_t *cbp_bl);
+  int_32_t    find_sad_8x8(int_32_t iMode, int_32_t iSizeX,int_32_t iSizeY, int_32_t iOffX,int_32_t iOffY, int_32_t m7[MB_BLOCK_SIZE][MB_BLOCK_SIZE]);
+  int_32_t    sad_hadamard(int_32_t iSizeX, int_32_t iSizeY,int_32_t iOffX, int_32_t iOffY,int_32_t m7[MB_BLOCK_SIZE][MB_BLOCK_SIZE]);
+  int_32_t    writeLumaCoeffAVS_B8(int_32_t b8, int_32_t intra);
+  int_32_t    writeChromaCoeffAVS_B8(int_32_t b8);
+  void      idct_transform(int_16_t *mb, int_16_t *temp);
+  char      *GetConfigFileContent(char *Filename);
+  void      ParseContent(char *buf, int_32_t bufsize);
+  int_32_t    ParameterNameToMapIndex(char *s);
 
-    /* entropy coding */
-    void      encode_golomb_word(uint_32_t symbol, uint_32_t grad0,uint_32_t max_levels, uint_32_t *res_bits,uint_32_t *res_leu);      /* returns symbol coded. (might be cropped if max_levels is too * small) */
-    void      encode_multilayer_golomb_word(uint_32_t  symbol, const uint_32_t *grad,const uint_32_t *max_levels, uint_32_t  *res_bits, uint_32_t  *res_len);      /* terminate using a max_levels value of 30UL. */
-    uint_32_t    decode_golomb_word(const unsigned char  **buffer, uint_32_t *bitoff,uint_32_t grad0, uint_32_t max_levels);
+  /* entropy coding */
+  void      encode_golomb_word(uint_32_t symbol, uint_32_t grad0,uint_32_t max_levels, uint_32_t *res_bits,uint_32_t *res_leu);      /* returns symbol coded. (might be cropped if max_levels is too * small) */
+  void      encode_multilayer_golomb_word(uint_32_t  symbol, const uint_32_t *grad,const uint_32_t *max_levels, uint_32_t  *res_bits, uint_32_t  *res_len);      /* terminate using a max_levels value of 30UL. */
+  uint_32_t    decode_golomb_word(const unsigned char  **buffer, uint_32_t *bitoff,uint_32_t grad0, uint_32_t max_levels);
 
-    int_32_t    writeSyntaxElement_GOLOMB(SyntaxElement *se, Bitstream *bitstream);
-    int_32_t    frametotc(int_32_t frame, int_32_t dropflag);
-    int_32_t    SliceHeader(int_32_t slice_nr, int_32_t slice_qp);
-    int_32_t    IPictureHeader(int_32_t frame);
-    int_32_t    PBPictureHeader();
-    void      code_a_picture(Picture *frame);
-    void      ReadOneFrame();
-    void      write_reconstructed_image();
-    int_32_t    writeout_picture();
-    int_32_t    writeout_slice();
-    void      find_snr();
-    double      find_GBIM(byte **I);
-    void      frame_mode_buffer(int_32_t bit_frame, float snr_frame_y, float snr_frame_u, float snr_frame_v);
-    void      init_frame();
-    void      init_field();
+  int_32_t    writeSyntaxElement_GOLOMB(SyntaxElement *se, Bitstream *bitstream);
+  int_32_t    frametotc(int_32_t frame, int_32_t dropflag);
+  int_32_t    SliceHeader(int_32_t slice_nr, int_32_t slice_qp);
+  int_32_t    IPictureHeader(int_32_t frame);
+  int_32_t    PBPictureHeader();
+  void      code_a_picture(Picture *frame);
+  void      ReadOneFrame();
+  void      write_reconstructed_image();
+  int_32_t    writeout_picture();
+  int_32_t    writeout_slice();
+  void      find_snr();
+  double      find_GBIM(byte **I);
+  void      frame_mode_buffer(int_32_t bit_frame, float snr_frame_y, float snr_frame_u, float snr_frame_v);
+  void      init_frame();
+  void      init_field();
 
-    void      top_field(Picture *pic);
-    void      bot_field(Picture *pic);
-    void      combine_field();
+  void      top_field(Picture *pic);
+  void      bot_field(Picture *pic);
+  void      combine_field();
 
-    void      put_buffer_frame();
-    void      put_buffer_top();
-    void      put_buffer_bot();
-    void      Update_Picture_Buffers_bot_field();
-    void      Update_Picture_Buffers_top_field();
-    void      interpolate_frame_to_fb();
+  void      put_buffer_frame();
+  void      put_buffer_top();
+  void      put_buffer_bot();
+  void      Update_Picture_Buffers_bot_field();
+  void      Update_Picture_Buffers_top_field();
+  void      interpolate_frame_to_fb();
 
-    void      CopyFrameToOldImgOrgVariables();
+  void      CopyFrameToOldImgOrgVariables();
 
-    /*
-    * void UnifiedOneForthPix (pel_t ** imgY, pel_t ** imgU, pel_t ** imgV,pel_t ** out4Y);
-    */
-    void      UnifiedOneForthPix_sse(pel_t **imgY);
-    void      UnifiedOneForthPix_c_sse(pel_t **imgY);
-    void      ReportFirstframe(int_32_t tmp_time);
-    void      ReportIntra(int_32_t tmp_time);
-    void      ReportP(int_32_t tmp_time);
-    void      ReportB(int_32_t tmp_time);
+  /*
+  * void UnifiedOneForthPix (pel_t ** imgY, pel_t ** imgU, pel_t ** imgV,pel_t ** out4Y);
+  */
+  void      UnifiedOneForthPix_sse(pel_t **imgY);
+  void      UnifiedOneForthPix_c_sse(pel_t **imgY);
+  void      ReportFirstframe(int_32_t tmp_time);
+  void      ReportIntra(int_32_t tmp_time);
+  void      ReportP(int_32_t tmp_time);
+  void      ReportB(int_32_t tmp_time);
 
-    void      CalculateFrameNumber(); /* Calculates the next frame number */
+  void      CalculateFrameNumber(); /* Calculates the next frame number */
 
-    /* !! weighting prediction */
-    void      estimate_weighting_factor();
-    void      find_distortion();
-    int_32_t    cdecide_fld_frame (float snr_frame_Y,float snr_field_Y,int_32_t bit_field, int_32_t bit_frame,double lambda_picture);
-    void      Update_Picture_Bufffers();
-    int_32_t    DetectLumVar();
-    void      CalculateBrightnessPar(int_32_t currentblock[16][16],int_32_t preblock[16][16],float *c,float *d);
-    void      CalculatePar(int_32_t refnum);
-    void      LumaPrediction(int_32_t *cbp,int_32_t *cbp_blk,int_32_t block8x8,int_32_t fw_mode,int_32_t bw_mode,int_32_t fw_refframe,int_32_t bw_refframe);
-    void      SetModesAndRefframe(int_32_t b8,int_32_t *fw_mode,int_32_t *bw_mode,int_32_t *fw_ref,int_32_t *bw_ref);
-    void      OneComponentChromaPrediction4x4(int_16_t *mpred,int_32_t pix_c_x,int_32_t pix_c_y,int_32_t *****mv,int_32_t ref,int_32_t blocktype,int_32_t uv,int_32_t directforword);
-    void      OneComponentChromaPrediction4x4_dir(int_16_t *mpred,int_32_t pix_c_x,int_32_t pix_c_y,int_32_t *****mv,int_32_t ref,int_32_t blocktype,int_32_t uv,int_32_t refframe);
-    void      IntraChromaPrediction4x4(int_32_t uv, int_32_t block_x, int_32_t block_y);
-    void      ChromaPrediction4x4(int_32_t uv,int_32_t block_x,int_32_t block_y,int_32_t fw_mode,int_32_t bw_mode,int_32_t fw_ref_frame,int_32_t bw_ref_frame);
-    int_32_t    SubMBType2Value(Macroblock *currMB, int_32_t layer);
-    int_32_t    MBType2Value(Macroblock *currMB);
-    int_32_t    writeMotionVector8x8_bid(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode,int_32_t pdir);
-    int_32_t    StoreMotionVector8x8(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode);
-    int_32_t    StoreMotionVector8x8_bid(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode,int_32_t pdir);
-    int_32_t    writeMVD8x8(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode);
-    void      writeCBPandDqp(int_32_t *CBPRate);
-    int_32_t    writeBlockCoeff(int_32_t block8x8);
-    int_32_t    storeMotionInfo(int_32_t pos);
-    int_32_t    writeFrameRef(int_32_t mode, int_32_t i, int_32_t j, int_32_t fwd_flag, int_32_t ref);
-    void      writeReferenceIndex(int_32_t *RefIndexRate);
-    void      writeMVD(int_32_t *MVDRate);
-    void      writeweightflag();
-    int_32_t    get_mem2D(byte ***array2D, int_32_t rows, int_32_t columns);
-    int_32_t    get_mem2Dint(int_32_t ***array2D, int_32_t rows, int_32_t columns);
-    int_32_t    get_mem3D(byte ****array2D, int_32_t frames, int_32_t rows, int_32_t columns);
-    int_32_t    get_mem3Dint(int_32_t ****array3D, int_32_t frames, int_32_t rows, int_32_t columns);
-    int_32_t    get_mem4Dint(int_32_t *****array4D,int_32_t idx,int_32_t frames,int_32_t rows,int_32_t columns);
-    int_32_t    get_mem2Dshort_int(int_16_t ***array2D, int_16_t rows, int_16_t columns);
+  /* !! weighting prediction */
+  void      estimate_weighting_factor();
+  void      find_distortion();
+  int_32_t    cdecide_fld_frame (float snr_frame_Y,float snr_field_Y,int_32_t bit_field, int_32_t bit_frame,double lambda_picture);
+  void      Update_Picture_Bufffers();
+  int_32_t    DetectLumVar();
+  void      CalculateBrightnessPar(int_32_t currentblock[16][16],int_32_t preblock[16][16],float *c,float *d);
+  void      CalculatePar(int_32_t refnum);
+  void      LumaPrediction(int_32_t *cbp,int_32_t *cbp_blk,int_32_t block8x8,int_32_t fw_mode,int_32_t bw_mode,int_32_t fw_refframe,int_32_t bw_refframe);
+  void      SetModesAndRefframe(int_32_t b8,int_32_t *fw_mode,int_32_t *bw_mode,int_32_t *fw_ref,int_32_t *bw_ref);
+  void      OneComponentChromaPrediction4x4(int_16_t *mpred,int_32_t pix_c_x,int_32_t pix_c_y,int_32_t *****mv,int_32_t ref,int_32_t blocktype,int_32_t uv,int_32_t directforword);
+  void      OneComponentChromaPrediction4x4_dir(int_16_t *mpred,int_32_t pix_c_x,int_32_t pix_c_y,int_32_t *****mv,int_32_t ref,int_32_t blocktype,int_32_t uv,int_32_t refframe);
+  void      IntraChromaPrediction4x4(int_32_t uv, int_32_t block_x, int_32_t block_y);
+  void      ChromaPrediction4x4(int_32_t uv,int_32_t block_x,int_32_t block_y,int_32_t fw_mode,int_32_t bw_mode,int_32_t fw_ref_frame,int_32_t bw_ref_frame);
+  int_32_t    SubMBType2Value(Macroblock *currMB, int_32_t layer);
+  int_32_t    MBType2Value(Macroblock *currMB);
+  int_32_t    writeMotionVector8x8_bid(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode,int_32_t pdir);
+  int_32_t    StoreMotionVector8x8(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode);
+  int_32_t    StoreMotionVector8x8_bid(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode,int_32_t pdir);
+  int_32_t    writeMVD8x8(int_32_t i0,int_32_t j0,int_32_t i1,int_32_t j1,int_32_t refframe,int_32_t dmv_flag,int_32_t fwd_flag,int_32_t mv_mode);
+  void      writeCBPandDqp(int_32_t *CBPRate);
+  int_32_t    writeBlockCoeff(int_32_t block8x8);
+  int_32_t    storeMotionInfo(int_32_t pos);
+  int_32_t    writeFrameRef(int_32_t mode, int_32_t i, int_32_t j, int_32_t fwd_flag, int_32_t ref);
+  void      writeReferenceIndex(int_32_t *RefIndexRate);
+  void      writeMVD(int_32_t *MVDRate);
+  void      writeweightflag();
+  int_32_t    get_mem2D(byte ***array2D, int_32_t rows, int_32_t columns);
+  int_32_t    get_mem2Dint(int_32_t ***array2D, int_32_t rows, int_32_t columns);
+  int_32_t    get_mem3D(byte ****array2D, int_32_t frames, int_32_t rows, int_32_t columns);
+  int_32_t    get_mem3Dint(int_32_t ****array3D, int_32_t frames, int_32_t rows, int_32_t columns);
+  int_32_t    get_mem4Dint(int_32_t *****array4D,int_32_t idx,int_32_t frames,int_32_t rows,int_32_t columns);
+  int_32_t    get_mem2Dshort_int(int_16_t ***array2D, int_16_t rows, int_16_t columns);
 
-    void      free_mem2D(byte **array2D);
-    void      free_mem2Dshort_int(int_16_t **array2D);
-    void      free_mem2Dint(int_32_t **array2D);
-    void      free_mem3D(byte ***array2D, int_32_t frames);
-    void      free_mem3Dint(int_32_t ***array3D, int_32_t frames);
-    void      free_mem4Dint(int_32_t ****array4D, int_32_t idx, int_32_t frames);
+  void      free_mem2D(byte **array2D);
+  void      free_mem2Dshort_int(int_16_t **array2D);
+  void      free_mem2Dint(int_32_t **array2D);
+  void      free_mem3D(byte ***array2D, int_32_t frames);
+  void      free_mem3Dint(int_32_t ***array3D, int_32_t frames);
+  void      free_mem4Dint(int_32_t ****array4D, int_32_t idx, int_32_t frames);
 
-    /* me */
-    int_32_t        only_motion_cost[5][4];
-    void      Init_Motion_Search_Module();
-    void      Clear_Motion_Search_Module();
-    int_32_t    FullPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double   lambda);
-    int_32_t    SubPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda,int_32_t block_index);
-    int_32_t    SubPelBlockMotionSearch_bid(pel_t  **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda, int_32_t block_index);
-    int_32_t    BlockMotionSearch(int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t search_range,double lambda, int_32_t block_index);
-    int_32_t    GetSkipCostMB(double lambda);
-    void      FindSkipModeMotionVector();
-    void      SetMotionVectorPredictor(int_32_t pmv[2],int_32_t **refFrArr,int_32_t ***tmp_mv,int_32_t ref_frame,int_32_t mb_pix_x,int_32_t mb_pix_y,int_32_t blockshape_x,int_32_t blockshape_y,int_32_t ref);
-    int_32_t    Get_Skip_CostMB(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda);
-    int_32_t    Get_Direct_Cost8x8(int_32_t, double);
-    int_32_t    Get_Direct_CostMB(double);
-    int_32_t    scale_motion_vector(int_32_t motion_vector,int_32_t currblkref,int_32_t neighbourblkref,int_32_t block_y_pos,int_32_t curr_block_y,int_32_t ref);
-    int_32_t    calculate_distance(int_32_t blkref, int_32_t fw_bw);
-    void      PartitionMotionSearch(int_32_t, int_32_t, double);
-    void      PartitionMotionSearch_bid(int_32_t, int_32_t, double);
-    void      Get_IP_direct();
-    int_32_t    sign(int_32_t a, int_32_t b);
+  /* me */
+  int_32_t        only_motion_cost[5][4];
+  void      Init_Motion_Search_Module();
+  void      Clear_Motion_Search_Module();
+  int_32_t    FullPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double lambda, int_32_t debug_flag);
+  int_32_t    SubPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda,int_32_t block_index);
+  int_32_t    SubPelBlockMotionSearch_bid(pel_t  **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda, int_32_t block_index);
+  int_32_t    BlockMotionSearch(int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t search_range,double lambda, int_32_t block_index);
+  int_32_t    GetSkipCostMB(double lambda);
+  void      FindSkipModeMotionVector();
+  void      SetMotionVectorPredictor(int_32_t pmv[2],int_32_t **refFrArr,int_32_t ***tmp_mv,int_32_t ref_frame,int_32_t mb_pix_x,int_32_t mb_pix_y,int_32_t blockshape_x,int_32_t blockshape_y,int_32_t ref);
+  int_32_t    Get_Skip_CostMB(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda);
+  int_32_t    Get_Direct_Cost8x8(int_32_t, double);
+  int_32_t    Get_Direct_CostMB(double);
+  int_32_t    scale_motion_vector(int_32_t motion_vector,int_32_t currblkref,int_32_t neighbourblkref,int_32_t block_y_pos,int_32_t curr_block_y,int_32_t ref);
+  int_32_t    calculate_distance(int_32_t blkref, int_32_t fw_bw);
+  void      PartitionMotionSearch(int_32_t, int_32_t, double);
+  void      PartitionMotionSearch_bid(int_32_t, int_32_t, double);
+  void      Get_IP_direct();
+  int_32_t    sign(int_32_t a, int_32_t b);
 
-    // loopfilter
-    void DeblockFrame(ImageParameters *img, byte **imgY, byte ***imgUV);
-    void DeblockMb(ImageParameters *img, byte **imgY, byte ***imgUV, int_32_t mb_y, int_32_t mb_x);
-    void GetStrength(byte Strength[2],Macroblock* MbP,Macroblock* MbQ,int_32_t dir,int_32_t edge,int_32_t block_y,int_32_t block_x);
-        void EdgeLoop(byte* SrcPtr,byte Strength[2],int_32_t QP, int_32_t dir,int_32_t width,int_32_t Chro);
+  // loopfilter
+  void DeblockFrame(ImageParameters *img, byte **imgY, byte ***imgUV);
+  void DeblockMb(ImageParameters *img, byte **imgY, byte ***imgUV, int_32_t mb_y, int_32_t mb_x);
+  void GetStrength(byte Strength[2],Macroblock* MbP,Macroblock* MbQ,int_32_t dir,int_32_t edge,int_32_t block_y,int_32_t block_x);
+  void EdgeLoop(byte* SrcPtr,byte Strength[2],int_32_t QP, int_32_t dir,int_32_t width,int_32_t Chro);
 
-    /* rate control */
-    double      THETA;
-    int_32_t      Switch;
+  /* rate control */
+  double      THETA;
+  int_32_t      Switch;
 
-    int_32_t    Iprev_bits;
-    int_32_t    Pprev_bits;
+  int_32_t    Iprev_bits;
+  int_32_t    Pprev_bits;
 
-    /* rate control variables */
-    int_32_t    Xp, Xb;
-    int_32_t    R, T_field;
-    int_32_t    Np, Nb, bits_topfield, Q;
-    long      T, T1;
+  /* rate control variables */
+  int_32_t    Xb;
+  int_32_t    R, T_field;
+  int_32_t    Np, Nb, bits_topfield, Q;
+  long      T, T1;
 
-    /* HRD consideration */
-    long      UpperBound1, UpperBound2, LowerBound;
-    double      InitialDelayOffset;
-    double      OMEGA;
+  /* HRD consideration */
+  long      UpperBound1, UpperBound2, LowerBound;
+  double      InitialDelayOffset;
+  double      OMEGA;
 
-    double      Wp, Wb;
-    int_32_t    TotalPFrame;
-    int_32_t    DuantQp;
-    int_32_t    PDuantQp;
-    FILE      *BitRate;
-    double      DeltaP;
-    double      bit_rate;
-    double      GAMMAP;      /* LIZG, JVT019r1 */
-    double      BETAP;      /* LIZG, JVT019r1 */
+  double      Wp, Wb;
+  int_32_t    TotalPFrame;
+  int_32_t    DuantQp;
+  int_32_t    PDuantQp;
+  FILE      *BitRate;
+  double      DeltaP;
+  double      bit_rate;
+  double      bit_rate_per_frame;
+  double      GAMMAP;      /* LIZG, JVT019r1 */
+  double      BETAP;      /* LIZG, JVT019r1 */
+  int_32_t   goprate;    //xzhao 20081108
 
-    int_32_t    RC_MAX_QUANT;    /* LIZG 28/10/2002 */
-    int_32_t    RC_MIN_QUANT;    /* LIZG 28/10/2002 */
+  int_32_t    RC_MAX_QUANT;
+  int_32_t    RC_MIN_QUANT;
 
-    double      BufferSize;    /* LIZG 25/10/2002 */
-    double      GOPTargetBufferLevel;
-    double      CurrentBufferFullness;  /* LIZG 25/10/2002 */
-    double      TargetBufferLevel;  /* LIZG 25/10/2002 */
-    double      PreviousBit_Rate;  /* LIZG 25/10/2002 */
-    double      AWp;
-    double      AWb;
-    int_32_t    MyInitialQp;
-    int_32_t    PAverageQp;
+  double      BufferSize;    /* LIZG 25/10/2002 */
+  double      GOPTargetBufferLevel;
+  double      CurrentBufferFullness;  /* LIZG 25/10/2002 */
+  double      TargetBufferLevel;  /* LIZG 25/10/2002 */
+  double      PreviousBit_Rate;  /* LIZG 25/10/2002 */
+  double      AWp;
+  double      AWb;
+  int_32_t    MyInitialQp;
+  int_32_t    PAverageQp;
 
-    /*
-    * LIZG JVT50V2 distortion prediction model ;
-    * coefficients of the prediction model
-    */
-    double      PreviousPictureMAD;
-    double      MADPictureC1;
-    double      MADPictureC2;
-    double      PMADPictureC1;
-    double      PMADPictureC2;
+  /*
+  * LIZG JVT50V2 distortion prediction model ;
+  * coefficients of the prediction model
+  */
+  double      PreviousPictureMAD;
+  double      MADPictureC1;
+  double      MADPictureC2;
+  double      PMADPictureC1;
+  double      PMADPictureC2;
 
-    /* LIZG JVT50V2 picture layer MAD */
-    Boolean      PictureRejected[21];
-    double      PPictureMAD[21];
-    double      PictureMAD[21];
-    double      ReferenceMAD[21];
+  /* LIZG JVT50V2 picture layer MAD */
+  myboolean      PictureRejected[21];
+  double      PPictureMAD[21];
+  double      PictureMAD[21];
+  double      ReferenceMAD[21];
 
-    /* quadratic rate-distortion model */
-    Boolean      m_rgRejected[21];
-    double      m_rgQp[21];
-    double      m_rgRp[21];
-    double      m_X1;
-    double      m_X2;
-    int_32_t    m_Qc;
-    double      m_Qstep;
-    int_32_t    m_Qp;
-    int_32_t    Pm_Qp;
-    int_32_t    PreAveMBHeader;
-    int_32_t    CurAveMBHeader;
-    int_32_t    PPreHeader;
-    int_32_t    PreviousQp1;
-    int_32_t    PreviousQp2;
-    int_32_t    NumberofBFrames;
+  /* quadratic rate-distortion model */
+  myboolean      m_rgRejected[21];
+  double      P_frm_Qstep[21];
+  double      P_frm_R[21];
+  double      m_X1, m_X2; //R-Q model parameters
+  int_32_t    m_Qc;
+  double      m_Qstep;
+  int_32_t    m_Qp;
+  int_32_t    Pm_Qp;
+  int_32_t    PreAveMBHeader;
+  int_32_t    CurAveMBHeader;
+  int_32_t    PPreHeader;
+  int_32_t    PreviousQp1;
+  int_32_t    PreviousQp2;
 
-    /* basic unit layer rate control */
-    int_32_t    TotalFrameQP;
-    int_32_t    NumberofBasicUnit;
-    int_32_t    PAveHeaderBits1;
-    int_32_t    PAveHeaderBits2;
-    int_32_t    PAveHeaderBits3;
-    int_32_t    PAveFrameQP;
-    int_32_t    TotalNumberofBasicUnit;
-    int_32_t    CodedBasicUnit;
-    double      MINVALUE;
-    double      CurrentFrameMAD;
-    double      CurrentBUMAD;
-    double      TotalBUMAD;
-    double      PreviousFrameMAD;
-    int_32_t    m_Hp;
-    int_32_t    m_windowSize;
-    int_32_t    MADm_windowSize;
-    int_32_t    DDquant;
-    int_32_t    MBPerRow;
-    double      AverageMADPreviousFrame;
-    int_32_t    TotalBasicUnitBits;
-    int_32_t    QPLastPFrame;
-    int_32_t    QPLastGOP;
+  /* basic unit layer rate control */
+  int_32_t    TotalFrameQP;
+  int_32_t    NumberofBasicUnit;
+  int_32_t    PAveHeaderBits1;
+  int_32_t    PAveHeaderBits2;
+  int_32_t    PAveHeaderBits3;
+  int_32_t    PAveFrameQP;
+  int_32_t    TotalNumberofBasicUnit;
+  int_32_t    CodedBasicUnit;
+  double      MINVALUE;
+  double      CurrentFrameMAD;
+  double      CurrentBUMAD;
+  double      TotalBUMAD;
+  double      PreviousFrameMAD;
+  int_32_t    m_Hp;
+  int_32_t    m_windowSize;
+  int_32_t    MADm_windowSize;
+  int_32_t    DDquant;
+  double      AverageMADPreviousFrame;
+  int_32_t    TotalBasicUnitBits;
+  int_32_t    QPLastPFrame;
+  int_32_t    QPLastGOP;
 
-    double      Pm_rgQp[20];
-    double      Pm_rgRp[20];
-    double      Pm_X1;
-    double      Pm_X2;
-    int_32_t    Pm_Hp;
+  double      PP_frm_Qstep[20];
+  double      PP_frm_R[20];
+  double      Pm_X1;
+  double      Pm_X2;
 
-    /* adaptive field/frame coding */
-    int_32_t    FieldQPBuffer;
-    int_32_t    FrameQPBuffer;
-    int_32_t    FrameAveHeaderBits;
-    int_32_t    FieldAveHeaderBits;
-    double      BUPFMAD[6336];    /* LIZG */
-    double      BUCFMAD[6336];    /* LIZG */
-    double      FCBUCFMAD[6336];
-    double      FCBUPFMAD[6336];
-    Boolean      GOPOverdue;
+  /* adaptive field/frame coding */
+  int_32_t    FieldQPBuffer;
+  int_32_t    FrameQPBuffer;
+  int_32_t    FrameAveHeaderBits;
+  int_32_t    FieldAveHeaderBits;
+  double      BUPFMAD[6336];    /* LIZG */
+  double      BUCFMAD[6336];    /* LIZG */
+  double      FCBUCFMAD[6336];
+  double      FCBUPFMAD[6336];
+  myboolean   GOPOverdue;
 
-    /* comput macroblock activity for rate control */
-    int_32_t    diffy[16][16];
-    int_32_t    diffyy[16][16];
-    int_32_t    diffy8[16][16];    /* for P8X8 mode */
-    void      rc_init_seq();
-    void      rc_init_GOP(int_32_t np, int_32_t nb);
-    void      rc_update_pict_frame(int_32_t nbits);
-    void      rc_init_pict(int_32_t fieldpic, int_32_t topfield, int_32_t targetcomputation);
-    void      rc_update_pict(int_32_t nbits);
-    void      setbitscount(int_32_t nbits);
-    int_32_t    updateQuantizationParameter(int_32_t topfield); /* LIZG */
-    void      updateRCModel();  /* LIZG */
-    void      updateMADModel();  /* LIZG */
-    Boolean      skipThisFrame();  /* LIZG */
-    void      RCModelEstimator(int_32_t n_windowSize);  /* LIZG */
-    void      MADModelEstimator(int_32_t n_windowSize);  /* LIZG */
-    double      calc_MAD();  /* LIZG */
-    double      ComputeFrameMAD();
-    int_32_t    Qstep2QP(double Qstep);
-    double      QP2Qstep(int_32_t QP);
+  /* compute macroblock activity for rate control */
+  int_32_t    diffy[16][16];
+  void      rc_init_seq();
+  void      rc_init_GOP(int_32_t np, int_32_t nb);
+  void      rc_update_pict_frame(int_32_t nbits);
+  void      rc_init_pict(int_32_t fieldpic, int_32_t topfield, int_32_t targetcomputation);
+  void      rc_update_pict(int_32_t nbits);
+  void      setbitscount(int_32_t nbits);
+  int_32_t    updateQuantizationParameter(int_32_t topfield); /* LIZG */
+  void      updateRCModel();  /* LIZG */
+  void      updateMADModel();  /* LIZG */
+  myboolean      skipThisFrame();  /* LIZG */
+  void      RCModelEstimator(int_32_t n_windowSize);  /* LIZG */
+  void      MADModelEstimator(int_32_t n_windowSize);  /* LIZG */
+  double      calc_MAD();  /* LIZG */
+  double      ComputeFrameMAD();
+  int_32_t    Qstep2QP(double Qstep);
+  double      QP2Qstep(int_32_t QP);
 
-    /* rdo coding state */
-    int_32_t    QP, QP2;
-    int_32_t    DELTA_QP, DELTA_QP2;
-    int_32_t    pred[16][16];
+  /* rdo coding state */
+  int_32_t    DELTA_QP, DELTA_QP2;
+  int_32_t    pred[16][16];
 
-    /* MODULE PARAMETERS */
-    int_16_t    ***cofAC4x4, ****cofAC4x4intern;
-    int_32_t    best_mode;
-    int_32_t    rec_mbY[16][16], rec_mbU[8][8], rec_mbV[8][8], rec_mbY8x8[16][16];  /* reconstruction
-                                              * values */
-    int_32_t    mpr8x8[16][16];
-    int_16_t    ****cofAC, ****cofAC8x8;  /* [8x8block][4x4block][level/run][scan_pos] */
-    int_16_t    ***cofDC;      /* [yuv][level/run][scan_pos] */
-    int_32_t    ****chromacofAC4x4;
-    int_32_t    cbp, cbp8x8, cnt_nonz_8x8;
-    int_32_t    cbp_blk, cbp_blk8x8;
-    int_32_t    frefframe[2][2], brefframe[2][2], b8mode[4], b8pdir[4];
-    int_32_t    best8x8mode[4];      /* [block] */
-    int_32_t    best8x8pdir[MAXMODE][4];  /* [mode][block] */
-    int_32_t    best8x8ref[MAXMODE][4];    /* [mode][block] */
-    int_32_t    b8_ipredmode[4], b8_intra_pred_modes[4];
-    int_32_t    best_c_imode;
-    int_32_t    best_weight_flag;    /* !! shenyanfei */
+  /* MODULE PARAMETERS */
+  int_16_t    ***cofAC4x4, ****cofAC4x4intern;
+  int_32_t    best_mode;
+  byte        rec_mbY[16][16], rec_mbU[8][8], rec_mbV[8][8], rec_mbY8x8[16][16];  /* reconstruction
+                                                                                  * values */
+  int_16_t    mpr8x8[16][16];
+  int_16_t    ****cofAC, ****cofAC8x8;  /* [8x8block][4x4block][level/run][scan_pos] */
+  int_16_t    ***cofDC;      /* [yuv][level/run][scan_pos] */
+  int_32_t    ****chromacofAC4x4;
+  int_32_t    cbp, cbp8x8, cnt_nonz_8x8;
+  int_32_t    cbp_blk, cbp_blk8x8;
+  int_32_t    frefframe[2][2], brefframe[2][2], b8mode[4], b8pdir[4];
+  int_32_t    best8x8mode[4];      /* [block] */
+  int_32_t    best8x8pdir[MAXMODE][4];  /* [mode][block] */
+  int_32_t    best8x8ref[MAXMODE][4];    /* [mode][block] */
+  int_32_t    b8_ipredmode[4], b8_intra_pred_modes[4];
+  int_32_t    best_c_imode;
+  int_32_t    best_weight_flag;    /* !! shenyanfei */
 
-    int_32_t    best8x8bwref[MAXMODE][4];  /* [mode][block] */
-    int_32_t    best8x8symref[MAXMODE][4][2];  /* [mode][block] */
+  int_32_t    best8x8bwref[MAXMODE][4];  /* [mode][block] */
+  int_32_t    best8x8symref[MAXMODE][4][2];  /* [mode][block] */
 
-    int_32_t    best_intra_pred_modes_tmp[4];
-    int_32_t    best_ipredmode_tmp[2][2];
-    int_32_t    best_mpr_tmp[16][16];
-    int_32_t    best_dct_mode;
-    CSptr      cs_mb, cs_b8, cs_cm;
-    void      delete_coding_state(CSptr);  /* !< delete structure */
-    CSptr      create_coding_state();    /* !< create structure */
+  int_32_t    best_intra_pred_modes_tmp[4];
+  int_32_t    best_ipredmode_tmp[2][2];
+  int_32_t    best_mpr_tmp[16][16];
+  int_32_t    best_dct_mode;
+  CSptr      cs_mb, cs_b8, cs_cm;
+  void      delete_coding_state(CSptr);  /* !< delete structure */
+  CSptr      create_coding_state();    /* !< create structure */
 
-    void      store_coding_state(CSptr);  /* !< store parameters */
-    void      reset_coding_state(CSptr);  /* !< restore parameters */
+  void      store_coding_state(CSptr);  /* !< store parameters */
+  void      reset_coding_state(CSptr);  /* !< restore parameters */
 
-    /* rate-distortion optimization */
-    void      init_rdopt();
-    void      clear_rdopt();
-    double      RDCost_for_AVSIntraBlocks(int_32_t *nonzero,int_32_t b8,int_32_t ipmode,double   lambda,double   min_rdcost,int_32_t mostProbableMode);
-    int_32_t    Mode_Decision_for_AVSIntraMacroblock(double lambda, int_32_t *total_cost);
-    double      RDCost_for_8x8blocks(int_32_t *cnt_nonz,int_32_t *cbp_blk,double   lambda,int_32_t block,int_32_t mode,int_32_t pdir,int_32_t ref,int_32_t bwd_ref);
-    void      SetModesAndRefframeForBlocks(int_32_t mode);
-    void      SetCoeffAndReconstruction8x8(Macroblock *currMB);
-    void      SetMotionVectorsMB(Macroblock *currMB, int_32_t bframe);
-    int_32_t    RDCost_for_macroblocks(double lambda, int_32_t mode, double *min_rdcost);
-    void      store_macroblock_parameters(int_32_t mode);
-    void      set_stored_macroblock_parameters();
-    void            (c_avs_enc:: *encode_one_macroblock) ();
-    void      encode_one_intra_macroblock_rdo();
-    void      encode_one_intra_macroblock_not_rdo();
-    void      encode_one_inter_macroblock_rdo();
-    void      encode_one_inter_macroblock_not_rdo();
+  /* rate-distortion optimization */
+  void      init_rdopt();
+  void      clear_rdopt();
+  double      RDCost_for_AVSIntraBlocks(int_32_t *nonzero,int_32_t b8,int_32_t ipmode,double   lambda,double   min_rdcost,int_32_t mostProbableMode);
+  int_32_t    Mode_Decision_for_AVSIntraMacroblock(double lambda, int_32_t *total_cost);
+  double      RDCost_for_8x8blocks(int_32_t *cnt_nonz,int_32_t *cbp_blk,double   lambda,int_32_t block,int_32_t mode,int_32_t pdir,int_32_t ref,int_32_t bwd_ref);
+  void      SetModesAndRefframeForBlocks(int_32_t mode);
+  void      SetCoeffAndReconstruction8x8(Macroblock *currMB);
+  void      SetMotionVectorsMB(Macroblock *currMB, int_32_t bframe);
+  int_32_t    RDCost_for_macroblocks(double lambda, int_32_t mode, double *min_rdcost);
+  void      store_macroblock_parameters(int_32_t mode);
+  void      set_stored_macroblock_parameters();
+  void            (c_avs_enc:: *encode_one_macroblock) ();
+  void      encode_one_intra_macroblock_rdo();
+  void      encode_one_intra_macroblock_not_rdo();
+  void      encode_one_inter_macroblock_rdo();
+  void      encode_one_inter_macroblock_not_rdo();
+#ifdef _ME_FOR_RATE_CONTROL_
+  void      encode_one_inter_macroblock_for_rate_control();
+  void      encode_one_b_frame_macroblock_for_rate_control();
+#endif
 
-    void      encode_one_b_frame_macroblock_rdo_fast();
-    void      encode_one_b_frame_macroblock_rdo();
-    void      encode_one_b_frame_macroblock_not_rdo();
-    int_32_t    Mode_Decision_for_AVSIntraMacroblock_not_rdo(double lambda, int_32_t *total_cost);
+  void      encode_one_b_frame_macroblock_rdo_fast();
+  void      encode_one_b_frame_macroblock_rdo();
+  void      encode_one_b_frame_macroblock_not_rdo();
+  int_32_t    Mode_Decision_for_AVSIntraMacroblock_not_rdo(double lambda, int_32_t *total_cost);
 
-    /* ref Buffer */
-    pel_t      UMVPelY_14(pel_t **Pic, int_32_t y, int_32_t x);
-    pel_t      FastPelY_14(pel_t **Pic, int_32_t y, int_32_t x);
-    pel_t      *FastLineX(int_32_t dummy, pel_t *Pic, int_32_t y, int_32_t x);
-    pel_t      *UMVLineX(int_32_t, pel_t *, int_32_t, int_32_t);
+  /* ref Buffer */
+  pel_t      UMVPelY_14(pel_t **Pic, int_32_t y, int_32_t x);
+  pel_t      FastPelY_14(pel_t **Pic, int_32_t y, int_32_t x);
+  pel_t      *FastLineX(int_32_t dummy, pel_t *Pic, int_32_t y, int_32_t x);
+  pel_t      *UMVLineX(int_32_t, pel_t *, int_32_t, int_32_t);
 
-    /* slice */
-    void      stuffing_byte(int_32_t n);
-    int_32_t    start_slice();
-    int_32_t    terminate_picture();
-    void      picture_data();
-    void      store_field_MV();
-    /* vlc */
-    int_32_t    u_1(char *tracestring, int_32_t value, Bitstream *part);
-    int_32_t    se_v(char *tracestring, int_32_t value, Bitstream *part);
-    int_32_t    ue_v(char *tracestring, int_32_t value, Bitstream *part);
-    int_32_t    u_v(int_32_t n, char *tracestring, int_32_t value, Bitstream *part);
+  /* slice */
+  void      stuffing_byte(int_32_t n);
+  int_32_t    start_slice();
+  int_32_t    terminate_picture();
+  void      picture_data();
+  void      store_field_MV();
+  /* vlc */
+  int_32_t    u_1(char *tracestring, int_32_t value, Bitstream *part);
+  int_32_t    se_v(char *tracestring, int_32_t value, Bitstream *part);
+  int_32_t    ue_v(char *tracestring, int_32_t value, Bitstream *part);
+  int_32_t    u_v(int_32_t n, char *tracestring, int_32_t value, Bitstream *part);
 
-    int_32_t    writeSyntaxElement_UVLC(SyntaxElement *se, Bitstream *this_dataPart);
-    int_32_t    writeSyntaxElement_fixed(SyntaxElement *se, Bitstream *this_dataPart);
+  int_32_t    writeSyntaxElement_UVLC(SyntaxElement *se, Bitstream *this_dataPart);
+  int_32_t    writeSyntaxElement_fixed(SyntaxElement *se, Bitstream *this_dataPart);
 
-    void      writeUVLC2buffer(SyntaxElement *se, Bitstream *currStream);
-    int_32_t    writeSyntaxElement2Buf_Fixed(SyntaxElement *se, Bitstream *this_streamBuffer);
-    int_32_t    symbol2uvlc(SyntaxElement *se);
-    void      ue_linfo(int_32_t n, int_32_t dummy, int_32_t *len, int_32_t *info);
-    void      se_linfo(int_32_t mvd, int_32_t dummy, int_32_t *len, int_32_t *info);
-    void      cbp_linfo_intra(int_32_t cbp, int_32_t dummy, int_32_t *len, int_32_t *info);
-    void      cbp_linfo_inter(int_32_t cbp, int_32_t dummy, int_32_t *len, int_32_t *info);
-    int_32_t    writeSyntaxElement_Intra4x4PredictionMode(SyntaxElement *se, Bitstream *this_dataPart);
-    void      writeVlcByteAlign(Bitstream *currStream);
-    int_32_t    writeSyntaxElement_Run(SyntaxElement *se, Bitstream *bitstream);
-    int_32_t    symbol2vlc(SyntaxElement *sym);
-    int_32_t    encode_IP_frame(avs_enc_frame_t *pFrame);
-    int_32_t    encode_B_frame(avs_enc_frame_t *pFrame);    
-    void      OpenORABS(OutputStream *p, char *fname);
-    void      CloseORABS(OutputStream *p);
-    void      FlushORABS(OutputStream *p);
+  void      writeUVLC2buffer(SyntaxElement *se, Bitstream *currStream);
+  int_32_t    writeSyntaxElement2Buf_Fixed(SyntaxElement *se, Bitstream *this_streamBuffer);
+  int_32_t    symbol2uvlc(SyntaxElement *se);
+  void      ue_linfo(int_32_t n, int_32_t dummy, int_32_t *len, int_32_t *info);
+  void      se_linfo(int_32_t mvd, int_32_t dummy, int_32_t *len, int_32_t *info);
+  void      cbp_linfo_intra(int_32_t cbp, int_32_t dummy, int_32_t *len, int_32_t *info);
+  void      cbp_linfo_inter(int_32_t cbp, int_32_t dummy, int_32_t *len, int_32_t *info);
+  int_32_t    writeSyntaxElement_Intra4x4PredictionMode(SyntaxElement *se, Bitstream *this_dataPart);
+  void      writeVlcByteAlign(Bitstream *currStream);
+  int_32_t    writeSyntaxElement_Run(SyntaxElement *se, Bitstream *bitstream);
+  int_32_t    symbol2vlc(SyntaxElement *sym);
+  int_32_t    encode_IP_frame(avs_enc_frame_t *pFrame);
+  int_32_t    encode_B_frame(avs_enc_frame_t *pFrame);    
+  void      OpenORABS(OutputStream *p, char *fname);
+  void      CloseORABS(OutputStream *p);
+  void      FlushORABS(OutputStream *p);
 
-    /* entropy coding */
-    int_32_t write_n_bit(OutputStream *p,int_32_t b,int_32_t n);
-_inline  void write_1_bit(OutputStream *p, int_32_t b);
-    int_32_t    write_align_stuff(OutputStream *p);
-    int_32_t    write_a_byte(OutputStream *p, int_32_t b);
-    /* header */
-    int_32_t    bbv_check_times;
-    int_32_t    luma_scale;
-    int_32_t    luma_shift;
-    int_32_t    chroma_scale;
-    int_32_t    chroma_shift;
-    int_32_t    low_delay;
-    int_32_t    slice_vertical_position_extension;
-    int_32_t    stream_length;
-    int_32_t    picture_distance;
-    //rm52j
-    int_32_t       pic_dist;             // picture distance relative to the I frame
-    int_32_t       last_pic_dist_i;      // distance for last I picture 
-    int_32_t       curr_pic_dist_i;      // distance for current I picture 
+  /* entropy coding */
+  int_32_t write_n_bit(OutputStream *p,int_32_t b,int_32_t n);
+  _inline  void write_1_bit(OutputStream *p, int_32_t b);
+  int_32_t    write_align_stuff(OutputStream *p);
+  int_32_t    write_a_byte(OutputStream *p, int_32_t b);
+  /* header */
+  int_32_t    bbv_check_times;
+  int_32_t    luma_scale;
+  int_32_t    luma_shift;
+  int_32_t    chroma_scale;
+  int_32_t    chroma_shift;
+  int_32_t    low_delay;
+  int_32_t    slice_vertical_position_extension;
+  int_32_t    stream_length;
+  int_32_t    picture_distance;
+  //rm52j
+  int_32_t       pic_dist;             // picture distance relative to the I frame
+  int_32_t       last_pic_dist_i;      // distance for last I picture 
+  int_32_t       curr_pic_dist_i;      // distance for current I picture 
 
-    int_32_t    picture_decoder_order;
-    int_32_t    bbv_delay;
-    int_32_t    picture_coding_type;
-    int_32_t    picture_reference_flag;
-    int_32_t    picture_reference_index;
-    // xzhao 20081022
-    //int_32_t    frame_rate;
-    float           frame_rate;
-    int_32_t    tc0;
-    void      picture_header();
+  int_32_t    picture_decoder_order;
+  int_32_t    bbv_delay;
+  int_32_t    picture_coding_type;
+  int_32_t    picture_reference_flag;
+  int_32_t    picture_reference_index;
+  float           frame_rate;
+  int_32_t    tc0;
+  void      picture_header();
 
-    /* encoding frame */
-    int_32_t    encode_one_frame();
+  /* encoding frame */
+  int_32_t    encode_one_frame();
 
-    /* quantization */
-    __m128i clip0q;
-    __m128i clip255q;
-    __inline void    avs_const_initialize();
-    __inline void       avs_const_initialize_block();
-    __inline __m128i  avs_clip_0_255_w(__m128i xmm0);
-    __inline __m128i  avs_combine_w2b(__m128i xmm0, __m128i xmm1);
-    __inline __m128i  avs_combine_d2w(__m128i xmm0, __m128i xmm1);
-    __inline __m128i  avs_filter_halfpel_w(__m128i xmm0, __m128i xmm1, __m128i xmm2);
-    __inline __m128i  avs_filter_quaterpel_w(__m128i xmm0, __m128i xmm1, __m128i xmm2);
-    __inline __m128i  avs_filter_quaterpel_d(__m128i xmm0, __m128i xmm1, __m128i xmm2);
-    __inline __m128i  avs_zero(__m128i xmm0);
-    void          Update_Picture_Buffers();
-    void          OneComponentLumaPrediction4x4(int_32_t *mpred,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t *mv,int_32_t ref);
-    void          SetRefAndMotionVectors(int_32_t block,int_32_t mode,int_32_t ref,int_32_t bw_ref,int_32_t pdir);
-    avs_enc_create_t* p_avsCreate;
-    avs_enc_frame_t*  p_avs_enc_frame;
-    //avs_enc_stats_t * p_stats;
-    pel_t line[16];
-    MB_INFO * pMbInfo;
-    int_32_t dec_frm_num;
-  };
-
-
-
+  /* quantization */
+  __m128i clip0q;
+  __m128i clip255q;
+  __inline void    avs_const_initialize();
+  __inline void       avs_const_initialize_block();
+  __inline __m128i  avs_clip_0_255_w(__m128i xmm0);
+  __inline __m128i  avs_combine_w2b(__m128i xmm0, __m128i xmm1);
+  __inline __m128i  avs_combine_d2w(__m128i xmm0, __m128i xmm1);
+  __inline __m128i  avs_filter_halfpel_w(__m128i xmm0, __m128i xmm1, __m128i xmm2);
+  __inline __m128i  avs_filter_quaterpel_w(__m128i xmm0, __m128i xmm1, __m128i xmm2);
+  __inline __m128i  avs_filter_quaterpel_d(__m128i xmm0, __m128i xmm1, __m128i xmm2);
+  __inline __m128i  avs_zero(__m128i xmm0);
+  void          Update_Picture_Buffers();
+  void          OneComponentLumaPrediction4x4(int_32_t *mpred,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t *mv,int_32_t ref);
+  void          SetRefAndMotionVectors(int_32_t block,int_32_t mode,int_32_t ref,int_32_t bw_ref,int_32_t pdir);
+  avs_enc_create_t* p_avsCreate;
+  avs_enc_frame_t*  p_avs_enc_frame;
+  //avs_enc_stats_t * p_stats;
+  pel_t line[16];
+  MB_INFO * pMbInfo;
+  int_32_t dec_frm_num;
+#ifdef ROI_ENABLE
+  byte *ROIArray;
+  byte* YCbCr[3];
+  int_32_t w[3],h[3];
+  LocateTextRegions_t detect_roi;
+#endif
+};
 #endif

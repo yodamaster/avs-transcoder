@@ -1,34 +1,3 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
-
 #include "transcoder.h"
 #include "multithead.h"
 #include <stdio.h>
@@ -37,9 +6,6 @@
 #include <sys/timeb.h>
 #include <memory.h>
 #include <string.h>
-
-
-
 #include <BaseTsd.h>
 #include <Windows.h>
 #include <WinBase.h>
@@ -51,7 +17,6 @@
 #include <qedit.h>         // for Null Renderer
 #include <Dvdmedia.h>
 
-//#include "global.h"
 
 #include "grabber.h"
 #include "Convert.h"
@@ -59,10 +24,16 @@
 #include "wmsdkidl.h"
 #include "wmsdk.h"
 #include "rostream.h"
-//#include "stdafx.h"
 
 #define TLS         __declspec(thread)
-#define  MAX_THREAD_NUM 4
+#define MAX_THREAD_NUM 4
+#define MAX_IMG_WIDTH     352
+#define MAX_IMG_HEIGHT    288
+
+#pragma warning (disable:4005)
+#pragma warning (disable:4018)
+#pragma warning (disable:4244)
+
 
 PTHREAD   p_thread;
 PWTHREAD  p_wthread;
@@ -80,18 +51,15 @@ int B_num = 2;
 int last_thread_num = 0;
 int last_frm_num = 0;
 
-//xzhao 20081108
 int ttfrms=0,cdfrms=0;
 
 __declspec( thread ) c_avs_enc    **p_c_avs_enc;
-//__declspec( thread ) c_mpeg2_dec  *p_c_mpeg2_dec;
 unsigned char ***pYUVbuf;
 InputParameters   inputs, *input;
 
 ColorSpaceConversions conv;
 double        length;
 bool      bUDF_ASFBitrate = false;      //Flag, True if user specified the Bitrate for converting an asf video, otherwise, False.
-// xzhao
 bool          bFramerateFlag = false;
 int           iOrgWidth;
 int           iOrgHeight;
@@ -109,164 +77,162 @@ int    GetVideoInfo(char* FileName, double* fps, double* length);
 int    GetASFVidoInfo(char* FileName);
 HRESULT GetStreamNumbers(IWMProfile* pProfile);
 
-//xzhao 20080708
 int *         dsmptmp1;
 int *         dsmptmp2;
 int *         dsmptmp3;
 int *         dsmptmp4;
 
-//  wangyue 20081107 for YUV_Scale_v2
 const int filter16[8][16][12] = {   // sine, N = 3
-                                    { // D = 1
-                                      {0,0,0,0,0,128,0,0,0,0,0,0},
-                                      {0,0,0,2,-6,127,7,-2,0,0,0,0},
-                                      {0,0,0,3,-12,125,16,-5,1,0,0,0},
-                                      {0,0,0,4,-16,120,26,-7,1,0,0,0},
-                                      {0,0,0,5,-18,114,36,-10,1,0,0,0},
-                                      {0,0,0,5,-20,107,46,-12,2,0,0,0},
-                                      {0,0,0,5,-21,99,57,-15,3,0,0,0},
-                                      {0,0,0,5,-20,89,68,-18,4,0,0,0},
-                                      {0,0,0,4,-19,79,79,-19,4,0,0,0},
-                                      {0,0,0,4,-18,68,89,-20,5,0,0,0},
-                                      {0,0,0,3,-15,57,99,-21,5,0,0,0},
-                                      {0,0,0,2,-12,46,107,-20,5,0,0,0},
-                                      {0,0,0,1,-10,36,114,-18,5,0,0,0},
-                                      {0,0,0,1,-7,26,120,-16,4,0,0,0},
-                                      {0,0,0,1,-5,16,125,-12,3,0,0,0},
-                                      {0,0,0,0,-2,7,127,-6,2,0,0,0}
-                                    },
-                                    { // D = 1.5
-                                      {0,2,0,-14,33,86,33,-14,0,2,0,0},
-                                      {0,1,1,-14,29,85,38,-13,-1,2,0,0},
-                                      {0,1,2,-14,24,84,43,-12,-2,2,0,0},
-                                      {0,1,2,-13,19,83,48,-11,-3,2,0,0},
-                                      {0,0,3,-13,15,81,53,-10,-4,3,0,0},
-                                      {0,0,3,-12,11,79,57,-8,-5,3,0,0},
-                                      {0,0,3,-11,7,76,62,-5,-7,3,0,0},
-                                      {0,0,3,-10,3,73,65,-2,-7,3,0,0},
-                                      {0,0,3,-9,0,70,70,0,-9,3,0,0},
-                                      {0,0,3,-7,-2,65,73,3,-10,3,0,0},
-                                      {0,0,3,-7,-5,62,76,7,-11,3,0,0},
-                                      {0,0,3,-5,-8,57,79,11,-12,3,0,0},
-                                      {0,0,3,-4,-10,53,81,15,-13,3,0,0},
-                                      {0,0,2,-3,-11,48,83,19,-13,2,1,0},
-                                      {0,0,2,-2,-12,43,84,24,-14,2,1,0},
-                                      {0,0,2,-1,-13,38,85,29,-14,1,1,0}
-                                    },
+  { // D = 1
+    {0,0,0,0,0,128,0,0,0,0,0,0},
+    {0,0,0,2,-6,127,7,-2,0,0,0,0},
+    {0,0,0,3,-12,125,16,-5,1,0,0,0},
+    {0,0,0,4,-16,120,26,-7,1,0,0,0},
+    {0,0,0,5,-18,114,36,-10,1,0,0,0},
+    {0,0,0,5,-20,107,46,-12,2,0,0,0},
+    {0,0,0,5,-21,99,57,-15,3,0,0,0},
+    {0,0,0,5,-20,89,68,-18,4,0,0,0},
+    {0,0,0,4,-19,79,79,-19,4,0,0,0},
+    {0,0,0,4,-18,68,89,-20,5,0,0,0},
+    {0,0,0,3,-15,57,99,-21,5,0,0,0},
+    {0,0,0,2,-12,46,107,-20,5,0,0,0},
+    {0,0,0,1,-10,36,114,-18,5,0,0,0},
+    {0,0,0,1,-7,26,120,-16,4,0,0,0},
+    {0,0,0,1,-5,16,125,-12,3,0,0,0},
+    {0,0,0,0,-2,7,127,-6,2,0,0,0}
+  },
+  { // D = 1.5
+    {0,2,0,-14,33,86,33,-14,0,2,0,0},
+    {0,1,1,-14,29,85,38,-13,-1,2,0,0},
+    {0,1,2,-14,24,84,43,-12,-2,2,0,0},
+    {0,1,2,-13,19,83,48,-11,-3,2,0,0},
+    {0,0,3,-13,15,81,53,-10,-4,3,0,0},
+    {0,0,3,-12,11,79,57,-8,-5,3,0,0},
+    {0,0,3,-11,7,76,62,-5,-7,3,0,0},
+    {0,0,3,-10,3,73,65,-2,-7,3,0,0},
+    {0,0,3,-9,0,70,70,0,-9,3,0,0},
+    {0,0,3,-7,-2,65,73,3,-10,3,0,0},
+    {0,0,3,-7,-5,62,76,7,-11,3,0,0},
+    {0,0,3,-5,-8,57,79,11,-12,3,0,0},
+    {0,0,3,-4,-10,53,81,15,-13,3,0,0},
+    {0,0,2,-3,-11,48,83,19,-13,2,1,0},
+    {0,0,2,-2,-12,43,84,24,-14,2,1,0},
+    {0,0,2,-1,-13,38,85,29,-14,1,1,0}
+  },
 
-                                    { // D = 2
-                                      {2,0,-10,0,40,64,40,0,-10,0,2,0},
-                                      {2,1,-9,-2,37,64,42,2,-10,-1,2,0},
-                                      {2,1,-9,-3,34,64,44,4,-10,-1,2,0},
-                                      {2,1,-8,-5,31,63,47,6,-10,-2,3,0},
-                                      {1,2,-8,-6,29,62,49,8,-10,-2,3,0},
-                                      {1,2,-7,-7,26,61,52,10,-10,-3,3,0},
-                                      {1,2,-6,-8,23,60,54,13,-10,-4,3,0},
-                                      {1,2,-6,-9,20,59,56,15,-10,-4,3,1},
-                                      {1,2,-5,-9,18,57,57,18,-9,-5,2,1},
-                                      {1,3,-4,-10,15,56,59,20,-9,-6,2,1},
-                                      {0,3,-4,-10,13,54,60,23,-8,-6,2,1},
-                                      {0,3,-3,-10,10,52,61,26,-7,-7,2,1},
-                                      {0,3,-2,-10,8,49,62,29,-6,-8,2,1},
-                                      {0,3,-2,-10,6,47,63,31,-5,-8,1,2},
-                                      {0,2,-1,-10,4,44,64,34,-3,-9,1,2},
-                                      {0,2,-1,-10,2,42,64,37,-2,-9,1,2}
-                                    },
+  { // D = 2
+    {2,0,-10,0,40,64,40,0,-10,0,2,0},
+    {2,1,-9,-2,37,64,42,2,-10,-1,2,0},
+    {2,1,-9,-3,34,64,44,4,-10,-1,2,0},
+    {2,1,-8,-5,31,63,47,6,-10,-2,3,0},
+    {1,2,-8,-6,29,62,49,8,-10,-2,3,0},
+    {1,2,-7,-7,26,61,52,10,-10,-3,3,0},
+    {1,2,-6,-8,23,60,54,13,-10,-4,3,0},
+    {1,2,-6,-9,20,59,56,15,-10,-4,3,1},
+    {1,2,-5,-9,18,57,57,18,-9,-5,2,1},
+    {1,3,-4,-10,15,56,59,20,-9,-6,2,1},
+    {0,3,-4,-10,13,54,60,23,-8,-6,2,1},
+    {0,3,-3,-10,10,52,61,26,-7,-7,2,1},
+    {0,3,-2,-10,8,49,62,29,-6,-8,2,1},
+    {0,3,-2,-10,6,47,63,31,-5,-8,1,2},
+    {0,2,-1,-10,4,44,64,34,-3,-9,1,2},
+    {0,2,-1,-10,2,42,64,37,-2,-9,1,2}
+  },
 
-                                    { // D = 2.5
+  { // D = 2.5
 
-                                      {0,-4,-7,11,38,52,38,11,-7,-4,0,0},
-                                      {0,-4,-7,9,37,51,40,13,-6,-7,2,0},
-                                      {0,-3,-7,8,35,51,41,14,-5,-7,1,0},
-                                      {0,-2,-8,6,33,51,42,16,-5,-7,2,0},
-                                      {0,-2,-8,5,32,50,43,18,-4,-8,2,0},
-                                      {0,-2,-8,4,30,50,45,19,-3,-8,1,0},
-                                      {0,-1,-8,2,28,49,46,21,-2,-8,1,0},
-                                      {0,-1,-8,1,26,49,47,23,-1,-8,0,0},
-                                      {0,0,-8,0,24,48,48,24,0,-8,0,0},
-                                      {0,0,-8,-1,23,47,49,26,1,-8,-1,0},
-                                      {0,1,-8,-2,21,46,49,28,2,-8,-1,0},
-                                      {0,1,-8,-3,19,45,50,30,4,-8,-2,0},
-                                      {0,2,-8,-4,18,43,50,32,5,-8,-2,0},
-                                      {0,2,-7,-5,16,42,51,33,6,-8,-2,0},
-                                      {0,1,-7,-5,14,41,51,35,8,-7,-3,0},
-                                      {0,2,-7,-6,13,40,51,37,9,-7,-4,0}
+    {0,-4,-7,11,38,52,38,11,-7,-4,0,0},
+    {0,-4,-7,9,37,51,40,13,-6,-7,2,0},
+    {0,-3,-7,8,35,51,41,14,-5,-7,1,0},
+    {0,-2,-8,6,33,51,42,16,-5,-7,2,0},
+    {0,-2,-8,5,32,50,43,18,-4,-8,2,0},
+    {0,-2,-8,4,30,50,45,19,-3,-8,1,0},
+    {0,-1,-8,2,28,49,46,21,-2,-8,1,0},
+    {0,-1,-8,1,26,49,47,23,-1,-8,0,0},
+    {0,0,-8,0,24,48,48,24,0,-8,0,0},
+    {0,0,-8,-1,23,47,49,26,1,-8,-1,0},
+    {0,1,-8,-2,21,46,49,28,2,-8,-1,0},
+    {0,1,-8,-3,19,45,50,30,4,-8,-2,0},
+    {0,2,-8,-4,18,43,50,32,5,-8,-2,0},
+    {0,2,-7,-5,16,42,51,33,6,-8,-2,0},
+    {0,1,-7,-5,14,41,51,35,8,-7,-3,0},
+    {0,2,-7,-6,13,40,51,37,9,-7,-4,0}
 
 
-                                    },
-                                    { // D = 3
-                                      {-2,-7,0,17,35,43,35,17,0,-7,-5,2},
-                                      {-2,-7,-1,16,34,43,36,18,1,-7,-5,2},
-                                      {-1,-7,-1,14,33,43,36,19,1,-6,-5,2},
-                                      {-1,-7,-2,13,32,42,37,20,3,-6,-5,2},
-                                      {0,-7,-3,12,31,42,38,21,3,-6,-5,2},
-                                      {0,-7,-3,11,30,42,39,23,4,-6,-6,1},
-                                      {0,-7,-4,10,29,42,40,24,5,-6,-6,1},
-                                      {1,-7,-4,9,27,41,40,25,6,-5,-6,1},
-                                      {1,-6,-5,7,26,41,41,26,7,-5,-6,1},
-                                      {1,-6,-5,6,25,40,41,27,9,-4,-7,1},
-                                      {1,-6,-6,5,24,40,42,29,10,-4,-7,0},
-                                      {1,-6,-6,4,23,39,42,30,11,-3,-7,0},
-                                      {2,-5,-6,3,21,38,42,31,12,-3,-7,0},
-                                      {2,-5,-6,3,20,37,42,32,13,-2,-7,-1},
-                                      {2,-5,-6,1,19,36,43,33,14,-1,-7,-1},
-                                      {2,-5,-7,1,18,36,43,34,16,-1,-7,-2}
-                                    },
-                                    { // D = 3.5
-                                      {-6,-3,5,19,31,36,31,19,5,-3,-6,0},
-                                      {-6,-4,4,18,31,37,32,20,6,-3,-6,-1},
-                                      {-6,-4,4,17,30,36,33,21,7,-3,-6,-1},
-                                      {-5,-5,3,16,30,36,33,22,8,-2,-6,-2},
-                                      {-5,-5,2,15,29,36,34,23,9,-2,-6,-2},
-                                      {-5,-5,2,15,28,36,34,24,10,-2,-6,-3},
-                                      {-4,-5,1,14,27,36,35,24,10,-1,-6,-3},
-                                      {-4,-5,0,13,26,35,35,25,11,0,-5,-3},
-                                      {-4,-6,0,12,26,36,36,26,12,0,-6,-4},
-                                      {-3,-5,0,11,25,35,35,26,13,0,-5,-4},
-                                      {-3,-6,-1,10,24,35,36,27,14,1,-5,-4},
-                                      {-3,-6,-2,10,24,34,36,28,15,2,-5,-5},
-                                      {-2,-6,-2,9,23,34,36,29,15,2,-5,-5},
-                                      {-2,-6,-2,8,22,33,36,30,16,3,-5,-5},
-                                      {-1,-6,-3,7,21,33,36,30,17,4,-4,-6},
-                                      {-1,-6,-3,6,20,32,37,31,18,4,-4,-6}
-                                    },
-                                    { // D = 4
-                                      {-9,0,9,20,28,32,28,20,9,0,-9,0},
-                                      {-9,0,8,19,28,32,29,20,10,0,-4,-5},
-                                      {-9,-1,8,18,28,32,29,21,10,1,-4,-5},
-                                      {-9,-1,7,18,27,32,30,22,11,1,-4,-6},
-                                      {-8,-2,6,17,27,32,30,22,12,2,-4,-6},
-                                      {-8,-2,6,16,26,32,31,23,12,2,-4,-6},
-                                      {-8,-2,5,16,26,31,31,23,13,3,-3,-7},
-                                      {-8,-3,5,15,25,31,31,24,14,4,-3,-7},
-                                      {-7,-3,4,14,25,31,31,25,14,4,-3,-7},
-                                      {-7,-3,4,14,24,31,31,25,15,5,-3,-8},
-                                      {-7,-3,3,13,23,31,31,26,16,5,-2,-8},
-                                      {-6,-4,2,12,23,31,32,26,16,6,-2,-8},
-                                      {-6,-4,2,12,22,30,32,27,17,6,-2,-8},
-                                      {-6,-4,1,11,22,30,32,27,18,7,-1,-9},
-                                      {-5,-4,1,10,21,29,32,28,18,8,-1,-9},
-                                      {-5,-4,0,10,20,29,32,28,19,8,0,-9}
-                                    },
-                                    { // D = 6
-                                      {-6,8,13,18,20,22,20,18,13,8,4,-10},
-                                      {-6,8,13,17,20,21,20,18,13,9,4,-9},
-                                      {-6,8,12,17,20,21,20,18,14,9,4,-9},
-                                      {-7,7,12,17,20,21,21,18,14,9,5,-9},
-                                      {-7,7,12,16,20,21,21,18,14,10,5,-9},
-                                      {-7,7,12,16,20,21,21,18,14,10,5,-9},
-                                      {-8,7,11,16,20,21,21,19,15,10,5,-9},
-                                      {-8,6,11,16,19,21,21,19,15,11,6,-9},
-                                      {-8,6,11,15,19,21,21,19,15,11,6,-8},
-                                      {-9,6,11,15,19,21,21,19,16,11,6,-8},
-                                      {-9,5,10,15,19,21,21,20,16,11,7,-8},
-                                      {-9,5,10,14,18,21,21,20,16,12,7,-7},
-                                      {-9,5,10,14,18,21,21,20,16,12,7,-7},
-                                      {-9,5,9,14,18,21,21,20,17,12,7,-7},
-                                      {-9,4,9,14,18,20,21,20,17,12,8,-6},
-                                      {-9,4,9,13,18,20,21,20,17,13,8,-6}
-                                    }
-                                  };
+  },
+  { // D = 3
+    {-2,-7,0,17,35,43,35,17,0,-7,-5,2},
+    {-2,-7,-1,16,34,43,36,18,1,-7,-5,2},
+    {-1,-7,-1,14,33,43,36,19,1,-6,-5,2},
+    {-1,-7,-2,13,32,42,37,20,3,-6,-5,2},
+    {0,-7,-3,12,31,42,38,21,3,-6,-5,2},
+    {0,-7,-3,11,30,42,39,23,4,-6,-6,1},
+    {0,-7,-4,10,29,42,40,24,5,-6,-6,1},
+    {1,-7,-4,9,27,41,40,25,6,-5,-6,1},
+    {1,-6,-5,7,26,41,41,26,7,-5,-6,1},
+    {1,-6,-5,6,25,40,41,27,9,-4,-7,1},
+    {1,-6,-6,5,24,40,42,29,10,-4,-7,0},
+    {1,-6,-6,4,23,39,42,30,11,-3,-7,0},
+    {2,-5,-6,3,21,38,42,31,12,-3,-7,0},
+    {2,-5,-6,3,20,37,42,32,13,-2,-7,-1},
+    {2,-5,-6,1,19,36,43,33,14,-1,-7,-1},
+    {2,-5,-7,1,18,36,43,34,16,-1,-7,-2}
+  },
+  { // D = 3.5
+    {-6,-3,5,19,31,36,31,19,5,-3,-6,0},
+    {-6,-4,4,18,31,37,32,20,6,-3,-6,-1},
+    {-6,-4,4,17,30,36,33,21,7,-3,-6,-1},
+    {-5,-5,3,16,30,36,33,22,8,-2,-6,-2},
+    {-5,-5,2,15,29,36,34,23,9,-2,-6,-2},
+    {-5,-5,2,15,28,36,34,24,10,-2,-6,-3},
+    {-4,-5,1,14,27,36,35,24,10,-1,-6,-3},
+    {-4,-5,0,13,26,35,35,25,11,0,-5,-3},
+    {-4,-6,0,12,26,36,36,26,12,0,-6,-4},
+    {-3,-5,0,11,25,35,35,26,13,0,-5,-4},
+    {-3,-6,-1,10,24,35,36,27,14,1,-5,-4},
+    {-3,-6,-2,10,24,34,36,28,15,2,-5,-5},
+    {-2,-6,-2,9,23,34,36,29,15,2,-5,-5},
+    {-2,-6,-2,8,22,33,36,30,16,3,-5,-5},
+    {-1,-6,-3,7,21,33,36,30,17,4,-4,-6},
+    {-1,-6,-3,6,20,32,37,31,18,4,-4,-6}
+  },
+  { // D = 4
+    {-9,0,9,20,28,32,28,20,9,0,-9,0},
+    {-9,0,8,19,28,32,29,20,10,0,-4,-5},
+    {-9,-1,8,18,28,32,29,21,10,1,-4,-5},
+    {-9,-1,7,18,27,32,30,22,11,1,-4,-6},
+    {-8,-2,6,17,27,32,30,22,12,2,-4,-6},
+    {-8,-2,6,16,26,32,31,23,12,2,-4,-6},
+    {-8,-2,5,16,26,31,31,23,13,3,-3,-7},
+    {-8,-3,5,15,25,31,31,24,14,4,-3,-7},
+    {-7,-3,4,14,25,31,31,25,14,4,-3,-7},
+    {-7,-3,4,14,24,31,31,25,15,5,-3,-8},
+    {-7,-3,3,13,23,31,31,26,16,5,-2,-8},
+    {-6,-4,2,12,23,31,32,26,16,6,-2,-8},
+    {-6,-4,2,12,22,30,32,27,17,6,-2,-8},
+    {-6,-4,1,11,22,30,32,27,18,7,-1,-9},
+    {-5,-4,1,10,21,29,32,28,18,8,-1,-9},
+    {-5,-4,0,10,20,29,32,28,19,8,0,-9}
+  },
+  { // D = 6
+    {-6,8,13,18,20,22,20,18,13,8,4,-10},
+    {-6,8,13,17,20,21,20,18,13,9,4,-9},
+    {-6,8,12,17,20,21,20,18,14,9,4,-9},
+    {-7,7,12,17,20,21,21,18,14,9,5,-9},
+    {-7,7,12,16,20,21,21,18,14,10,5,-9},
+    {-7,7,12,16,20,21,21,18,14,10,5,-9},
+    {-8,7,11,16,20,21,21,19,15,10,5,-9},
+    {-8,6,11,16,19,21,21,19,15,11,6,-9},
+    {-8,6,11,15,19,21,21,19,15,11,6,-8},
+    {-9,6,11,15,19,21,21,19,16,11,6,-8},
+    {-9,5,10,15,19,21,21,20,16,11,7,-8},
+    {-9,5,10,14,18,21,21,20,16,12,7,-7},
+    {-9,5,10,14,18,21,21,20,16,12,7,-7},
+    {-9,5,9,14,18,21,21,20,17,12,7,-7},
+    {-9,4,9,14,18,20,21,20,17,12,8,-6},
+    {-9,4,9,13,18,20,21,20,17,13,8,-6}
+  }
+};
 // ----------------------------------------------------------------------------
 // get current time in milli-second
 // ----------------------------------------------------------------------------
@@ -279,8 +245,7 @@ GetTime()
   return ((unsigned int)(time_ms.time * 1000 + time_ms.millitm));
 }
 
-HRESULT Callback(IMediaSample* pSample, REFERENCE_TIME* StartTime,
-         REFERENCE_TIME* StopTime, BOOL TypeChanged)
+HRESULT Callback(IMediaSample* pSample, REFERENCE_TIME* StartTime, REFERENCE_TIME* StopTime, BOOL TypeChanged)
 {
   int i;
   int iPercent;
@@ -290,98 +255,88 @@ HRESULT Callback(IMediaSample* pSample, REFERENCE_TIME* StartTime,
   static int Frm_num = 0;
   REFERENCE_TIME iLastFrameTime;
 
-  int iFlag=0; //xzhao 20081017
+  int iFlag=0;
   static REFERENCE_TIME lastst=*StartTime;
-  const int iPeriod=(int)(10000000/input->fr);
+  const int iPeriod = (int)(10000000/input->fr);
 
-  // xzhao Frame Rate Conversion
   if(!input->fr)
   {
-	  iFlag=1;
+    iFlag=1;
   }
   else
   {
-	  REFERENCE_TIME st=((REFERENCE_TIME)(*StartTime/iPeriod))*iPeriod;
-	  REFERENCE_TIME ed=st+iPeriod;
-	  if(abs((int)(*StartTime-st))<=(*StartTime-lastst)/2 || abs((int)(*StartTime-ed))<(*StartTime-lastst)/2)
-	  {
-		  iFlag=1;
-		  cdfrms++;
-	  }
-	  lastst=*StartTime;
+    REFERENCE_TIME st=((REFERENCE_TIME)(*StartTime/iPeriod))*iPeriod;
+    REFERENCE_TIME ed=st+(REFERENCE_TIME)iPeriod;
+    if(abs(*StartTime-st)<=(*StartTime-lastst)/2 || abs(*StartTime-ed)<(*StartTime-lastst)/2)
+    {
+      iFlag=1;
+      cdfrms++;
+    }
+    lastst=*StartTime;
   }
 
   ttfrms++;
 
   if(iFlag)
   {
-  pSample->GetPointer(&pBuffer);
-  const int iSampleSize = pSample->GetActualDataLength();
-
-  if (iCount == 0)
-  {
-    if (Frm_num < iThreadnum * iGOPlen)
-      iRet = Frm_num / iGOPlen;
-    else
-      iRet = WaitForMultipleObjects(iThreadnum, pEvtReady, FALSE, INFINITE) - WAIT_OBJECT_0;
-    // xzhao 20080331
-    //tmp[iRet] = Frm_num / (B_num + 1);
-    tmp[iRet] = Frm_num;
-  }
-  //xzhao 20080714
-  //memcpy(pYUVBuffer, pBuffer, iOrgWidth*iOrgHeight*3/2);
-
-  ////Trans RGB24 to IYUV
-  //conv.RGB24_to_YV12(pBuffer, pYUVBuffer, iOrgWidth, iOrgHeight);
-  conv.YUY2_to_YV12(pBuffer, pYUVBuffer, iOrgWidth, iOrgHeight);
-  ////xzhao YVU==>YUV?
-  memcpy(tmpBuffer, pYUVBuffer + iOrgWidth * iOrgHeight, iOrgWidth * iOrgHeight / 4);
-  memcpy(pYUVBuffer + iOrgWidth * iOrgHeight, pYUVBuffer + iOrgWidth * iOrgHeight * 5 / 4, iOrgWidth * iOrgHeight / 4);
-  memcpy(pYUVBuffer + iOrgWidth * iOrgHeight * 5 / 4, tmpBuffer, iOrgWidth * iOrgHeight / 4);
-
-  // xzhao 20080331
-  if (iCount % (B_num + 1) == 0&&iCount!=0)
-    YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount - B_num], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
-  else if (iCount == 0 || ((iCount > iGOPlen - B_num - 1) && iGOPlen%(B_num+1)!=1))         //xzhao 20081107
-    YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
-  else
-    YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount + 1], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
-
-
-  Frm_num++;
-  iCount++;
-  p_thread[iRet].p_enc->dec_frm_num = iCount;
-  last_thread_num = iRet;
-  last_frm_num = iCount;
-
-  if (iCount == iGOPlen)
-  {
-    //p_thread[iRet].m_bRunning = TRUE;
-    WaitForSingleObject(hMutex, INFINITE);
-    for (i=0; i<iThreadnum*2; i++)
+    pSample->GetPointer(&pBuffer);
+    const int iSampleSize = pSample->GetActualDataLength();
+    if (iCount == 0)
     {
-      if (p_wthread->order[i][0] == -1)
-      {
-        p_wthread->order[i][0] = iRet;
-        break;
-      }
+      if (Frm_num < iThreadnum * iGOPlen)
+        iRet = Frm_num / iGOPlen;
+      else
+        iRet = WaitForMultipleObjects(iThreadnum, pEvtReady, FALSE, INFINITE) - WAIT_OBJECT_0;
+      tmp[iRet] = Frm_num;
     }
-    ReleaseMutex(hMutex);
-    ResumeThread(thread_handle[iRet]);
-    iCount = 0;
-    last_frm_num = 0;
+    ////Trans RGB24 to IYUV
+    //conv.RGB24_to_YV12(pBuffer, pYUVBuffer, iOrgWidth, iOrgHeight);
+    conv.YUY2_to_YV12(pBuffer, pYUVBuffer, iOrgWidth, iOrgHeight);
+    ////xzhao YVU==>YUV?
+    memcpy(tmpBuffer, pYUVBuffer + iOrgWidth * iOrgHeight, iOrgWidth * iOrgHeight / 4);
+    memcpy(pYUVBuffer + iOrgWidth * iOrgHeight, pYUVBuffer + iOrgWidth * iOrgHeight * 5 / 4, iOrgWidth * iOrgHeight / 4);
+    memcpy(pYUVBuffer + iOrgWidth * iOrgHeight * 5 / 4, tmpBuffer, iOrgWidth * iOrgHeight / 4);
+
+    if (iCount % (B_num + 1) == 0 && iCount!=0)
+      YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount - B_num], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
+    else if (iCount == 0 || ((iCount > iGOPlen - B_num - 1) && iGOPlen%(B_num+1)!=1))         //xzhao 20081107
+      YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
+    else
+      YUV_Scale_v2(pYUVBuffer, pYUVbuf[iRet][iCount + 1], iOrgWidth, iOrgHeight, input->img_width, input->img_height);
+
+
+    Frm_num++;
+    iCount++;
+    p_thread[iRet].p_enc->dec_frm_num = iCount;
+    last_thread_num = iRet;
+    last_frm_num = iCount;
+
+    if (iCount == iGOPlen)
+    {
+      //p_thread[iRet].m_bRunning = TRUE;
+      WaitForSingleObject(hMutex, INFINITE);
+      for (i=0; i<iThreadnum*2; i++)
+      {
+        if (p_wthread->order[i][0] == -1)
+        {
+          p_wthread->order[i][0] = iRet;
+          break;
+        }
+      }
+      ReleaseMutex(hMutex);
+      ResumeThread(thread_handle[iRet]);
+      iCount = 0;
+      last_frm_num = 0;
+      iLastFrameTime = (*StartTime) / 10000;
+      iPercent = (int)((*StartTime) / (length * 100000));
+      fprintf(stderr, "\rFrame: %d\t\t", Frm_num);
+      fprintf(stderr, "Start Time(ms): %d\t\t", iLastFrameTime);
+      fprintf(stderr, "%d%%", iPercent);
+      fflush(stderr);
+    }
     iLastFrameTime = (*StartTime) / 10000;
-    iPercent = (int)((*StartTime) / (length * 100000));
-    fprintf(stderr, "\rFrame: %d\t\t", Frm_num);
-    fprintf(stderr, "Start Time(ms): %d\t\t", iLastFrameTime);
-    fprintf(stderr, "%d%%", iPercent);
-    fflush(stderr);
-  }
-
-
-  iLastFrameTime = (*StartTime) / 10000;
-  fwrite(&iLastFrameTime, sizeof(int), 1, fpFrameTime);  //写时间戳
-  return S_OK;
+    fwrite(&iLastFrameTime, sizeof(int), 1, fpFrameTime);  //写时间戳
+    return S_OK;
   }
   else
   {
@@ -393,21 +348,18 @@ int main(int argc, char* argv[])
 {
   unsigned int iTime;
   int i, j;
-  char time_stamp_file[500];
+  char time_stamp_file[100];
 
-
-  //MB_INFO ***pMBinfo;
   c_avs_enc    **p_c_avs_enc;
-  //c_mpeg2_dec  *p_c_mpeg2_dec;
-
   CoInitialize( NULL );
 
   input = &inputs;
-  if(GetEncodeParams(argc, argv, input)) //Get encode params
-	  return -1;
+  if (GetEncodeParams(argc, argv, input) == -1)
+  {
+    return 0;
+  }
 
   double fRateTable[] = {24000.0/1001, 24, 25, 30000.0/1001, 30, 50, 60000.0/1001, 60};
-  //double fFrameRate = input->frame_rate_code; //fRateTable[input->frame_rate_code - 1];    //FrameRateCode to FrameRate use Table-Driven Method
   double fFrameRate = fRateTable[input->frame_rate_code - 1];    //FrameRateCode to FrameRate use Table-Driven Method
 
   double fps = 25;
@@ -416,7 +368,7 @@ int main(int argc, char* argv[])
 
   if(!bFramerateFlag)
   {
-    input->fr=(float)fps;
+    input->fr= (float)fps;
   }
 
 
@@ -435,7 +387,7 @@ int main(int argc, char* argv[])
     iBitrate = GetASFVidoInfo(input->infile);
     if (iBitrate <= 0)
     {
-      //printf("Failed in GetASFVidoInfo() Function!\r\n");
+      printf("Failed in GetASFVidoInfo() Function!\r\n");
     }
     else
     {
@@ -548,8 +500,6 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  //  hr = EnumFilters(pGraph);
-
   // Create the Null Renderer filter and add it to the graph.
   CComPtr<IBaseFilter> pNull;
   hr = pNull.CoCreateInstance(CLSID_NullRenderer);
@@ -568,31 +518,27 @@ int main(int argc, char* argv[])
   if(mt1.formattype == FORMAT_VideoInfo)
   {
     VIDEOINFOHEADER * vih = (VIDEOINFOHEADER*) mt1.pbFormat;
-    if (!bUDF_ASFBitrate && vih->dwBitRate > (unsigned int)iThreshold && vih->dwBitRate < 10000000)
+    if (!bUDF_ASFBitrate && vih->dwBitRate > iThreshold && vih->dwBitRate < 10000000)
     {
       input->bit_rate = (int)(vih->dwBitRate / fps * fFrameRate);
     }
-    else if (!bUDF_ASFBitrate && vih->dwBitRate <= (unsigned int)iThreshold && vih->dwBitRate != 0)
+    else if (!bUDF_ASFBitrate && vih->dwBitRate <= iThreshold && vih->dwBitRate != 0)
     {
       input->bit_rate = (int)(iThreshold / fps * fFrameRate);
     }
     else if (!bUDF_ASFBitrate && (vih->dwBitRate > 10000000 || vih->dwBitRate == 0))
     {
-	  //xzhao 20081227
-      //printf("Wrong with Bitrate! Please set a Bitrate!\r\n");
+      printf("Wrong with Bitrate! Please set a Bitrate!\r\n");
     }
 
     if (input->img_width == 0 || input->img_height == 0)
     {
-      // xzhao 20080714
       // The width must be a multiples of 4!
       if((vih->bmiHeader.biWidth%4)!=0)
         iOrgWidth = input->img_width = 4*((int)(vih->bmiHeader.biWidth/4)+1);
       else
         iOrgWidth = input->img_width = vih->bmiHeader.biWidth;
       iOrgHeight = input->img_height = vih->bmiHeader.biHeight>0 ?vih->bmiHeader.biHeight:-vih->bmiHeader.biHeight;
-
-      //xzhao 20080709
       if((input->img_width%16)!=0)
         input->img_width = 16*((int)(iOrgWidth/16)+1);
     }
@@ -605,23 +551,21 @@ int main(int argc, char* argv[])
   else if(mt1.formattype == FORMAT_VideoInfo2)
   {
     VIDEOINFOHEADER2 * vih = (VIDEOINFOHEADER2*) mt1.pbFormat;
-    if (!bUDF_ASFBitrate && vih->dwBitRate >(unsigned int) iThreshold && vih->dwBitRate < 10000000)
+    if (!bUDF_ASFBitrate && vih->dwBitRate > iThreshold && vih->dwBitRate < 10000000)
     {
       input->bit_rate = (int)(vih->dwBitRate / fps * fFrameRate);
     }
-    else if (!bUDF_ASFBitrate && vih->dwBitRate <= (unsigned int)iThreshold && vih->dwBitRate != 0)
+    else if (!bUDF_ASFBitrate && vih->dwBitRate <= iThreshold && vih->dwBitRate != 0)
     {
       input->bit_rate = (int)(iThreshold / fps * fFrameRate);
     }
     else if (!bUDF_ASFBitrate && (vih->dwBitRate > 10000000 || vih->dwBitRate == 0))
     {
-	  //xzhao 20081227
-      //printf("Wrong with Bitrate! Please set a Bitrate!\r\n");
+      printf("Wrong with Bitrate! Please set a Bitrate!\r\n");
     }
 
     if (input->img_width == 0 || input->img_height == 0)
     {
-      // xzhao 20080714
       // The width must be a multiples of 4!
       if((vih->bmiHeader.biWidth%4)!=0)
         iOrgWidth = input->img_width = 4*((int)(vih->bmiHeader.biWidth/4)+1);
@@ -648,33 +592,28 @@ int main(int argc, char* argv[])
   printf("Encoding Thread Number: %d\n", iThreadnum);
 
   pYUVbuf = new unsigned char** [iThreadnum];
-  //pMBinfo = new MB_INFO** [iThreadnum];
 
   p_c_avs_enc   = new c_avs_enc* [iThreadnum];
-  //p_c_mpeg2_dec = new c_mpeg2_dec;
 
   //为转码器需要的对象准备必要的内存
   /*avs_enc*/
   for (i=0; i<iThreadnum; i++)
   {
     p_c_avs_enc[i] = new c_avs_enc;
-    //p_c_avs_enc[i]->p_avsCreate = (avs_enc_create_t*)malloc(sizeof(avs_enc_create_t));
-    //sprintf(p_c_avs_enc[i]->p_avsCreate->strConfigFile, "%s", "encoder.cfg");
     p_c_avs_enc[i]->input = &(p_c_avs_enc[i]->inputs);
     memcpy(p_c_avs_enc[i]->input, input, sizeof(InputParameters));
     p_c_avs_enc[i]->p_avs_enc_frame = (avs_enc_frame_t*)malloc(sizeof(avs_enc_frame_t));
-    p_c_avs_enc[i]->p_avs_enc_frame->bitstream = (unsigned char *)malloc(720*576*4*sizeof(char) * iGOPlen);
-    //p_c_avs_enc[i]->p_stats = (avs_enc_stats_t*)malloc(sizeof(avs_enc_stats_t));
-    write_buf[i] = (unsigned char *)malloc(720*576*4*sizeof(char) * iGOPlen);
+    p_c_avs_enc[i]->p_avs_enc_frame->bitstream = (unsigned char *)malloc(input->img_width*input->img_height*4*sizeof(char) * iGOPlen);
+    if (p_c_avs_enc[i]->p_avs_enc_frame->bitstream == NULL)
+    {
+      printf("error in alloc memory\n");
+      exit(0);
+    }
+    write_buf[i] = (unsigned char *)malloc(input->img_width*input->img_height*4*sizeof(char) * iGOPlen);
     pYUVbuf[i] = new unsigned char* [iGOPlen];
-    //pMBinfo[i] = new MB_INFO* [iGOPlen];
-    //p_c_avs_enc[i]->p_avsCreate->width  = input->img_width;
-    //p_c_avs_enc[i]->p_avsCreate->height = input->img_height;
     for (j=0; j<iGOPlen; j++)
     {
-      //xzhao
       pYUVbuf[i][j] = (unsigned char *) malloc(input->img_width * input->img_height * 3 /2);
-      //pMBinfo[i][j] = (MB_INFO *) malloc( sizeof(MB_INFO) * iOrgWidth * iOrgHeight / 256);
     }
     p_c_avs_enc[i]->p_avs_enc_frame->inputfrm   = pYUVbuf[i];
     write_buf_flag[i] = 0;
@@ -747,8 +686,7 @@ int main(int argc, char* argv[])
     CloseHandle(pEvtReady[i]);
   }
 
-  //xzhao 20081108
-  //printf("TOTAL FRAMES: %d, CODED FRAMES: %d",ttfrms,cdfrms);
+  printf("TOTAL FRAMES: %d, CODED FRAMES: %d",ttfrms,cdfrms);
 
   CloseHandle(write_evt);
   CloseHandle(write_handle);
@@ -764,7 +702,6 @@ int main(int argc, char* argv[])
 
   CoUninitialize();
   pGrab.p->Release();
-  //    pSeeking.p->Release();
   pControl.p->Release();
   pMediaFilter.p->Release();
   pEvent.p->Release();
@@ -772,8 +709,6 @@ int main(int argc, char* argv[])
   pGrabberBase.p->Release();
   pNull.p->Release();
   pBuilder.p->Release();
-  //pGraph.p->Release();
-
   exit(0);
   return 0;
 }
@@ -823,11 +758,9 @@ DWORD WINAPI write_thread(LPVOID pArg)
 
   while (1)
   {
-    //i = WaitForMultipleObjects(iThreadnum, pEvtReady, FALSE, INFINITE) - WAIT_OBJECT_0;
     n = ((PWTHREAD)pArg)->order[0][0];
     if (n != -1 && write_buf_flag[n] == 1)
     {
-      //printf("\nw: %d\n\n", ((PWTHREAD)pArg)->nbit[n]);
       fwrite(write_buf[n], 1, ((PWTHREAD)pArg)->nbit[n], f);
       WaitForSingleObject(hMutex, INFINITE);
       for (i=0; i<iThreadnum*2-1; i++)
@@ -837,7 +770,6 @@ DWORD WINAPI write_thread(LPVOID pArg)
       ((PWTHREAD)pArg)->order[iThreadnum*2-1][0] = -1;
       write_buf_flag[n] = 0;
       ReleaseMutex(hMutex);
-      //ResumeThread(thread_handle[n]);
       SetEvent(((PWTHREAD)pArg)->m_hEvent);
     }
     else
@@ -874,7 +806,6 @@ void create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc)
   }
   write_evt = CreateEvent(NULL, FALSE, FALSE, NULL);
   hMutex = CreateMutex(NULL, 0, NULL);
-  //p_thread[0].m_bRunning = p_thread[1].m_bRunning = FALSE;
   for (i=0; i<thread_num; i++)
   {
     thread_handle[i] = CreateThread(
@@ -889,7 +820,6 @@ void create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc)
     p_thread[i].m_hEvent = pEvtReady[i];
     p_thread[i].iThreadOrder = i;
     p_thread[i].p_enc = p_c_avs_enc[i];
-    //ResumeThread(thread_handle[i]);
     p_thread[i].m_bRunning = TRUE;
     p_wthread->order[i][0] = -1;
     p_wthread->order[i+iThreadnum][0] = -1;
@@ -969,33 +899,29 @@ Return: void
 ***********************************************************************/
 
 void YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer, 
-			   int wsrc, int hsrc, int wdst, int hdst)
+                  int wsrc, int hsrc, int wdst, int hdst)
 {
-	if (wsrc == wdst && hsrc == hdst)
-	{
-		memcpy(dstBuffer, srcBuffer, wsrc * hsrc * 3 / 2);
-		return;
-	}
+  if (wsrc == wdst && hsrc == hdst)
+  {
+    memcpy(dstBuffer, srcBuffer, wsrc * hsrc * 3 / 2);
+    return;
+  }
 
-	double xscale = wsrc * 1.0 / wdst;
-	double yscale = hsrc * 1.0 / hdst;
+  double xscale = wsrc * 1.0 / wdst;
+  double yscale = hsrc * 1.0 / hdst;
+  int crop_w = wsrc;
+  int crop_h = hsrc;
+  int filterw, filterh;
+  int x16,y16;
+  int x, y;
+  int i, j;
+  int *px, *py;
+  int m;
 
-	int crop_w = wsrc;
-	int crop_h = hsrc;
-	int filterw, filterh;
-    int x16,y16;
-
-	int x, y;
-	int i, j;
-	int *px, *py;
-	//int xsrc, ysrc;
-	
-	int m;
-
-	dsmptmp1 = (int *) calloc(hsrc * wdst, sizeof(int));
-	dsmptmp2 = (int *) calloc(max(hsrc,hdst) * wdst, sizeof(int));   //xzhao 20081019
-	dsmptmp3 = (int *) calloc(hdst * wdst, sizeof(int));
-	dsmptmp4 = (int *) calloc(hdst * wdst, sizeof(int));
+  dsmptmp1 = (int *) calloc(hsrc * wdst, sizeof(int));
+  dsmptmp2 = (int *) calloc(max(hsrc,hdst) * wdst, sizeof(int));
+  dsmptmp3 = (int *) calloc(hdst * wdst, sizeof(int));
+  dsmptmp4 = (int *) calloc(hdst * wdst, sizeof(int));
 
   if(crop_w*7 > 20*wdst) filterw = 6;
   else if(crop_w*2 > 5*wdst) filterw = 5;
@@ -1025,66 +951,61 @@ void YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer,
     py[j] = ( j*crop_h*16 + 4*2*crop_h - 4*2*hdst + hdst/2) / hdst;
   }
 
-	for( j = 0; j < hsrc; j++ ) 
-	{
-
-		//----- down sample row -----
-		for(  i = 0; i < wdst; i++ )
-		{
-			x16 = px[i]&0x0f;
-             x = px[i]>>4;
-			dsmptmp1[j * wdst + i] = 0;
-			for( int k = 0; k < 12; k++ )
-			{
-			    m = x - 5 + k;
-                if( m<0 ) m = 0;
-                else if( m>(wsrc-1) ) m=wsrc-1;
-				dsmptmp1[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + m)));
-			}
-		}
-	}
-
-
-	for( i = 0; i < wdst; i++ )
-	{
-		//----- down sample column -----
-		for( j = 0; j < hdst; j++ )
-		{
-			 y16 = py[j]&0x0f;
-             y = py[j]>>4;
-			 dsmptmp2[j * wdst + i] = 0;
-			for( int k = 0; k < 12; k++ )
-			{
-				m = y - 5 + k;
-                if( m<0 ) m = 0;
-                else if( m>(hsrc-1) ) m=hsrc-1;
-				dsmptmp2[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp1[m * wdst + i];
-			}
-		}
-
-	}
-	for (y = 0; y < hdst; y++)
-	{
-
-		for (x = 0; x < wdst; x++)
-		{
+  for( j = 0; j < hsrc; j++ ) 
+  {
+    //----- down sample row -----
+    for(  i = 0; i < wdst; i++ )
+    {
+      x16 = px[i]&0x0f;
+      x = px[i]>>4;
+      dsmptmp1[j * wdst + i] = 0;
+      for( int k = 0; k < 12; k++ )
+      {
+        m = x - 5 + k;
+        if( m<0 ) m = 0;
+        else if( m>(wsrc-1) ) m=wsrc-1;
+        dsmptmp1[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + m)));
+      }
+    }
+  }
 
 
-			*(dstBuffer + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp2[y * wdst + x]+(1<<13) ) / (1<<14))) ;
+  for( i = 0; i < wdst; i++ )
+  {
+    //----- down sample column -----
+    for( j = 0; j < hdst; j++ )
+    {
+      y16 = py[j]&0x0f;
+      y = py[j]>>4;
+      dsmptmp2[j * wdst + i] = 0;
+      for( int k = 0; k < 12; k++ )
+      {
+        m = y - 5 + k;
+        if( m<0 ) m = 0;
+        else if( m>(hsrc-1) ) m=hsrc-1;
+        dsmptmp2[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp1[m * wdst + i];
+      }
+    }
 
-		}
-	}
-	delete [] px;
-    delete [] py;
+  }
+  for (y = 0; y < hdst; y++)
+  {
+    for (x = 0; x < wdst; x++)
+    {
+      *(dstBuffer + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp2[y * wdst + x]+(1<<13) ) / (1<<14))) ;
+    }
+  }
+  delete [] px;
+  delete [] py;
 
 
-	// chroma
-	wsrc >>= 1;
-	hsrc >>= 1;
-	wdst >>= 1;
-	hdst >>= 1;
-	crop_w = wsrc;
-	crop_h = hsrc;
+  // chroma
+  wsrc >>= 1;
+  hsrc >>= 1;
+  wdst >>= 1;
+  hdst >>= 1;
+  crop_w = wsrc;
+  crop_h = hsrc;
 
   px = new int[wdst];
   py = new int[hdst];
@@ -1097,77 +1018,71 @@ void YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer,
     py[j] = ( j*crop_h*16 + 4*2*crop_h - 4*2*hdst + hdst/2) / hdst;
   }
 
-	for( j = 0; j < hsrc; j++ ) 
-	{
+  for( j = 0; j < hsrc; j++ ) 
+  {
 
-		//----- down sample row -----
-		for(  i = 0; i < wdst; i++ )
-		{
-			x16 = px[i]&0x0f;
-             x = px[i]>>4;
-			dsmptmp1[j * wdst + i] = 0;
-			dsmptmp2[j * wdst + i] = 0;
-			for( int k = 0; k < 12; k++ )
-			{
-			    m = x - 5 + k;
-                if( m<0 ) m = 0;
-                else if( m>(wsrc-1) ) m=wsrc-1;
-				dsmptmp1[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + (wsrc * hsrc * 4) +m)));
-                dsmptmp2[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + (wsrc * hsrc * 5) +m)));
-			
-			}
-		}
-	}
-
-
-	for( i = 0; i < wdst; i++ )
-	{
-		//----- down sample column -----
-		for( j = 0; j < hdst; j++ )
-		{
-			 y16 = py[j]&0x0f;
-             y = py[j]>>4;
-			 dsmptmp3[j * wdst + i] = 0;
-             dsmptmp4[j * wdst + i] = 0;
-
-			for( int k = 0; k < 12; k++ )
-			{
-				m = y - 5 + k;
-                if( m<0 ) m = 0;
-                else if( m>(hsrc-1) ) m=hsrc-1;
-				dsmptmp3[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp1[m * wdst + i];
-                dsmptmp4[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp2[m * wdst + i];
-				
-			}
-		}
-
-	}
+    //----- down sample row -----
+    for(  i = 0; i < wdst; i++ )
+    {
+      x16 = px[i]&0x0f;
+      x = px[i]>>4;
+      dsmptmp1[j * wdst + i] = 0;
+      dsmptmp2[j * wdst + i] = 0;
+      for( int k = 0; k < 12; k++ )
+      {
+        m = x - 5 + k;
+        if( m<0 ) m = 0;
+        else if( m>(wsrc-1) ) m=wsrc-1;
+        dsmptmp1[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + (wsrc * hsrc * 4) +m)));
+        dsmptmp2[j * wdst + i] += filter16[filterw][x16][k] * ( *(srcBuffer+(j * wsrc + (wsrc * hsrc * 5) +m)));
+      }
+    }
+  }
 
 
-	for (y = 0; y < hdst; y++)
-	{
+  for( i = 0; i < wdst; i++ )
+  {
+    //----- down sample column -----
+    for( j = 0; j < hdst; j++ )
+    {
+      y16 = py[j]&0x0f;
+      y = py[j]>>4;
+      dsmptmp3[j * wdst + i] = 0;
+      dsmptmp4[j * wdst + i] = 0;
 
-		for (x = 0; x < wdst; x++)
-		{
+      for( int k = 0; k < 12; k++ )
+      {
+        m = y - 5 + k;
+        if( m<0 ) m = 0;
+        else if( m>(hsrc-1) ) m=hsrc-1;
+        dsmptmp3[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp1[m * wdst + i];
+        dsmptmp4[j * wdst + i] += filter16[filterh][y16][k] * dsmptmp2[m * wdst + i];
+      }
+    }
+
+  }
 
 
-			*(dstBuffer + (wdst * hdst * 4) + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp3[y * wdst + x]+(1<<13) ) / (1<<14))) ;
-			*(dstBuffer + (wdst * hdst * 5) + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp4[y * wdst + x]+(1<<13) ) / (1<<14))) ;
+  for (y = 0; y < hdst; y++)
+  {
+    for (x = 0; x < wdst; x++)
+    {
+      *(dstBuffer + (wdst * hdst * 4) + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp3[y * wdst + x]+(1<<13) ) / (1<<14))) ;
+      *(dstBuffer + (wdst * hdst * 5) + (y * wdst + x)) = unsigned char(Clip3( 0, 255,(dsmptmp4[y * wdst + x]+(1<<13) ) / (1<<14))) ;
+    }
+  }
+  delete [] px;
+  delete [] py;
 
-		}
-	}
-    delete [] px;
-    delete [] py;
-
-	// xzhao
-	free(dsmptmp1);
-	free(dsmptmp2);
-	free(dsmptmp3);
-	free(dsmptmp4);	
+  // xzhao
+  free(dsmptmp1);
+  free(dsmptmp2);
+  free(dsmptmp3);
+  free(dsmptmp4);  
 }
 
 void YUV_Scale_v1(unsigned char* srcBuffer, unsigned char *dstBuffer,
-         int wsrc, int hsrc, int wdst, int hdst)
+                  int wsrc, int hsrc, int wdst, int hdst)
 {
   if (wsrc == wdst && hsrc == hdst)
   {
@@ -1402,13 +1317,8 @@ int GetVideoInfo(char* FileName, double* fps, double* length)
   }
 
   UINT nFrames = (UINT)(*length * *fps);
-  printf("Length of Video: %gs\r\nAuthored Frame Rate: %gfps\r\n(%d frames of %dx%dx%d)\n", *length, *fps, nFrames,
-    pbih->biWidth, pbih->biHeight, pbih->biBitCount);
+  printf("Length of Video: %gs\r\nAuthored Frame Rate: %gfps\r\n(%d frames of %dx%dx%d)\n", *length, *fps, nFrames, pbih->biWidth, pbih->biHeight, pbih->biBitCount);
 
-  /*End of 获取源文件帧率等信息 hhan 2006-08-20
-  **Obtain the authored frame rate of a video file without rendering it
-  */
-  //////////////////////////////////////////////////////////////////////////
   pMediaDet->Release();
   return 0;
 }
@@ -1454,7 +1364,7 @@ int GetASFVidoInfo(char* FileName)
 
   if( FAILED( hr ) )
   {
-    //_tprintf( _T( "Could not open file (hr=0x%08x).\n" ) ,hr );
+    _tprintf( _T( "Could not open file (hr=0x%08x).\n" ) ,hr );
     return( hr );
   }
 
@@ -1588,25 +1498,32 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
   int i;
   int err;
 
-  printf("\n::::::::::::::::::::::Welcome to use IDM AVS Transcoder:::::::::::::::::::::::\n");
+  //##########################################################################################
+  //# Files
+  //##########################################################################################
+  //input->infile
   if (argc <= 1)
   {
-    //printf("No input file!\r\n");
-	  printf("\n::::::::::::::::::::::::::IDM_AVS_Transcoder Usage:::::::::::::::::::::::::::\n");
-	  printf("-w: Output video frame width,                  For example: -w 720\n");
-	  printf("-h: Output video frame height,                 For example: -h 576\n");
-	  printf("-g: Encoding GOP length,                       For example: -g 18\n");
-	  printf("-e: Reference frame number,                    For example: -e 1\n");
-	  printf("-n: B frame number between two P frame,        For example: -n 1\n");
-	  printf("-q: Encoding QP(0~63) of I, P and B frames,    For example: -q 26\n");
-	  printf("-a: Rate Control Enable,                       For example: -a 1\n");
-	  printf("-b: Transcoding Bitrate(kbps, If -a 1),        For example: -b 1000\n");
-	  printf("-s: ME search range,                           For example: -s 16\n");
-	  printf("-t: Transcoding thread number,                 For example: -t 2\n");
-	  printf("-l: LoopFilter Disable(1: disable; 0: enable), For example: -l 0\n");
-	  printf("-m: Encoding frame rate(fps),                  For example: -m 15.6\n");
-	  printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-      return -1;
+    //output the help command
+    printf("usage\n");
+    printf("VideoTransCoder.exe input.m2v out.avs\n");
+    printf("command options\n");
+    printf("\t -w width\n");
+    printf("\t -h height\n");
+    printf("\t -c chroma_format\n");
+    printf("\t -p progressive_frame (1(default):progressive, 0:interlace)\n");
+    printf("\t -g gop_length (18:default)\n");
+    printf("\t -r reference_frame_numer(2:default)\n");
+    printf("\t -b b_frame_num(2:default)\n");
+    printf("\t -q default_qp_for_i_b_p_frame(26:default)\n");
+    printf("\t -a rate control enable flag(0:default, disable, 1:enable)\n");
+    printf("\t -f frame_rate_code(2:default) Frame rate code [1)24000/1001, 2)24, 3)25, 4)30000/1001, 5)30, 6)50, 7)60000/1001, 8)60]\n");
+    printf("\t -s bit_rate(1000000:default) in Kbps, s means speed\n");
+    printf("\t -o rdo flag(1:default, enable, 0:disable)\n");
+    printf("\t -m me search range(16:default)\n");
+    printf("\t -n fps(default value is the decoded frame rate)\n");
+    printf("\t -t thread number(1:default)\n");
+    return -1;
   }
 
   if (*argv[1] != '-')
@@ -1615,21 +1532,8 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
   }
   else
   {
-	  printf("\n::::::::::::::::::::::::::IDM_AVS_Transcoder Usage:::::::::::::::::::::::::::\n");
-	  printf("-w: Output video frame width,                  For example: -w 720\n");
-	  printf("-h: Output video frame height,                 For example: -h 576\n");
-	  printf("-g: Encoding GOP length,                       For example: -g 18\n");
-	  printf("-e: Reference frame number,                    For example: -e 1\n");
-	  printf("-n: B frame number between two P frame,        For example: -n 1\n");
-	  printf("-q: Encoding QP(0~63) of I, P and B frames,    For example: -q 26\n");
-	  printf("-a: Rate Control Enable,                       For example: -a 1\n");
-	  printf("-b: Transcoding Bitrate(kbps, If -a 1),        For example: -b 1000\n");
-	  printf("-s: ME search range,                           For example: -s 16\n");
-	  printf("-t: Transcoding thread number,                 For example: -t 2\n");
-	  printf("-l: LoopFilter Disable(1: disable; 0: enable), For example: -l 0\n");
-	  printf("-m: Encoding frame rate(fps),                  For example: -m 15.6\n");
-	  printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-      return -1;
+    printf("No input file!\r\n");
+    return -1;
   }
   input->infile_header = 0;
   input->no_frames = 2;          //number of frames to be encoded (if -1, encoding forever until EOF)
@@ -1637,89 +1541,88 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
   input->img_height = 0;          //Image height in pels (must be a multiple of 8 )
   strcpy(input->TraceFile, "trace_enc.txt");
   strcpy(input->ReconFile, "test_rec.yuv");
+#ifdef _OUTPUT_DEC_IMG_
+  strcpy(input->DecRecFile, "org_dec.yuv");
+#endif
   //input->outfile
   strcpy(input->outfile, input->infile);
   strcat(input->outfile, ".avs");
 
-//##########################################################################################
-//# Encoder Control
-//##########################################################################################
-  input->thread_num = 1;          //Number of thread(s)
-  input->GopLength = 18;          //Length of one GOP, must be a multiple of (B frame number + 1)
-  input->qp0 = 28;            //QP of frame I (0  ~ 63)
-  input->qpN = 28;            //QP of frame P (0  ~ 63)
-  input->qpB = 28;            //QP of frame B (0  ~ 63)
+  //##########################################################################################
+  //# Encoder Control
+  //##########################################################################################
+  input->thread_num = 1;      //Number of thread(s)
+  input->GopLength  = 10;     //Length of one GOP, must be a multiple of (B frame number + 1)
+  input->qp0 = 36;            //QP of frame I (0  ~ 63)
+  input->qpN = 36;            //QP of frame P (0  ~ 63)
+  input->qpB = 36;            //QP of frame B (0  ~ 63)
   input->hadamard = 0;
   input->search_range = 16;        //Search range
-  input->no_multpred = 1;          //Number of reference frames (1, 2)
+  input->no_multpred  = 2;          //Number of reference frames (1, 2)
   input->InterSearch16x16 = 1;
   input->InterSearch16x8 = 1;
   input->InterSearch8x16 = 1;
   input->InterSearch8x8 = 1;
-
-  input->fr = 0;                          // xzhao 20081018
+  input->fr = 0;
   //input->intra_period=1;
-//##########################################################################################
-//# B Frames
-//##########################################################################################
-  input->successive_Bframe = 1;      //Number of B frames (0, 1, 2)
-//##########################################################################################
-//# RD Optimization
-//##########################################################################################
-  input->rdopt = 0;            //RDO switch (0: OFF, 1: ON)
+  //##########################################################################################
+  //# B Frames
+  //##########################################################################################
+  input->successive_Bframe = 2;      //Number of B frames (0, 1, 2)
+  //##########################################################################################
+  //# RD Optimization
+  //##########################################################################################
+  input->rdopt = 1;            //RDO switch (0: OFF, 1: ON)
 
-//##########################################################################################
-//# Additional Stuff
-//#########################################################################################
-  input->progressive_frame = 0;      //is progressive sequence? (1: progressive, 0: interlace)
+  //##########################################################################################
+  //# Additional Stuff
+  //#########################################################################################
+  input->progressive_frame = 1;      //is progressive sequence? (1: progressive, 0: interlace)
   input->InterlaceCodingOption = 0;
 
-//##########################################################################################
-//# Loop filter parameters
-//##########################################################################################
+  //##########################################################################################
+  //# Loop filter parameters
+  //##########################################################################################
   input->loop_filter_disable = 1;
   input->loop_filter_parameter_flag = 1;
   input->alpha_c_offset = 6;
-  input->beta_offset = 6;
+  input->beta_offset    = 6;
 
-//##########################################################################################
-//# Slice parameters
-//##########################################################################################
+  //##########################################################################################
+  //# Slice parameters
+  //##########################################################################################
   input->slice_row_nr = 0;
 
-//##########################################################################################
-//# Weighting Prediction parameters
-//##########################################################################################
+  //##########################################################################################
+  //# Weighting Prediction parameters
+  //##########################################################################################
   input->picture_weighting_flag = 0;
 
-//##########################################################################################
-//#frame rate
-//###########################################################################################
+  //##########################################################################################
+  //#frame rate
+  //###########################################################################################
   input->frame_rate_code = 2;        //Frame rate code [1)24000/1001, 2)24, 3)25, 4)30000/1001, 5)30, 6)50, 7)60000/1001, 8)60]
 
-//###########################################################################################
-//#chroma format parameter
-//###########################################################################################
+  //###########################################################################################
+  //#chroma format parameter
+  //###########################################################################################
   input->chroma_format = 1;        //Chroma format (1: 4:2:0,     2: 4:2:2)
 
-//########################################################################################
-//#Rate control
-//########################################################################################
+  //########################################################################################
+  //#Rate control
+  //########################################################################################
   input->RCEnable = 0;          //Flag of rate control (0: off, 1: one-pass, 2: multi-pass?)
   input->bit_rate = 1000000;        //Bitrate (in bps)
-  input->SeinitialQP =28;        // Initial QP for the first I frame(available with one-pass rate control)
-                                  // 35 for LBC, 22 for HD
- 
-  input->basicunit = 8160;
-  input->channel_type = 0;
+  input->SeinitialQP = 36;        //Initial QP for the first I frame(available with one-pass rate control)
+  input->basicunit = 1;
+  input->channel_type = 0;        //   # type of channel( 1=time varying channel; 0=Constant channel)
 
 
-  if (argc >= 3)
+  if (argc >= 4)
   {
     if (*argv[2] != '-')
     {
       strcpy(input->outfile, argv[2]);
-      //memcpy(input->outfile, argv[2], 256);
     }
 
     for ( i = 0, err = 0; ++i < argc  &&  !err; )
@@ -1800,7 +1703,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 'e':
+        case 'r':
           if (*token == 0)
           {
             input->no_multpred = atoi(nextArg);
@@ -1813,7 +1716,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 'n':
+        case 'b':
           if (*token == 0)
           {
             input->successive_Bframe = atoi(nextArg);
@@ -1825,20 +1728,6 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             err = 1;
             return -1;
           }
-
-        case 'o':
-          if (*token == 0)
-          {
-            //pEncParam->iCloseGOP = atoi(nextArg);
-            break;
-          }
-          else
-          {
-            printf("Wrong CloseGOP param!\r\n");
-            err = 1;
-            return -1;
-          }
-
         case 'q':
           if (*token == 0)
           {
@@ -1878,7 +1767,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 'b':
+        case 's':
           if (*token == 0)
           {
             input->bit_rate = atoi(nextArg) * 1000;
@@ -1892,7 +1781,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 'r':
+        case 'o':
           if (*token == 0)
           {
             input->rdopt = atoi(nextArg);
@@ -1905,7 +1794,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 's':
+        case 'm':
           if (*token == 0)
           {
             input->search_range = atoi(nextArg);
@@ -1957,7 +1846,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
             return -1;
           }
 
-        case 'm':
+        case 'n':
           if (*token == 0)
           {
             input->fr = (float)atof(nextArg);
@@ -1978,6 +1867,31 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
         }
       }
     }
+  }
+  else
+  {
+    //output the help command
+    printf("VideoTransCoder.exe\n");
+    printf("will output the help message\n");
+    printf("usage\n");
+    printf("VideoTransCoder.exe input.m2v out.avs\n");
+    printf("command options\n");
+    printf("\t -w width\n");
+    printf("\t -h height\n");
+    printf("\t -c chroma_format\n");
+    printf("\t -p progressive_frame (1(default):progressive, 0:interlace)\n");
+    printf("\t -g gop_length (18:default)\n");
+    printf("\t -r reference_frame_numer(2:default)\n");
+    printf("\t -b b_frame_num(2:default)\n");
+    printf("\t -q default_qp_for_i_b_p_frame(26:default)\n");
+    printf("\t -a rate control enable flag(0:default, disable, 1:enable)\n");
+    printf("\t -f frame_rate_code(2:default) Frame rate code [1)24000/1001, 2)24, 3)25, 4)30000/1001, 5)30, 6)50, 7)60000/1001, 8)60]\n");
+    printf("\t -s bit_rate(1000000:default) in Kbps, s means speed\n");
+    printf("\t -o rdo flag(1:default, enable, 0:disable)\n");
+    printf("\t -m me search range(16:default)\n");
+    printf("\t -n fps(default value is the decoded frame rate)\n");
+    printf("\t -t thread number(1:default)\n");
+    return -1;
   }
   return 0;
 }

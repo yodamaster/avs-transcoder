@@ -1,41 +1,10 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
-*/
+/*$T transcoding_type.h GC 1.140 10/28/07 15:47:10 */
 
-/*
-*************************************************************************************
-* File name: 
-* Function: 
-*
-*************************************************************************************
-*/
+
+/*$6
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
 
 #define MAX_GOP_LENGTH 100
 #ifndef _TRANSCODING_TYPE_H_
@@ -111,7 +80,9 @@ typedef struct tag_avs_enc_frame_t
 
   unsigned char  *input;      /* [in] input image (read from) */
   unsigned char  **inputfrm;
-
+#ifdef  _ME_FOR_RATE_CONTROL_
+  unsigned char *pre_frm;
+#endif
   int_16_t  type[MAX_GOP_LENGTH];      /* [in:opt] coding type */
 
   int_32_t  lastFrame;    /* [in: opt] last frame */

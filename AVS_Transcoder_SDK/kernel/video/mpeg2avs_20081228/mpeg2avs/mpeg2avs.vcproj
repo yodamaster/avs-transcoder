@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib ..\bin\avs_enc.lib"
+				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../bin/VideoTranscoder.pdb"
@@ -247,10 +247,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\bin\encoder.cfg"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

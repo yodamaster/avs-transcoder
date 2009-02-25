@@ -1,72 +1,35 @@
-/*
-*****************************************************************************
-* COPYRIGHT AND WARRANTY INFORMATION
-*
-* Copyright 2003, Advanced Audio Video Coding Standard, Part II
-*
-* DISCLAIMER OF WARRANTY
-*
-* The contents of this file are subject to the Mozilla Public License
-* Version 1.1 (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS"
-* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-* License for the specific language governing rights and limitations under
-* the License.
-*                     
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-* The AVS Working Group doesn't represent or warrant that the programs
-* furnished here under are free of infringement of any third-party patents.
-* Commercial implementations of AVS, including shareware, may be
-* subject to royalty fees to patent holders. Information regarding
-* the AVS patent policy for standardization procedure is available at 
-* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
-* of AVS Working Group.
-*
-* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
-************************************************************************
+/*$T defines.h GC 1.140 10/28/07 15:38:24 */
+
+
+/*$6
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 
-/*
-*************************************************************************************
-* File name: 
-* Function: 
-*
-*************************************************************************************
-*/
 
 #ifndef _DEFINES_H_
 #define _DEFINES_H_
+
+#pragma warning (disable:4715)
 #define AVS
 #define TRACE  0  /* !< 0:Trace off 1:Trace on */
 #define snprintf  _snprintf
-
-//#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
-                                         //         it, just enable this macro.
-
-// Fast Algorithms
-#define _THREE_STEP_MOTION_SEARCH_       // zhwang
-                                         // Notice: Using Three-step-motion-search to accelerate the 
-                                         //         ME process
-#define _FAST_INTERPOLATION_             // xzhao   
-                                         // Notice: Using Fast Interpolation Algorithm will introduce 
-                                         //         ignorable mismatch between decoded frame and rec-
-                                         //         onstructed frame, but the overall encoding time 
-                                         //         can be saved by an attracting ratio of about 37%
 #define _FAST_MODE_DECISION_
 #ifdef _FAST_MODE_DECISION_
 #define _SKIP_MODE_COST_THRESHOLD_ 100
 #define _COST_THRESHOLD_ 0
 #endif
-
+#define _OUTPUT_RECON_IMG_
+//#define _THREE_STEP_MOTION_SEARCH_       //zhwang
+#define _OUTPUT_DEC_IMG_
+//#define _FAST_INTERPOLATION_               //xzhao
 //#define _DIAMOND_SEARCH_
-
 /*
- * define FastME ;
- * #define FIELDINTE
- */
+* define FastME ;
+* #define FIELDINTE
+*/
+//#define _ME_FOR_RATE_CONTROL_
+//#define ROI_ENABLE
 #define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4)
 #define MAX_ITEMS_TO_PARSE  10000
 #define MAXHEADERSIZE 100
@@ -107,20 +70,17 @@
 #define min(a, b)      (((a) < (b)) ? (a) : (b))
 #define clamp(a, b, c)    ((a) < (b) ? (b) : ((a) > (c) ? (c) : (a)))  /* !< clamp a to the range of [b; c] */
 
-#define LOG2_MAX_FRAME_NUM_MINUS4  4
+#define LOG2_MAX_FRAME_NUM_MINUS4  4      /* POC200301 moved from defines.h */
 
 /*
- * Threshold values to zero out quantized transform coefficients. ;
- * Recommend that _CHROMA_COEFF_COST_ be low to improve chroma quality
- */
-#define _LUMA_COEFF_COST_  4        /* !< threshold for luma coeffs */
-#define _CHROMA_COEFF_COST_  4        /* !< threshold for chroma coeffs, used to be 7 */
+* FLAGS and DEFINES for new chroma intra prediction, Dzung Hoang ;
+* Threshold values to zero out quantized transform coefficients. ;
+* Recommend that _CHROMA_COEFF_COST_ be low to improve chroma quality
+*/
+#define _LUMA_COEFF_COST_  0        /* !< threshold for luma coeffs */
+#define _CHROMA_COEFF_COST_  0        /* !< threshold for chroma coeffs, used to be 7 */
 
-#define IMG_PAD_SIZE    16        /* !< Number of pixels padded around the reference frame (>=4) */
-
-#define MAX_IMG_HEIGHT    576
-#define MAX_IMG_WEIGHT    720
-
+#define IMG_PAD_SIZE    16
 #define absm(A)      ((A) < (0) ? (-(A)) : (A))  /* !< abs macro, faster than procedure */
 #define MAX_VALUE1    9999    /* !< used for start value for some variables */
 
@@ -197,10 +157,14 @@
 
 /* CAVLC needs more symbols per MB */
 #define MAXPICTURETYPESEQUENCELEN  100  /* !< Maximum size of the string that defines the picture types to be
-             * coded, e.g. "IBBPBBPBB" */
+* coded, e.g. "IBBPBBPBB" */
 
+/* define _USE_TRANSCODING_SEARCH_RANGE_ */
+#define _DISABLE_INTRA_IN_INTER_
 #define SVA_START_CODE_EMULATION
+#define ZHANG_PENG_TEST
 
+/* end zhang peng */
 #ifdef SVA_START_CODE_EMULATION
 #define SVA_STREAM_BUF_SIZE  1024    /* must large than 3 */
 #endif
