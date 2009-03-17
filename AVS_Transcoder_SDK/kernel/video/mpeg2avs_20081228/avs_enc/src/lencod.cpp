@@ -1,3 +1,41 @@
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
+*/
 
 #if defined WIN32
 #include <conio.h>
@@ -174,9 +212,7 @@ int_32_t c_avs_enc::avs_enc_destroy()
 int_32_t c_avs_enc::avs_enc_encode()
 {
   int_32_t i;
-#ifdef _ME_FOR_RATE_CONTROL_
-  int_32_t save_gframe_no;
-#endif
+
   init_global_variables();
   OpenBitStreamFile(input->outfile);
   p_avs_enc_frame->length = 0;
@@ -187,29 +223,6 @@ int_32_t c_avs_enc::avs_enc_encode()
   gframe_no=current_encoded_frame;
   goprate = 0;
 
-#ifdef _ME_FOR_RATE_CONTROL_
-  save_gframe_no = gframe_no;
-  glb_me_for_rate_control_flag = 1;
-  //i=0 is AVS_I_frame and omitted here
-  for (i=1; i<dec_frm_num; i++)
-  {
-    if (inputs.successive_Bframe == 0 || i % (inputs.successive_Bframe + 1) == 1 || i > input->GopLength - input->successive_Bframe)
-      p_avs_enc_frame->type[0] = AVS_TYPE_P;
-    else
-      p_avs_enc_frame->type[0] = AVS_TYPE_B;
-    p_avs_enc_frame->pre_frm = p_avs_enc_frame->inputfrm[i-1];
-    p_avs_enc_frame->input   = p_avs_enc_frame->inputfrm[i];
-    avs_enc_frame(p_avs_enc_frame);
-    gframe_no++;
-  }
-  gframe_no = save_gframe_no;
-  if (img->number == 0)
-  {
-    total_encoded_frame = -1;
-  }
-  p_avs_enc_frame->length = 0;
-  glb_me_for_rate_control_flag = 0;
-#endif
   for (i=0; i<dec_frm_num; i++)
   {
     if (i == 0)
@@ -225,12 +238,7 @@ int_32_t c_avs_enc::avs_enc_encode()
   }
   memcpy((byte*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, pORABS->buf, pORABS->iBytePosition);
   p_avs_enc_frame->length += pORABS->iBytePosition;
-
-  //#ifdef _DEBUG
-  //if(input->RCEnable)
-  printf("\nGOP BITS: %d, TARGET BITS: %d\n",goprate,(int_32_t) floor(dec_frm_num * input->bit_rate / input->fr + 0.5));
-  //#endif
-
+ 
   return 0;
 }
 
@@ -522,7 +530,7 @@ void c_avs_enc::report()
   fprintf(stdout, " Bits for parameter sets           : %d \n", stat->bit_ctr_parametersets);
   fprintf(stdout, " GBIM value                  : %f \n", GBIM_value / (total_encoded_frame + 1));
   fprintf(stdout, "--------------------------------------------------------------------------\n");
-  fprintf(stdout, "Exit RM %s encoder ver %s ", RM, VERSION);
+  fprintf(stdout, "Exit IDM_AVS_Transcoder with RM %s encoder ver %s ", RM, VERSION);
   fprintf(stdout, "\n");
 }
 
@@ -1196,9 +1204,6 @@ int_32_t c_avs_enc::encode_IP_frame(avs_enc_frame_t *pFrame)
   int_32_t i;
 
   pInputImage = pFrame->input;
-#ifdef _ME_FOR_RATE_CONTROL_
-  pPreImage   = pFrame->pre_frm;
-#endif
   pAVSMbInfo  = pFrame->pEncMBInfo;
 
   if(first_frm_flag == 1)
@@ -1291,9 +1296,6 @@ int_32_t c_avs_enc::encode_IP_frame(avs_enc_frame_t *pFrame)
 */
 int_32_t c_avs_enc::encode_B_frame(avs_enc_frame_t *pFrame)
 {
-#ifdef _ME_FOR_RATE_CONTROL_
-  pPreImage   = pFrame->pre_frm;
-#endif
   pInputImage = pFrame->input;
   pAVSMbInfo  = pFrame->pEncMBInfo;
 

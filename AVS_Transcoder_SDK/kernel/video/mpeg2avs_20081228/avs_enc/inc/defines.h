@@ -1,9 +1,40 @@
-/*$T defines.h GC 1.140 10/28/07 15:38:24 */
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
 
-
-/*$6
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
 */
 
 
@@ -19,10 +50,18 @@
 #define _SKIP_MODE_COST_THRESHOLD_ 100
 #define _COST_THRESHOLD_ 0
 #endif
-#define _OUTPUT_RECON_IMG_
-//#define _THREE_STEP_MOTION_SEARCH_       //zhwang
-#define _OUTPUT_DEC_IMG_
-//#define _FAST_INTERPOLATION_               //xzhao
+//#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
+                                         //         it, just enable this macro.
+
+#define _THREE_STEP_MOTION_SEARCH_       // zhwang
+                                         // Notice: Using Three-step-motion-search to accelerate the 
+                                         //         ME process
+//#define _OUTPUT_DEC_IMG_
+#define _FAST_INTERPOLATION_             // xzhao   
+                                         // Notice: Using Fast Interpolation Algorithm will introduce 
+                                         //         ignorable mismatch between decoded frame and rec-
+                                         //         onstructed frame, but the overall encoding time 
+                                         //         can be saved by an attracting ratio of about 37%
 //#define _DIAMOND_SEARCH_
 /*
 * define FastME ;

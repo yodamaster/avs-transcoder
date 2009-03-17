@@ -1,3 +1,41 @@
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
+*/
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -120,23 +158,7 @@ void c_avs_enc:: picture_data( )
       break;
     }
   }
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag)
-  {
-    switch(img->type)
-    {
-    case INTRA_IMG:
-      printf("nothing to do for intra frame\n");
-      break;
-    case INTER_IMG:
-      encode_one_macroblock = &c_avs_enc::encode_one_inter_macroblock_for_rate_control;
-      break;
-    case B_IMG:
-      encode_one_macroblock = &c_avs_enc::encode_one_b_frame_macroblock_for_rate_control;
-      break;
-    }
-  }
-#endif
+
   while (end_of_picture == myfalse) // loop over macroblocks
   {
     set_MB_parameters(CurrentMbNumber);
@@ -152,43 +174,25 @@ void c_avs_enc:: picture_data( )
 #endif
       img->current_slice_qp = img->qp;
       img->current_slice_start_mb = img->current_mb_nr;
-#ifdef _ME_FOR_RATE_CONTROL_
-      if (glb_me_for_rate_control_flag)
-      {
-        len = SliceHeader(slice_nr, slice_qp);
-      }
-#else
+
       len = SliceHeader(slice_nr, slice_qp);
-#endif
+
       img->current_slice_nr = slice_nr;
       stat->bit_slice += len;
       slice_nr++;
     }
     start_macroblock();
     (this->*encode_one_macroblock)();
-#ifdef _ME_FOR_RATE_CONTROL_
-    if (glb_me_for_rate_control_flag)
-    {
-      write_one_macroblock(1);
-      terminate_macroblock (&end_of_picture);
-    }
-#else
+
     write_one_macroblock(1);
     terminate_macroblock (&end_of_picture);
-#endif
+
     proceed2nextMacroblock ();
     CurrentMbNumber++;
   }
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag)
-  {
-    terminate_picture ();
-    DeblockFrame (img, imgY, imgUV);
-  }
-#else
+
   terminate_picture ();
   DeblockFrame (img, imgY, imgUV);
-#endif
 }
 void c_avs_enc:: top_field(Picture *pic)
 {
@@ -225,7 +229,7 @@ void c_avs_enc:: top_field(Picture *pic)
     CurrentMbNumber++;
   }
 
-
+  if(!input->loop_filter_disable)
   DeblockFrame (img, imgY, imgUV);
 
   //rate control
@@ -268,6 +272,7 @@ void c_avs_enc:: bot_field(Picture *pic)
   }
 
   terminate_picture ();
+  if(!input->loop_filter_disable)
   DeblockFrame (img, imgY, imgUV);
 
   pic->bits_per_picture = 8 * (currBitStream->byte_pos);
