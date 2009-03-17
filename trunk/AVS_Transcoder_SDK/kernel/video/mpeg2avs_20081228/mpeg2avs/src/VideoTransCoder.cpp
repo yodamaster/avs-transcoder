@@ -1590,7 +1590,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
   //# Encoder Control
   //##########################################################################################
   input->thread_num = 1;      //Number of thread(s)
-  input->GopLength  = 10;     //Length of one GOP, must be a multiple of (B frame number + 1)
+  input->GopLength  = 18;     //Length of one GOP, must be a multiple of (B frame number + 1)
   input->qp0 = 36;            //QP of frame I (0  ~ 63)
   input->qpN = 36;            //QP of frame P (0  ~ 63)
   input->qpB = 36;            //QP of frame B (0  ~ 63)
@@ -1606,7 +1606,7 @@ int GetEncodeParams(int argc, char* argv[], InputParameters* input)
   //##########################################################################################
   //# B Frames
   //##########################################################################################
-  input->successive_Bframe = 2;      //Number of B frames (0, 1, 2)
+  input->successive_Bframe = 1;      //Number of B frames (0, 1, 2)
   //##########################################################################################
   //# RD Optimization
   //##########################################################################################

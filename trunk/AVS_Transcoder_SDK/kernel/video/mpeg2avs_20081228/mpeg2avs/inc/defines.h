@@ -13,8 +13,8 @@
 #define AVS
 #define TRACE  0  /* !< 0:Trace off 1:Trace on */
 #define snprintf  _snprintf
-//#define _THREE_STEP_MOTION_SEARCH_
-#define _OUTPUT_DEC_IMG_
+#define _THREE_STEP_MOTION_SEARCH_
+//#define _OUTPUT_DEC_IMG_
 //#define _ME_FOR_RATE_CONTROL_
 /*
  * define FastME ;
