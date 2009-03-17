@@ -1,3 +1,41 @@
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
+*/
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
@@ -155,18 +193,10 @@ int c_avs_enc::encode_one_frame ()
     tmp_time = (int)((ltime2 * 1000 + tstruct2.millitm) - (ltime1 * 1000 + tstruct1.millitm));
     tot_time = tot_time + tmp_time;
   }
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag == 0)
-  {
-    writeout_picture ();
-    FreeBitstream();
-    find_snr ();
-  }
-#else
+
   writeout_picture ();
   FreeBitstream();
   find_snr ();
-#endif
 
   GBIM_value_frm = 0;//find_GBIM(imgY);
   GBIM_value=0;
@@ -254,16 +284,9 @@ void c_avs_enc::code_a_picture (Picture *frame)
 {
   stat->em_prev_bits_frm = 0;
   stat->em_prev_bits = &stat->em_prev_bits_frm;
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag)
-  {
-    AllocateBitstream();
-    picture_header();
-  }
-#else
+
   AllocateBitstream();
   picture_header();
-#endif
 
   picture_data();
 
@@ -606,53 +629,14 @@ __inline void c_avs_enc::avs_const_initialize()
 }
 
 __inline __m128i c_avs_enc::avs_combine_w2b(__m128i xmm0, __m128i xmm1)
-{
-  //__m128i tmp0,tmp1;
-  // reorder
-  /*xmm0 = _mm_shufflehi_epi16(xmm0,216);  //[3,1,2,0]
-  xmm0 = _mm_shufflelo_epi16(xmm0,216);
-  tmp0 = _mm_shuffle_epi32(xmm0,216);
-  tmp1 = _mm_shuffle_epi32(xmm0,141);
-  xmm0 = _mm_unpackhi_epi8(tmp1,tmp0);
-  xmm0 = _mm_shufflehi_epi16(xmm0,216);  //[3,1,2,0]
-  xmm0 = _mm_shufflelo_epi16(xmm0,216);
-  xmm0 = _mm_shuffle_epi32(xmm0,216);
-
-  // reorder
-  xmm1 = _mm_shufflehi_epi16(xmm1,216);  //[3,1,2,0]
-  xmm1 = _mm_shufflelo_epi16(xmm1,216);
-  tmp0 = _mm_shuffle_epi32(xmm1,216);
-  tmp1 = _mm_shuffle_epi32(xmm1,141);
-  xmm1 = _mm_unpackhi_epi8(tmp1,tmp0);
-  xmm1 = _mm_shufflehi_epi16(xmm1,216);  //[3,1,2,0]
-  xmm1 = _mm_shufflelo_epi16(xmm1,216);
-  xmm1 = _mm_shuffle_epi32(xmm1,141);
-
-  xmm0 = _mm_or_si128(xmm0,xmm1);*/
-
+{  
   xmm0 = _mm_packus_epi16(xmm0,xmm1);
 
   return xmm0;
 }
 
 __inline __m128i c_avs_enc::avs_combine_d2w(__m128i xmm0, __m128i xmm1)
-{
-  // reorder
-  /*tmp0 = _mm_shuffle_epi32(xmm0,216);  //[3,1,2,0]
-  tmp1 = _mm_shuffle_epi32(xmm0,141);
-  xmm0 = _mm_unpackhi_epi8(tmp1,tmp0);
-  xmm0 = _mm_shuffle_epi32(xmm0,216);  //[3,1,2,0]
-  xmm0 = _mm_shufflelo_epi16(xmm0,216);
-
-
-  // reorder
-  tmp0 = _mm_shuffle_epi32(xmm1,216);  //[3,1,2,0]
-  tmp1 = _mm_shuffle_epi32(xmm1,141);
-  xmm1 = _mm_unpackhi_epi8(tmp1,tmp0);
-  xmm1 = _mm_shuffle_epi32(xmm1,216);  //[3,1,2,0]
-  xmm1 = _mm_shufflelo_epi16(xmm1,141);
-
-  xmm0 = _mm_or_si128(xmm0,xmm1);*/
+{  
   xmm0 = _mm_packus_epi16(xmm0,xmm1);
   xmm1 = _mm_xor_si128(xmm1,xmm1);
   xmm0 = _mm_packus_epi16(xmm0,xmm1);
@@ -664,9 +648,7 @@ __inline __m128i c_avs_enc::avs_filter_halfpel_w(__m128i xmm0, __m128i xmm1, __m
   xmm1 = _mm_add_epi16(xmm1,xmm2);
   xmm2 = _mm_slli_epi16(xmm1,2);
   xmm1 = _mm_add_epi16(xmm1,xmm2);
-
-  //xmm0 = _mm_add_epi16(xmm0,xmm3);
-
+  
   xmm2 = _mm_sub_epi16(xmm1,xmm0);
   return xmm2;
 }
@@ -722,7 +704,6 @@ __inline __m128i c_avs_enc::avs_zero(__m128i xmm0)
 * Attention:
 *************************************************************************
 */
-// xzhao { 2007.9.15
 void  c_avs_enc::UnifiedOneForthPix_sse (pel_t ** imgY)
 {
   int img_pad_width,img_pad_height;
@@ -2829,15 +2810,7 @@ void c_avs_enc::put_buffer_frame()
     Refbuf11[i] = &ref_frm[i][0][0][0];
   }
 
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag)
-  {
-    //set the refbuffer to org frame
-    memcpy(Refbuf11[0], pPreImage, bytes_y);
-  }
-#endif
   //current reconstructed image
-
   imgY  = imgY_frm  =   current_frame[0];
   imgUV = imgUV_frm =  &current_frame[1];
 

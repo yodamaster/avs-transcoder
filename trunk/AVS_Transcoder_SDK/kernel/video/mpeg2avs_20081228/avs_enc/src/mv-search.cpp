@@ -1,3 +1,41 @@
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
+*/
 #include <math.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -702,17 +740,6 @@ c_avs_enc::TSSMotionSearch (pel_t**   orig_pic,     // <--  original pixel value
     pf_trace = fopen("enc_trace.txt", "a");
   }
 #endif
-  //__m64 *m1, *m2, m64sad;
-  //===== set function for getting reference picture lines =====
-  //if ((center_x > search_range) && (center_x < img->width -1-search_range-blocksize_x) &&
-  //  (center_y > search_range) && (center_y < height-1-search_range-blocksize_y)   )
-  //  {
-  //  get_ref_line = &c_avs_enc::FastLineX;
-  //  }
-  //else
-  //  {
-  //  get_ref_line = &c_avs_enc::UMVLineX;
-  //  }
   max_cand[0] = img->width-16/*center_x-pic_pix_x*/; //img->width  + IMG_PAD_SIZE;
   max_cand[1] = img->height-16/*center_y-pic_pix_y*/; // img->height + IMG_PAD_SIZE;
   min_cand[0] = 2;//为了提高速度，整像素mv控制着不超过图像边界
@@ -2194,14 +2221,7 @@ int_32_t c_avs_enc:: BlockMotionSearch (int_32_t       ref,           // <--  re
   //==============================
   //=====   SUB-PEL SEARCH   =====
   //==============================
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (!glb_me_for_rate_control_flag)
-  {
     min_mcost =  SubPelBlockMotionSearch (imgY_org_pic, ref, pic_pix_x, pic_pix_y, blocktype, pred_mv_x, pred_mv_y, &mv_x, &mv_y, 9, 9, min_mcost, lambda, block_index);
-  }
-#else
-  min_mcost = SubPelBlockMotionSearch (imgY_org_pic, ref, pic_pix_x, pic_pix_y, blocktype, pred_mv_x, pred_mv_y, &mv_x, &mv_y, 9, 9, min_mcost, lambda, block_index);
-#endif
 
   if (!input->rdopt)
   {
@@ -2234,190 +2254,7 @@ int_32_t c_avs_enc:: BlockMotionSearch (int_32_t       ref,           // <--  re
   }
   return min_mcost;
 }
-/*
-*************************************************************************
-* Function:Get cost for skip mode for an macroblock
-* Input:
-* Output:
-* Return:
-* Attention:
-*************************************************************************
-*/
 
-//int_32_t c_avs_enc::GetSkipCostMB (double lambda)
-//{
-//  int_32_t block_y, block_x, pic_pix_y, pic_pix_x, x, y, x1, y1, mv[2];
-//  //int_16_t diff[16];
-//  int_32_t cost = 0, sad = 0;
-//  int_32_t pix_x = img->pix_x;
-//  int_32_t pix_y = img->pix_y;
-//  byte**    imgY_org_pic = imgY_org;
-//  byte  *d1, *d2, *d3, *d4;
-//  int_16_t *d5, *d6;
-//  for (block_y=0; block_y<16; block_y+=8)
-//  {
-//    pic_pix_y = pix_y +block_y;
-//    for (block_x=0; block_x<16; block_x+=8)
-//    {
-//      pic_pix_x = pix_x + block_x;
-//      //根据mv计算参考帧的起始地址
-//      mv[0] = img->all_mv[block_x>>3][block_y>>3][0][0][0];
-//      mv[1] = img->all_mv[block_x>>3][block_y>>3][0][0][1];
-//      y  = ((pic_pix_y + IMG_PAD_SIZE) << 2) + mv[1];
-//      x  = ((pic_pix_x + IMG_PAD_SIZE) << 2) + mv[0];
-//      y1 = y % 4;
-//      x1 = x % 4;
-//      y /= 4;
-//      x /= 4;
-//
-//      d1 = &imgY_org_pic[pic_pix_y][pic_pix_x];
-//      d2 = &imgY_org_pic[pic_pix_y + 1][pic_pix_x];
-//      d3 = &mref[0][y1][x1][y][x];
-//      d4 = &mref[0][y1][x1][y + 1][x];
-//      d5 = &img->mpr[block_y][block_x];
-//      d6 = &img->mpr[block_y + 1][block_x];
-//
-//      __asm
-//      {
-//        mov      esi,  dword ptr [d1]  //read in orig
-//        movdqu    xmm0, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d2]
-//        movdqu    xmm1, xmmword ptr [esi]
-//
-//        mov      esi,  dword ptr [d3]  //read in ref_frame
-//        movdqu    xmm2, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d4]
-//        movdqu    xmm3, xmmword ptr [esi]
-//
-//        psadbw    xmm0, xmm2;    //sad
-//        psadbw        xmm1, xmm3;
-//        paddw         xmm0, xmm1;
-//        pextrw      eax,  xmm0, 0
-//        mov      sad, eax
-//
-//        pxor      xmm7, xmm7        //byte -> int_16_t
-//        punpcklbw    xmm2, xmm7
-//        punpcklbw    xmm3, xmm7
-//
-//        mov      esi,  dword ptr [d5]
-//        movdqa      xmmword ptr [esi],    xmm2
-//        mov      esi,  dword ptr [d6]
-//        movdqa      xmmword ptr [esi],    xmm3
-//      }
-//      cost += sad;
-//
-//      d1 = &imgY_org_pic[pic_pix_y + 2][pic_pix_x];
-//      d2 = &imgY_org_pic[pic_pix_y + 3][pic_pix_x];
-//      d3 = &mref[0][y1][x1][y + 2][x];
-//      d4 = &mref[0][y1][x1][y + 3][x];
-//      d5 = &img->mpr[block_y + 2][block_x];
-//      d6 = &img->mpr[block_y + 3][block_x];
-//
-//      __asm
-//      {
-//        mov      esi,  dword ptr [d1]  //read in orig
-//        movdqu    xmm0, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d2]
-//        movdqu    xmm1, xmmword ptr [esi]
-//
-//        mov      esi,  dword ptr [d3]  //read in ref_frame
-//        movdqu    xmm2, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d4]
-//        movdqu    xmm3, xmmword ptr [esi]
-//
-//        psadbw    xmm0, xmm2;    //sad
-//        psadbw        xmm1, xmm3;
-//        paddw         xmm0, xmm1;
-//        pextrw      eax,  xmm0, 0
-//          mov      sad, eax
-//
-//          pxor      xmm7, xmm7        //byte -> int_16_t
-//          punpcklbw    xmm2, xmm7
-//          punpcklbw    xmm3, xmm7
-//
-//          mov      esi,  dword ptr [d5]
-//        movdqa      xmmword ptr [esi],    xmm2
-//          mov      esi,  dword ptr [d6]
-//        movdqa      xmmword ptr [esi],    xmm3
-//      }
-//      cost += sad;
-//
-//      d1 = &imgY_org_pic[pic_pix_y + 4][pic_pix_x];
-//      d2 = &imgY_org_pic[pic_pix_y + 5][pic_pix_x];
-//      d3 = &mref[0][y1][x1][y + 4][x];
-//      d4 = &mref[0][y1][x1][y + 5][x];
-//      d5 = &img->mpr[block_y + 4][block_x];
-//      d6 = &img->mpr[block_y + 5][block_x];
-//
-//      __asm
-//      {
-//        mov      esi,  dword ptr [d1]  //read in orig
-//        movdqu    xmm0, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d2]
-//        movdqu    xmm1, xmmword ptr [esi]
-//
-//        mov      esi,  dword ptr [d3]  //read in ref_frame
-//        movdqu    xmm2, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d4]
-//        movdqu    xmm3, xmmword ptr [esi]
-//
-//        psadbw    xmm0, xmm2;    //sad
-//        psadbw        xmm1, xmm3;
-//        paddw         xmm0, xmm1;
-//        pextrw      eax,  xmm0, 0
-//          mov      sad, eax
-//
-//          pxor      xmm7, xmm7        //byte -> int_16_t
-//          punpcklbw    xmm2, xmm7
-//          punpcklbw    xmm3, xmm7
-//
-//          mov      esi,  dword ptr [d5]
-//        movdqa      xmmword ptr [esi],    xmm2
-//          mov      esi,  dword ptr [d6]
-//        movdqa      xmmword ptr [esi],    xmm3
-//      }
-//      cost += sad;
-//
-//      d1 = &imgY_org_pic[pic_pix_y + 6][pic_pix_x];
-//      d2 = &imgY_org_pic[pic_pix_y + 7][pic_pix_x];
-//      d3 = &mref[0][y1][x1][y + 6][x];
-//      d4 = &mref[0][y1][x1][y + 7][x];
-//      d5 = &img->mpr[block_y + 6][block_x];
-//      d6 = &img->mpr[block_y + 7][block_x];
-//      __asm
-//      {
-//        mov      esi,  dword ptr [d1]  //read in orig
-//        movdqu    xmm0, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d2]
-//        movdqu    xmm1, xmmword ptr [esi]
-//
-//        mov      esi,  dword ptr [d3]  //read in ref_frame
-//        movdqu    xmm2, xmmword ptr [esi]
-//        mov      esi,  dword ptr [d4]
-//        movdqu    xmm3, xmmword ptr [esi]
-//
-//        psadbw    xmm0, xmm2;    //sad
-//        psadbw        xmm1, xmm3;
-//        paddw         xmm0, xmm1;
-//        pextrw      eax, xmm0, 0
-//          mov      sad, eax
-//
-//          pxor      xmm7, xmm7        //byte -> int_16_t
-//          punpcklbw    xmm2, xmm7
-//          punpcklbw    xmm3, xmm7
-//
-//          mov      esi,  dword ptr [d5]
-//        movdqa      xmmword ptr [esi],    xmm2
-//          mov      esi,  dword ptr [d6]
-//        movdqa      xmmword ptr [esi],    xmm3
-//      }
-//      cost += sad;
-//    }
-//  }
-//
-//  return cost;
-//}
-//
 int_32_t c_avs_enc::GetSkipCostMB (double lambda)
 {
   int_32_t block_y, block_x, pic_pix_y, pic_pix_x, x, y, x1, y1, mv[2];
@@ -3088,13 +2925,7 @@ void c_avs_enc::PartitionMotionSearch (int_32_t blocktype, int_32_t block8x8, do
   {
     max_ref = 1;
   }
-#ifdef _ME_FOR_RATE_CONTROL_
-  if (glb_me_for_rate_control_flag)
-  {
-    min_ref = 0;
-    max_ref = 1;
-  }
-#endif
+
   //ref=-1的时候是后向，ref=0的时候是前向
   for (ref=min_ref; ref<max_ref; ref++)
   {
@@ -3123,6 +2954,7 @@ void c_avs_enc::PartitionMotionSearch (int_32_t blocktype, int_32_t block8x8, do
     mcost = BlockMotionSearch (ref, 8*pic_block_x, 8*pic_block_y, blocktype, search_range, lambda, block8x8);
 #endif
     motion_cost[blocktype][refinx][block8x8] += mcost;
+
     //--- set motion vectors and reference frame (for motion vector prediction) ---
     for (j=0; j<step_v; j++)
     {

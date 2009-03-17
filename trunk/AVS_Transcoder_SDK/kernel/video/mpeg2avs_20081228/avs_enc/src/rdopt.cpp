@@ -1,3 +1,41 @@
+/*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
+*************************************************************************************
+* File name: 
+* Function: 
+*
+*************************************************************************************
+*/
 #include <stdlib.h>
 #include <math.h>
 #include <memory.h>
@@ -1269,7 +1307,8 @@ int_32_t c_avs_enc:: RDCost_for_macroblocks (double lambda, int_32_t mode, doubl
   //Rate control
   if (input->RCEnable)
   {
-    memcpy(pred, img->mpr, 256*sizeof(int_16_t));
+	  for(j=0; j<16; j++)
+		  memcpy(pred[j], img->mpr[j], 16*sizeof(int_16_t));
   }
 
   dummy = 0;
@@ -4691,251 +4730,3 @@ int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda
   }
   return cbp;
 }
-#ifdef _ME_FOR_RATE_CONTROL_
-void c_avs_enc::encode_one_inter_macroblock_for_rate_control()
-  {
-  TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
-  Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
-  double      lambda_mode, lambda_motion, min_rdcost=99999, rdcost = 0, max_rdcost=1e30;
-  int_32_t         valid[MAXMODE];
-  int_32_t         block, mode, i0, i1, j0, j1, ref, dummy;
-  int_32_t         lambda_motion_factor;
-  int_32_t         fw_mcost, mcost, max_mcost=(1<<30);
-  int_32_t         cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir;
-  int_32_t         min_cost=99999;
-  int_32_t         cost[MAXMODE];
-  int_32_t         write_ref   = input->no_multpred>1;
-  int_32_t         max_ref     = img->nb_references;
-  int_32_t         adjust_ref;
-  int_32_t         **ipredmodes = img->ipredmode;
-  int_32_t         block_x   = img->block_x;
-  int_32_t         block_y   = img->block_y;
-  int_32_t         ***tmpmvs = tmp_mv;
-  int_32_t         *****allmvs = img->all_mv;
-  int_32_t         **refar     = refFrArr;
-  int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-  int_32_t         min_cost_8x8;
-  static int_32_t  fast_count=0;
-#define _OUTPUT_TRACE_1
-#ifdef _OUTPUT_TRACE_
-  FILE *pf_trace;
-  pf_trace = NULL;
-  if (frame_no < 14)
-    {
-    pf_trace = fopen("enc_trace.txt", "a");
-    }
-#endif
-
-  for (i0=0; i0<5; i0++)
-    {
-    only_motion_cost[i0][0] = 99999;
-    only_motion_cost[i0][1] = 99999;
-    only_motion_cost[i0][2] = 99999;
-    only_motion_cost[i0][3] = 99999;
-    }
-  max_ref = img->nb_references;
-  if (img->number % input->intra_period == 1)//for close GOP
-    {
-    max_ref = 1;
-    }
-  adjust_ref = 0;
-#ifdef FastME
-  decide_intrabk_SAD();
-#endif
-
-  //===== SET VALID MODES =====
-  memset(valid, 0, MAXMODE*sizeof(int));
-  memset(cost,  0, MAXMODE*sizeof(int));
-  valid[I4MB]   = 0;
-  valid[I16MB]  = 0;
-  valid[0]      = 1;
-  valid[1]      = (input->InterSearch16x16);
-  valid[2]      = (input->InterSearch16x8);
-  valid[3]      = (input->InterSearch8x16);
-  valid[4]      = (input->InterSearch8x8);
-  valid[5]      = 0;
-  valid[6]      = 0;
-  valid[7]      = 0;
-  valid[P8x8]   = valid[4];
-  //===== SET LAGRANGE PARAMETERS =====
-  lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
-  lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
-  // reset chroma intra predictor to default
-  currMB->c_ipred_mode = DC_PRED_8;
-  best_pdir  = 0;
-  mode = INTER16x16; //INTER16x16
-  if (valid[mode])
-    {
-    block = 0;
-    PartitionMotionSearch (mode, block, lambda_motion);
-    fw_mcost=max_mcost;
-    for (ref=0; ref<max_ref; ref++)
-      {
-      mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
-      mcost += motion_cost[mode][ref+1][block];
-      if (mcost < fw_mcost)
-        {
-        fw_mcost    = mcost;
-        best_fw_ref = ref;
-        }
-      }
-    cost[INTER16x16] = fw_mcost;
-    best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
-    best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
-    best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
-
-    if (cost[INTER16x16] < min_cost)
-      {
-      best_mode = mode;
-      min_cost  = cost[INTER16x16];
-      }
-    }//INTER16x16
-final:
-  best_mode = INTER16x16;
-  //////////////////////////////////////////////////////////////////////////
-  // 处理dct系数，目前没有考虑色度
-  //////////////////////////////////////////////////////////////////////////
-  //===== set parameters for chosen mode =====
-  SetModesAndRefframeForBlocks (best_mode);
-  storeMotionInfo (0);
-
-  // xzhao {
-  img->reconflag=1;
-  // xzhao }
-  LumaResidualCoding ();
-  dummy = 0;
-  img->NoResidueDirect = 0;
-  ChromaResidualCoding (&dummy);
-  SetMotionVectorsMB (currMB, 0);
-  }
-
-  void c_avs_enc::encode_one_b_frame_macroblock_for_rate_control()
-    {
-    TLS static const int_32_t  b8_mode_table[2]  = {0, 4};         // DO NOT CHANGE ORDER !!!
-    TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8}; // DO NOT CHANGE ORDER !!!
-
-    Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
-    double      lambda_mode, lambda_motion;
-    int_32_t         valid[MAXMODE];
-    int_32_t         cost[MAXMODE];
-    int_32_t         cost_8x8[2] = {0, 0};
-    int_32_t         block, mode,pdir, dummy;
-    int_32_t         lambda_motion_factor;
-    int_32_t         fw_mcost, bw_mcost, bid_mcost, max_mcost=(1<<30);
-    int_32_t         best_fw_ref = 0, best_bw_ref = 0, best_pdir;
-    int_32_t         min_cost=99999, cost_direct=0;
-    int_32_t         write_ref   = input->no_multpred>1;
-    int_32_t         max_ref     = img->nb_references;
-    int_32_t         adjust_ref;
-    int_32_t         **ipredmodes = img->ipredmode;
-    int_32_t         block_x   = img->block_x;
-    int_32_t         block_y   = img->block_y;
-    int_32_t         ***tmpmvs = tmp_mv;
-    int_32_t         *****allmvs = img->all_mv;
-    int_32_t         **refar     = refFrArr;
-    int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-    static int_32_t         fast_count=0;
-    int_32_t i0;
-#define _DIRECT_THRESHOLD_COST_  200
-    for (i0=0; i0<5; i0++)
-      {
-      only_motion_cost[i0][0] = 99999;
-      only_motion_cost[i0][1] = 99999;
-      only_motion_cost[i0][2] = 99999;
-      only_motion_cost[i0][3] = 99999;
-      }
-    if (img->current_mb_nr == 0)
-      {
-      fast_count = 0;
-      }
-    output_flag = 0;
-    adjust_ref = 0;
-    max_ref = 1;
-#ifdef FastME
-    decide_intrabk_SAD();
-#endif
-    //===== SET VALID MODES =====
-    memset(valid, 0, MAXMODE*sizeof(int));
-    memset(cost,  0, MAXMODE*sizeof(int));
-    valid[I4MB]   = 0;
-    valid[I16MB]  = 0;
-    valid[0]      = 1;
-    valid[1]      = (input->InterSearch16x16);
-    valid[2]      = (input->InterSearch16x8);
-    valid[3]      = (input->InterSearch8x16);
-    valid[4]      = (input->InterSearch8x8);
-    valid[5]      = 0;
-    valid[6]      = 0;
-    valid[7]      = 0;
-    valid[P8x8]   = valid[4];
-    //===== SET LAGRANGE PARAMETERS =====
-    lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
-    lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
-    // reset chroma intra predictor to default
-    currMB->c_ipred_mode = DC_PRED_8;
-
-    best_fw_ref = 0;
-    best_bw_ref = 0;
-    bid_best_fw_ref = bid_best_bw_ref = 0;
-    ////===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
-    mode = INTER16x16;
-    //valid[mode] = 0;
-    if (valid[mode])
-      {
-      block = 0;
-      PartitionMotionSearch     (mode, block, lambda_motion);
-      //--- get cost and reference frame for forward prediction ---
-      fw_mcost = motion_cost[mode][1][block];
-      bw_mcost = motion_cost[mode][0][block];
-      bid_mcost = motion_cost_bid[mode][1][block];
-      //--- get prediction direction ----
-      if (fw_mcost<=bw_mcost && fw_mcost<=bid_mcost)
-        {
-        best_pdir = 0;
-        cost[INTER16x16] = fw_mcost;
-        }
-      else if (bw_mcost<=fw_mcost && bw_mcost<=bid_mcost)
-        {
-        best_pdir = 1;
-        cost[INTER16x16] = bw_mcost;
-        }
-      else
-        {
-        best_pdir = 2;
-        cost[INTER16x16] = bid_mcost;
-        }
-      //----- set reference frame and direction parameters -----
-      best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
-      best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
-      best8x8bwref[1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
-      best8x8symref[1][0][0] = best8x8symref[1][1][0] = best8x8symref[1][2][0] = best8x8symref[1][3][0] = bid_best_fw_ref;
-      best8x8symref[1][0][1] = best8x8symref[1][1][1] = best8x8symref[1][2][1] = best8x8symref[1][3][1] = bid_best_bw_ref;
-      if (cost[INTER16x16] < min_cost)
-        {
-        best_mode = INTER16x16;
-        min_cost  = cost[INTER16x16];
-        }
-      }
-
-final:
-    best_mode = INTER16x16;
-    //////////////////////////////////////////////////////////////////////////
-    // 处理dct系数，目前没有考虑色度
-    //////////////////////////////////////////////////////////////////////////
-    //===== set parameters for chosen mode =====
-    SetModesAndRefframeForBlocks (best_mode);
-    storeMotionInfo (0);
-
-    // xzhao {
-    img->reconflag=1;
-    LumaResidualCoding ();
-    dummy = 0;
-    img->NoResidueDirect = 0;
-    ChromaResidualCoding (&dummy);
-    SetMotionVectorsMB (currMB, 1);
-    if (img->current_mb_nr == img->width*img->height/256-1)
-      {
-      //printf("\n b fast:%4d, percent:%6.2f\n", fast_count, fast_count/(float)(img->width*img->height/256)*100);
-      }
-    }
-#endif

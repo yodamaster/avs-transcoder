@@ -1,4 +1,35 @@
 /*
+*****************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+************************************************************************
+*/
+
+/*
 *************************************************************************************
 * File name: 
 * Function: 
@@ -32,11 +63,9 @@ TLS Mapping Map[39];
 * Attention:
 *************************************************************************
 */
-//zhang peng
 void c_avs_enc::Configure (char *av)
 {
-  char *content;
-  int_32_t CLcount;  
+  char *content;  
   Map[0].TokenName  =    "GOPLength";                
   Map[1].TokenName  =    "FramesToBeEncoded";        
   Map[2].TokenName  =    "QPFirstFrame";             
@@ -160,74 +189,11 @@ void c_avs_enc::Configure (char *av)
   // Process default config file
   // Parse the command line
   
-  CLcount = 1;
-  //while (CLcount < ac)
-  {
-    //if (0 == strncmp (av[CLcount], "-f", 2))  // A file parameter?
-    {
       content = GetConfigFileContent (av);
       printf ("Parsing Configfile %s", av);
       ParseContent (content, (int_32_t)strlen (content));
       printf ("\n");
-      free (content);
-      CLcount += 2;
-    } 
-  /*
-    else
-    {
-      if (0 == strncmp (av[CLcount], "-p", 2))  // A config change?
-      {
-        // Collect all data until next parameter (starting with -<x> (x is any character)),
-        // put it into content, and parse content.
-        CLcount++;
-        ContentLen = 0;
-        NumberParams = CLcount;
-  
-        // determine the necessary size for content
-        while (NumberParams < ac && av[NumberParams][0] != '-')
-          ContentLen += strlen (av[NumberParams++]);        // Space for all the strings
-  
-        ContentLen += 1000;                     // Additional 1000 bytes for spaces and \0s
-  
-        if ((content = malloc (ContentLen))==NULL)
-          no_mem_exit("Configure: content");
-  
-        content[0] = '\0';
-
-        // concatenate all parameters itendified before
-        while (CLcount < NumberParams)
-        {
-          char *source = &av[CLcount][0];
-          char *destin = &content[strlen (content)];
-
-          while (*source != '\0')
-          {
-            if (*source == '=')  // The Parser expects whitespace before and after '='
-            {
-              *destin++=' '; *destin++='='; *destin++=' ';  // Hence make sure we add it
-            } 
-            else
-              *destin++=*source;
-
-            source++;
-          }
-
-          *destin = '\0';
-          CLcount++;
-        }
-        printf ("Parsing command line string '%s'", content);
-        ParseContent (content, strlen(content));
-        free (content);
-        printf ("\n");
-      }
-      else
-      {
-        snprintf (errortext, ET_SIZE, "Error in command line, ac %d, around string '%s', missing -f or -p parameters?", CLcount, av[CLcount]);
-        error (errortext, 300);
-      }
-    }
-  */
-  }
+      free (content);  
   printf ("\n");
 }
 
