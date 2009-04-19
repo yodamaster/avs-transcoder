@@ -760,17 +760,11 @@ DWORD WINAPI run_thread(LPVOID pArg)
     n = ((PTHREAD)pArg)->iThreadOrder;
     ((PTHREAD)pArg)->p_enc->current_encoded_frame = tmp[n];
     avs_encoder_encode(((PTHREAD)pArg)->p_enc);
-    //SuspendThread(write_handle);
-    ResumeThread(write_handle);
-    while (write_buf_flag[n] == 1)
-    {
-      ResumeThread(write_handle);
-      WaitForSingleObject(write_evt, INFINITE);
-      ResetEvent(write_evt);
-    }
     memcpy(write_buf[n], ((PTHREAD)pArg)->p_enc->p_avs_enc_frame->bitstream, ((PTHREAD)pArg)->p_enc->p_avs_enc_frame->length);
     write_buf_flag[n] = 1;
     p_wthread->nbit[n] = ((PTHREAD)pArg)->p_enc->p_avs_enc_frame->length;
+
+	ResumeThread(write_handle);
 
     SetEvent(((PTHREAD)pArg)->m_hEvent);
     SuspendThread(((PTHREAD)pArg)->m_hThread);
