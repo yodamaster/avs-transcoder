@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib"
+				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib ..\bin\avs_enc.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../bin/dec.pdb"
@@ -195,11 +195,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\rostream.cpp"
+				RelativePath=".\src\dec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\dec.cpp"
+				RelativePath=".\src\rostream.cpp"
 				>
 			</File>
 		</Filter>
