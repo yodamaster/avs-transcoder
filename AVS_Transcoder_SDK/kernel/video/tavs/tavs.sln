@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avs_enc", "avs_enc\avs_enc.vcproj", "{9112B1F0-999C-4632-8503-AD43CA2B3FE0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dec", "dec\dec.vcproj", "{EEBE9221-B327-4881-9576-CD95E8CD7C5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9112B1F0-999C-4632-8503-AD43CA2B3FE0} = {9112B1F0-999C-4632-8503-AD43CA2B3FE0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
