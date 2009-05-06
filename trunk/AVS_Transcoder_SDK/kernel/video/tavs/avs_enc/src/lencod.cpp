@@ -85,7 +85,7 @@ DLL_EXPORT void avs_encoder_encode(c_avs_enc *p_avs_enc)
 =======================================================================================================================
 =======================================================================================================================
 */
-DLL_EXPORT void avs_encoder_destropy(c_avs_enc *p_avs_enc)
+DLL_EXPORT void avs_encoder_destroy(c_avs_enc *p_avs_enc)
 {
   p_avs_enc->avs_enc_destroy();
 }

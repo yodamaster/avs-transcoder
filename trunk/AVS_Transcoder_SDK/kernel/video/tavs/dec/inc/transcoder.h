@@ -22,7 +22,7 @@
 //DLL_EXPORT void transcoder_destropy();
 void avs_encoder_create  (c_avs_enc* p_avs_enc);
 void avs_encoder_encode  (c_avs_enc* p_avs_enc);
-void avs_encoder_destropy(c_avs_enc* p_avs_enc);
+void avs_encoder_destroy(c_avs_enc* p_avs_enc);
 //int_32_t mpeg2_decoder_create( mpeg2_dec_create_t * create);
 //int_32_t mpeg2_decoder_destroy();
 //int_32_t mpeg2_decoder_decode( mpeg2_dec_frame_t * frame, mpeg2_dec_stats_t * stats);

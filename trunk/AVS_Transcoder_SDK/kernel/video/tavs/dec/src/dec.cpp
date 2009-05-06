@@ -770,7 +770,7 @@ DWORD WINAPI run_thread(LPVOID pArg)
     SuspendThread(((PTHREAD)pArg)->m_hThread);
     if(!((PTHREAD)pArg)->m_bRunning)
     {
-      avs_encoder_destropy(((PTHREAD)pArg)->p_enc);
+      avs_encoder_destroy(((PTHREAD)pArg)->p_enc);
       ExitThread(0);
     }
   }

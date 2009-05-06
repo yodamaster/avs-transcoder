@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbasd.lib strmiids.lib dmoguids.lib ..\bin\avs_enc.lib"
+				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbasd.lib strmiids.lib dmoguids.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib ..\bin\avs_enc.lib"
+				AdditionalDependencies="WMVCORE.lib cscc.lib winmm.lib strmbase.lib strmiids.lib dmoguids.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../bin/dec.pdb"
@@ -157,7 +157,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				SupportUnloadOfDelayLoadedDLL="false"
-				ImportLibrary="../bin/dec.lib"
+				ImportLibrary=""
 				TargetMachine="1"
 			/>
 			<Tool
