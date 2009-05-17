@@ -11,11 +11,11 @@
 #define TRUE                    1
 #endif
 
-typedef void* PTRANSCODER_CREATE;
+typedef void_t* PTRANSCODER_CREATE;
 typedef struct node
   {
   struct node* pNext;
-  void* pData;
+  void_t* pData;
   } NODE, *PNODE, *PLIST; //定义线程队列
 
 // struct of encode parameters
@@ -85,7 +85,7 @@ typedef struct tag_wthread
   ULONG     nThreadId;
   int       iThreadOrder;
   //c_avs_enc *p_enc;
-  //void*     bitstream[4];
+  //void_t*     bitstream[4];
   int      nbit[4];
   int       order[8][2];
   //线程的参数
@@ -93,8 +93,8 @@ typedef struct tag_wthread
   char output_file_name[100];
   char config_file_name[100];
 }WTHREAD, *PWTHREAD;
-void mutithreads_test(int thread_num);
-void create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc);
+void_t mutithreads_test(int thread_num);
+void_t create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc);
 DWORD WINAPI run_thread(LPVOID pArg);
 
 #endif

@@ -109,8 +109,8 @@ HRESULT GetPin(IBaseFilter * pFilter, PIN_DIRECTION dirrequired,  int iNum, IPin
 IPin *  GetInPin ( IBaseFilter *pFilter, int Num );
 IPin *  GetOutPin( IBaseFilter *pFilter, int Num );
 int     GetEncodeParams(int argc, char* argv[], InputParameters* input);
-void  YUV_Scale_v1(unsigned char* srcBuffer, unsigned char *dstBuffer, int wsrc, int hsrc, int wdst, int hdst);
-void  YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer, int wsrc, int hsrc, int wdst, int hdst); //wangyue20081107
+void_t  YUV_Scale_v1(unsigned char* srcBuffer, unsigned char *dstBuffer, int wsrc, int hsrc, int wdst, int hdst);
+void_t  YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer, int wsrc, int hsrc, int wdst, int hdst); //wangyue20081107
 int    GetVideoInfo(char* FileName, double* fps, double* length);
 int    GetASFVidoInfo(char* FileName);
 HRESULT GetStreamNumbers(IWMProfile* pProfile);
@@ -410,7 +410,7 @@ int main(int argc, char* argv[])
   }
 
 
-  //读取asf,wmv文件的码率信息
+  //read asf,wmv file bit rate info
   int iBitrate; //bit per second
   int iThreshold = 300000;  //BitRate Threshold
 
@@ -458,11 +458,7 @@ int main(int argc, char* argv[])
   CMediaType mt;
 
   mt.SetType(&MEDIATYPE_Video);
-  // xzhao
   mt.SetSubtype(&MEDIASUBTYPE_YUY2);
-  //mt.SetSubtype(&MEDIASUBTYPE_IYUV);
-  //mt.SetSubtype(&MEDIASUBTYPE_RGB24);
-
   hr = pGrab->SetAcceptedMediaType(&mt);
 
   // Create the filter graph manager.
@@ -471,7 +467,6 @@ int main(int argc, char* argv[])
 
   // Query for other useful interfaces.
   CComQIPtr<IGraphBuilder, &IID_IGraphBuilder> pBuilder(pGraph);
-  //    CComQIPtr<IMediaSeeking, &IID_IMediaSeeking> pSeeking(pGraph);
   CComQIPtr<IMediaControl, &IID_IMediaControl> pControl(pGraph);
   CComQIPtr<IMediaFilter, &IID_IMediaFilter> pMediaFilter(pGraph);
   CComQIPtr<IMediaEvent, &IID_IMediaEvent> pEvent(pGraph);
@@ -525,7 +520,6 @@ int main(int argc, char* argv[])
   if( FAILED( hr ) )
   {
     printf("Could not connect source filter to grabber\r\n");
-    //    fpErrorInfo = fopen("VideoErrorInfo.txt", "a");
     SYSTEMTIME time;
     TCHAR szDate[64], szTime[64];
     GetLocalTime(&time);
@@ -827,7 +821,7 @@ DWORD WINAPI write_thread(LPVOID pArg)
   return 1;
 }
 
-void create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc)
+void_t create_multithread_transcoder(int thread_num, c_avs_enc **p_c_avs_enc)
 {
   int i;
 
@@ -927,10 +921,10 @@ Input:  unsigned char* srcBuffer    Source File
 unsigned char *dstBuffer    Destiny File
 int wsrc, int hsrc        Original Size
 int wdst, int hdst        New Size
-Return: void
+Return: void_t
 ***********************************************************************/
 
-void YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer, 
+void_t YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer, 
                   int wsrc, int hsrc, int wdst, int hdst)
 {
   if (wsrc == wdst && hsrc == hdst)
@@ -1113,7 +1107,7 @@ void YUV_Scale_v2(unsigned char* srcBuffer, unsigned char *dstBuffer,
   free(dsmptmp4);  
 }
 
-void YUV_Scale_v1(unsigned char* srcBuffer, unsigned char *dstBuffer,
+void_t YUV_Scale_v1(unsigned char* srcBuffer, unsigned char *dstBuffer,
                   int wsrc, int hsrc, int wdst, int hdst)
 {
   if (wsrc == wdst && hsrc == hdst)
@@ -1254,7 +1248,7 @@ int GetVideoInfo(char* FileName, double* fps, double* length)
   IMediaDet *pMediaDet;
 
   res = CoCreateInstance(CLSID_MediaDet, NULL, CLSCTX_INPROC, IID_IMediaDet,
-    (void **)&pMediaDet);
+    (void_t **)&pMediaDet);
   if(FAILED(res))
   {
     printf("CoCreateInstance(): res=0x%08x\n", res);
