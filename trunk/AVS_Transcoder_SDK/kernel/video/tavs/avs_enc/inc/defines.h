@@ -68,7 +68,6 @@
 * #define FIELDINTE
 */
 //#define _ME_FOR_RATE_CONTROL_
-//#define ROI_ENABLE
 #define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4)
 #define MAX_ITEMS_TO_PARSE  10000
 #define MAXHEADERSIZE 100
@@ -180,5 +179,5 @@
 
 #define MAX_SYMBOLS_PER_MB  1200    /* !< Maximum number of different syntax elements for one MB */
 
-#define SVA_STREAM_BUF_SIZE  1024    /* must large than 3 */
+#define STREAM_BUF_SIZE  1024    /* must large than 3 */
 #endif

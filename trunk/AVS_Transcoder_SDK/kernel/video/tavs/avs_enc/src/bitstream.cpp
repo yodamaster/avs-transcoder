@@ -86,10 +86,10 @@ _inline void c_avs_enc::write_1_bit(OutputStream *p,int_32_t b)
       p->uPreBytes    = 0x00000002;
     }
   }
-  if(p->iBytePosition == SVA_STREAM_BUF_SIZE)
+  if(p->iBytePosition == STREAM_BUF_SIZE)
   {
-    memcpy((unsigned char*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, p->buf, SVA_STREAM_BUF_SIZE);
-    p_avs_enc_frame->length += SVA_STREAM_BUF_SIZE;
+    memcpy((unsigned char*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, p->buf, STREAM_BUF_SIZE);
+    p_avs_enc_frame->length += STREAM_BUF_SIZE;
     p->iBytePosition  = 0;
     p->iBitOffset    = 0;
   }
@@ -131,10 +131,10 @@ int_32_t c_avs_enc::write_a_byte(OutputStream *p,int_32_t b)
   if ((p->iBitOffset==0)&&((j != 0)||(i !=0)))
   {
 
-    if(p->iBytePosition == SVA_STREAM_BUF_SIZE)
+    if(p->iBytePosition == STREAM_BUF_SIZE)
     {
-      memcpy((unsigned char*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, p->buf, SVA_STREAM_BUF_SIZE);
-      p_avs_enc_frame->length += SVA_STREAM_BUF_SIZE;
+      memcpy((unsigned char*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, p->buf, STREAM_BUF_SIZE);
+      p_avs_enc_frame->length += STREAM_BUF_SIZE;
       p->iBytePosition  = 0;
       p->iBitOffset    = 0;
     }
@@ -172,7 +172,7 @@ int_32_t c_avs_enc::write_start_code(OutputStream *p, unsigned char code)
 {
   if(p->iBitOffset)  write_align_stuff(p);
 
-  if(p->iBytePosition >= SVA_STREAM_BUF_SIZE-4 && p->iBytePosition >0 )
+  if(p->iBytePosition >= STREAM_BUF_SIZE-4 && p->iBytePosition >0 )
   {
     memcpy((unsigned char*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, p->buf, p->iBytePosition);
     p_avs_enc_frame->length += p->iBytePosition;
