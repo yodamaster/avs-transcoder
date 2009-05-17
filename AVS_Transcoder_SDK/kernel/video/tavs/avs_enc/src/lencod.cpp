@@ -107,7 +107,7 @@ int_32_t c_avs_enc::avs_enc_create()
   cp = &CopyRights;
   camera = &CameraParameter;
   pORABS = &ORABS;
-  memset(pORABS, 0, SVA_STREAM_BUF_SIZE*sizeof(byte));
+  memset(pORABS, 0, STREAM_BUF_SIZE*sizeof(byte));
   snr->snr_y  = 0;
   snr->snr_u  = 0;
   snr->snr_v  = 0;
