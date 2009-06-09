@@ -2118,8 +2118,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
     cbp8x8 = cnt_nonz_8x8 = 0;
     mode = 4;
     best_pdir = 0;
-    //===== store coding state of macroblock =====
-    store_coding_state (cs_mb);
     //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
     for (block=0; block<4; block++)
     {
@@ -2145,11 +2143,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         }
       }
       cost = fw_mcost;
-      //--- store coding state before coding with current mode ---
-      store_coding_state (cs_cm);
-
-      //--- get and check rate-distortion cost ---
-      rdcost = RDCost_for_8x8blocks (&cnt_nonz, &curr_cbp_blk, lambda_mode,block, mode, best_pdir, best_fw_ref, best_bw_ref);
 
       //--- set variables if best mode has changed ---
       if (rdcost < min_rdcost)
@@ -2176,11 +2169,8 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
             mpr8x8    [j+j0][i] = (byte)img->mpr[j+j0][i];
           }
         }
-        //--- store coding state ---
-        store_coding_state (cs_b8);
       } // if (rdcost <= min_rdcost)
-      //--- re-set coding state as it was before coding with current mode was performed ---
-      reset_coding_state (cs_cm);
+
       cost8x8 += min_cost_8x8;
 
       //----- set cbp and count of nonzero coefficients ---
@@ -2205,11 +2195,8 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         }
       } // if (block<3)
 
-      //===== set the coding state after current block =====
-      reset_coding_state (cs_b8);
     }
-    //--- re-set coding state (as it was before 8x8 block coding) ---
-    reset_coding_state (cs_mb);
+
     if (input->RCEnable)
     {
       //Rate control
