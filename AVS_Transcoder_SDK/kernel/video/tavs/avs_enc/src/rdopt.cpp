@@ -1934,7 +1934,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   Macroblock* currMB = &img->mb_data[img->current_mb_nr];
   double   qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
   int_32_t valid[MAXMODE];
-  int_32_t block, index, mode, i0, i1, j0, j1, ref, i, j, k;
+  int_32_t block, index, mode, i0, j0, ref, i, j, k;
   int_32_t lambda_motion_factor;
   int_32_t fw_mcost, mcost, max_mcost=(1<<30);
   int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
@@ -2124,8 +2124,8 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
     for (block=0; block<4; block++)
     {
       //--- set coordinates ---
-      j0 = ((block/2)<<3);    j1 = (j0>>2);
-      i0 = ((block%2)<<3);    i1 = (i0>>2);
+      j0 = ((block/2)<<3);    //j1 = (j0>>2);
+      i0 = ((block%2)<<3);    //i1 = (i0>>2); 
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
       min_cost_8x8=(1<<20);
       min_rdcost=1e30;
@@ -2426,7 +2426,7 @@ void c_avs_enc::encode_one_inter_macroblock_not_rdo()
   Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
   double      lambda_mode, lambda_motion, min_rdcost=99999, rdcost = 0, max_rdcost=1e30;
   int_32_t         valid[MAXMODE];
-  int_32_t         block, mode, i0, i1, j0, j1, ref, dummy;
+  int_32_t         block, mode, i0, j0, ref, dummy;
   int_32_t         lambda_motion_factor;
   int_32_t         fw_mcost, mcost, max_mcost=(1<<30);
   int_32_t         cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir;
@@ -2626,8 +2626,8 @@ void c_avs_enc::encode_one_inter_macroblock_not_rdo()
     for (block=0; block<4; block++)
       {
       //--- set coordinates ---
-      j0 = ((block/2)<<3);    j1 = (j0>>2);
-      i0 = ((block%2)<<3);    i1 = (i0>>2);
+      j0 = ((block/2)<<3);    //j1 = (j0>>2);
+      i0 = ((block%2)<<3);    //i1 = (i0>>2);
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
       min_cost_8x8=(1<<20);
       min_rdcost=1e30;
@@ -2764,7 +2764,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
   Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
   double      qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
   int_32_t         valid[MAXMODE];
-  int_32_t         block, index, mode, i0, i1, j0, j1, ref, i, j, k, ctr16x16;
+  int_32_t         block, index, mode, i0, j0, ref, i, j, k, ctr16x16;
   int_32_t         lambda_motion_factor;
   int_32_t         fw_mcost, bw_mcost, bid_mcost, mcost, max_mcost=(1<<30);
   int_32_t         curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
@@ -2836,8 +2836,8 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
     for (block=0; block<4; block++)
       {
       //--- set coordinates ---
-      j0 = ((block/2)<<3);    j1 = (j0>>2);
-      i0 = ((block%2)<<3);    i1 = (i0>>2);
+      j0 = ((block/2)<<3);    //j1 = (j0>>2);
+      i0 = ((block%2)<<3);    //i1 = (i0>>2);
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
       min_cost_8x8=(1<<20);
       min_rdcost=1e30;
