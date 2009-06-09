@@ -2122,8 +2122,8 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
     for (block=0; block<4; block++)
     {
       //--- set coordinates ---
-      j0 = ((block/2)<<3);    //j1 = (j0>>2);
-      i0 = ((block%2)<<3);    //i1 = (i0>>2); 
+      j0 = ((block/2)<<3);    
+      i0 = ((block%2)<<3);   
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
       min_cost_8x8=(1<<20);
       min_rdcost=1e30;
@@ -2153,22 +2153,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         best8x8pdir     [P8x8][block] = best_pdir;
         best8x8ref      [P8x8][block] = best_fw_ref;
         //--- store number of nonzero coefficients ---
-        best_cnt_nonz  = cnt_nonz;          //--- store block cbp ---
-        //--- store coefficients ---
-        for (k=0; k< 4; k++)
-          for (j=0; j< 2; j++)
-            for (i=0; i<65; i++)
-              cofAC8x8[block][k][j][i] = img->cofAC[block][k][j][i]; // 18->65 for ABT
-
-        //--- store reconstruction and prediction ---
-        for (j=0; j<8; j++)
-        {
-          for (i=i0; i<i0+8; i++)
-          {
-            rec_mbY8x8[j0+j][i] = imgY[img->pix_y+j0+j][img->pix_x+i];
-            mpr8x8    [j+j0][i] = (byte)img->mpr[j+j0][i];
-          }
-        }
+        best_cnt_nonz  = cnt_nonz;  
       } // if (rdcost <= min_rdcost)
 
       cost8x8 += min_cost_8x8;
