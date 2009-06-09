@@ -1938,7 +1938,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   int_32_t lambda_motion_factor;
   int_32_t fw_mcost, mcost, max_mcost=(1<<30);
   int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
-  int_32_t cost, min_cost, cost8x8, cost_direct=0, have_direct=0;
   int_32_t write_ref   = input->no_multpred>1;
   int_32_t max_ref     = img->nb_references;
   int_32_t **ipredmodes = img->ipredmode;
@@ -1948,7 +1947,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   int_32_t *****allmvs = img->all_mv;
   int_32_t **refar     = refFrArr;
   int_32_t bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-  int_32_t min_cost_8x8;
   int_32_t mb_available_up, mb_available_left, mb_available_up_left;
   max_ref = img->nb_references;
   if (img->number % input->intra_period == 1)//for close GOP
@@ -1990,7 +1988,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
 
   //===== set direct motion vectors =====
 #ifdef FastME
-  cost8x8 = 1<<20;
+
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
   min_cost=cost8x8;
   best_mode=P8x8;
@@ -2113,8 +2111,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
 
   if (valid[P8x8])
   {
-    cost8x8 = 0;
-    min_cost = (1<<20);
     cbp8x8 = cnt_nonz_8x8 = 0;
     mode = 4;
     best_pdir = 0;
@@ -2125,8 +2121,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       j0 = ((block/2)<<3);    
       i0 = ((block%2)<<3);   
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
-      min_cost_8x8=(1<<20);
-      min_rdcost=1e30;
       curr_cbp_blk = 0;
       //--- motion estimation for all reference frames ---
       PartitionMotionSearch (mode, block, lambda_motion);
@@ -2142,21 +2136,13 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
           best_fw_ref = ref;
         }
       }
-      cost = fw_mcost;
 
       //--- set variables if best mode has changed ---
-      if (rdcost < min_rdcost)
-      {
-        min_cost_8x8                  = cost;
-        min_rdcost                    = rdcost;
         best8x8mode           [block] = mode;
         best8x8pdir     [P8x8][block] = best_pdir;
         best8x8ref      [P8x8][block] = best_fw_ref;
         //--- store number of nonzero coefficients ---
         best_cnt_nonz  = cnt_nonz;  
-      } // if (rdcost <= min_rdcost)
-
-      cost8x8 += min_cost_8x8;
 
       //----- set cbp and count of nonzero coefficients ---
       if (best_cnt_nonz)
@@ -2169,6 +2155,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         //===== set motion vectors and reference frames (prediction) =====
         SetRefAndMotionVectors (block, mode, best8x8ref[P8x8][block], best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
         //===== re-set reconstructed block =====
+		/*
         j0   = 8*(block/2);
         i0   = 8*(block%2);
         for (j=0; j<8; j++)
@@ -2178,10 +2165,11 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
             imgY[img->pix_y+j0+j][img->pix_x+i] = rec_mbY8x8[j0+j][i];
           }
         }
+		*/
       } // if (block<3)
 
     }
-
+    /*
     if (input->RCEnable)
     {
       //Rate control
@@ -2193,25 +2181,14 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         }
       }
     }
-    if(cost8x8<min_cost)
-    {
-      best_mode = P8x8;
-      min_cost = cost8x8;
-    }
-  }
-  else // if (valid[P8x8])
-  {
-    cost8x8 = (1<<20);
+	*/
   }
 #ifndef FastME
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
-  min_cost=cost8x8;
-  best_mode=P8x8;
 
   mode = INTER16x16; //INTER16x16
   if (valid[mode])
   {
-    cost = 0;
     block = 0;
     PartitionMotionSearch (mode, block, lambda_motion);
     fw_mcost=max_mcost;
@@ -2227,23 +2204,16 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       }
     }
     best_pdir  = 0;
-    cost      += fw_mcost;
 
     best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
     best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
     best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
 
-    if (cost < min_cost)
-    {
-      best_mode = mode;
-      min_cost  = cost;
-    }
   }//INTER16x16
 
   mode = INTER16x8; //INTER16x8
   if (valid[mode])
   {
-    cost = 0;
     for (block=0; block<2; block++)
     {
       PartitionMotionSearch (mode, block, lambda_motion);
@@ -2260,7 +2230,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         }
       }
       best_pdir  = 0;
-      cost      += fw_mcost;
 
       best8x8ref [2][2*block] = best8x8ref [2][2*block+1] = best_fw_ref;
       best8x8pdir[2][2*block] = best8x8pdir[2][2*block+1] = best_pdir;
@@ -2270,17 +2239,11 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
 
     }
-    if (cost < min_cost)
-    {
-      best_mode = mode;
-      min_cost  = cost;
-    }
   }//INTER16x8
 
   mode = INTER8x16; //INTER8x16
   if (valid[mode])
   {
-    cost = 0;
     for (block=0; block<2; block++)
     {
       PartitionMotionSearch (mode, block, lambda_motion);
@@ -2298,7 +2261,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       }
 
       best_pdir  = 0;
-      cost      += fw_mcost;
 
       best8x8ref [3][  block] = best8x8ref [3][  block+2] = best_fw_ref;
       best8x8pdir[3][  block] = best8x8pdir[3][  block+2] = best_pdir;
@@ -2307,11 +2269,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       if (block==0)
         SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
 
-    }
-    if (cost < min_cost)
-    {
-      best_mode = mode;
-      min_cost  = cost;
     }
   }//INTER8x16
 
