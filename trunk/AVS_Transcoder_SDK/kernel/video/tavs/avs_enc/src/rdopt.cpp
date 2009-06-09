@@ -2208,7 +2208,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       best8x8bwref   [2][2*block] = best8x8bwref   [2][2*block+1] = best_bw_ref;
 
       if (block==0)
-        SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
+        SetRefAndMotionVectors(block, mode, best_fw_ref, best_bw_ref, best_pdir);
 
     }
   }//INTER16x8
@@ -2261,7 +2261,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
     if (valid[mode])
     {
       // bypass if c_ipred_mode not used
-      SetModesAndRefframeForBlocks (mode);
 
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
       {
