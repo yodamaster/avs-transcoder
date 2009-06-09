@@ -1934,7 +1934,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   Macroblock* currMB = &img->mb_data[img->current_mb_nr];
   double   qp, lambda_mode, lambda_motion, min_rdcost, rdcost = 0, max_rdcost=1e30;
   int_32_t valid[MAXMODE];
-  int_32_t block, index, mode, i0, j0, ref, i, j, k;
+  int_32_t block, index, mode, ref, i, j;
   int_32_t lambda_motion_factor;
   int_32_t fw_mcost, mcost, max_mcost=(1<<30);
   int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
@@ -2117,9 +2117,6 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
     //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
     for (block=0; block<4; block++)
     {
-      //--- set coordinates ---
-      j0 = ((block/2)<<3);    
-      i0 = ((block%2)<<3);   
       //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
       curr_cbp_blk = 0;
       //--- motion estimation for all reference frames ---
@@ -2154,34 +2151,9 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       {
         //===== set motion vectors and reference frames (prediction) =====
         SetRefAndMotionVectors (block, mode, best8x8ref[P8x8][block], best8x8bwref[P8x8][block],best8x8pdir[P8x8][block]);
-        //===== re-set reconstructed block =====
-		/*
-        j0   = 8*(block/2);
-        i0   = 8*(block%2);
-        for (j=0; j<8; j++)
-        {
-          for (i=i0; i<i0+8; i++)
-          {
-            imgY[img->pix_y+j0+j][img->pix_x+i] = rec_mbY8x8[j0+j][i];
-          }
-        }
-		*/
-      } // if (block<3)
+       } // if (block<3)
 
     }
-    /*
-    if (input->RCEnable)
-    {
-      //Rate control
-      for (j=0; j<16; j++)
-      {
-        for(i=0; i<16; i++)
-        {
-          diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i]-img->mpr[j][i];
-        }
-      }
-    }
-	*/
   }
 #ifndef FastME
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
