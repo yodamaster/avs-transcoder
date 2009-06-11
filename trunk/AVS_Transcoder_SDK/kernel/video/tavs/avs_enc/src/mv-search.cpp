@@ -288,54 +288,42 @@ void c_avs_enc::SetMotionVectorPredictor (int_32_t  pmv[2], int_32_t  **refFrArr
 
   block_available_up   = mb_available_up   || (mb_pix_y > 0);
   block_available_left = mb_available_left || (mb_pix_x > 0);
+ 
+  switch (blockshape_x)
+  {
+  case 8:
+	  if (mb_pix_y==0)
+	  {
+		  if (mb_pix_x==0)
+		  {
+			  block_available_upleft  = mb_available_upleft;
+			  block_available_upright = mb_available_up;
+		  }
+		  else
+		  {
+			  block_available_upleft  = mb_available_up;
+			  block_available_upright = mb_available_upright;
+		  }
+	  }
+	  else
+	  {
+		  block_available_upleft  = (mb_pix_x==0 ? mb_available_left : 1);
+		  block_available_upright = (mb_pix_x==0);
+	  }
+	  break;
 
-  if (mb_pix_y > 0)
-  {
-    if (mb_pix_x < 8)  // first column of 8x8 blocks
-    {
-      if (mb_pix_y==8)
-      {
-        if (blockshape_x == 16)
-          block_available_upright = 0;
-        else
-          block_available_upright = 1;
-      }
-      else
-      {
-        if (mb_pix_x+blockshape_x != 8)
-          block_available_upright = 1;
-        else
-          block_available_upright = 0;
-      }
-    }
-    else
-    {
-      if (mb_pix_x+blockshape_x != 16)
-        block_available_upright = 1;
-      else
-        block_available_upright = 0;
-    }
-  }
-  else if (mb_pix_x+blockshape_x != MB_BLOCK_SIZE)
-  {
-    block_available_upright = block_available_up;
-  }
-  else
-  {
-    block_available_upright = mb_available_upright;
-  }
-
-  if (mb_pix_x > 0)
-  {
-    block_available_upleft = (mb_pix_y > 0 ? 1 : block_available_up);
-  }
-  else if (mb_pix_y > 0)
-  {
-    block_available_upleft = block_available_left;
-  }
-  else
-  {
-    block_available_upleft = mb_available_upleft;
+  case 16:
+	  if (mb_pix_y==0)
+	  {
+		  block_available_upleft  = mb_available_upleft;
+		  block_available_upright = mb_available_upright;
+	  }
+	  else
+	  {
+		  block_available_upleft  = mb_available_left;
+		  block_available_upright = 0;
+	  }
+	  break;
   }
 
   mvPredType = MVPRED_MEDIAN;
@@ -394,9 +382,9 @@ void c_avs_enc::SetMotionVectorPredictor (int_32_t  pmv[2], int_32_t  **refFrArr
     {
     case MVPRED_MEDIAN:
       if(hv == 1){
-        mva[2] = abs(mva[0] - mvb[0])  + abs(mva[1] - mvb[1]) ;
+        mva[2] = abs(mva[0] - mvb[0])  + abs(mva[1] - mvb[1]);
         mvb[2] = abs(mvb[0] - mvc[0]) + abs(mvb[1] - mvc[1]);
-        mvc[2] = abs(mvc[0] - mva[0])  + abs(mvc[1] - mva[1]) ;
+        mvc[2] = abs(mvc[0] - mva[0])  + abs(mvc[1] - mva[1]);
         pred_vec = MEDIAN(mva[2],mvb[2],mvc[2]);
         if(pred_vec == mva[2])
         {
