@@ -2320,342 +2320,159 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   skip_intrabk_SAD(best_mode, max_ref);
 #endif
 }
+
 void c_avs_enc::encode_one_inter_macroblock_not_rdo()
 {
-  TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
-  Macroblock* currMB      = &img->mb_data[img->current_mb_nr];
-  double      lambda_mode, lambda_motion, min_rdcost=99999, rdcost = 0, max_rdcost=1e30;
-  int_32_t         valid[MAXMODE];
-  int_32_t         block, mode, i0, j0, ref, dummy;
-  int_32_t         lambda_motion_factor;
-  int_32_t         fw_mcost, mcost, max_mcost=(1<<30);
-  int_32_t         cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir;
-  int_32_t         min_cost=99999;
-  int_32_t         intra_cost=0;               //xzhao 20081106
-  int_32_t         cost[MAXMODE];
-  int_32_t         write_ref   = input->no_multpred>1;
-  int_32_t         max_ref     = img->nb_references;
-  int_32_t         adjust_ref;
-  int_32_t         **ipredmodes = img->ipredmode;
-  int_32_t         block_x   = img->block_x;
-  int_32_t         block_y   = img->block_y;
-  int_32_t         ***tmpmvs = tmp_mv;
-  int_32_t         *****allmvs = img->all_mv;
-  int_32_t         **refar     = refFrArr;
-  int_32_t         bid_best_fw_ref = 0, bid_best_bw_ref = 0;
-  int_32_t         min_cost_8x8;
-  static int_32_t  fast_count=0;
-#define _OUTPUT_TRACE_1
-#ifdef _OUTPUT_TRACE_
-  FILE *pf_trace;
-  pf_trace = NULL;
-  if (frame_no < 14)
-  {
-    pf_trace = fopen("enc_trace.txt", "a");
-  }
-#endif
+	TLS static const int_32_t  mb_mode_table[7]  = {0, 1, 2, 3, P8x8, I16MB, I4MB}; // DO NOT CHANGE ORDER !!!
+	const int_32_t  num_blocks_in_mb[7] = {0,1,2,2,4,0,0};
 
-  for (i0=0; i0<5; i0++)
-  {
-    only_motion_cost[i0][0] = 99999;
-    only_motion_cost[i0][1] = 99999;
-    only_motion_cost[i0][2] = 99999;
-    only_motion_cost[i0][3] = 99999;
-  }
-  max_ref = img->nb_references;
-  if (img->number % input->intra_period == 1)//for close GOP
-  {
-    max_ref = 1;
-  }
-  adjust_ref = 0;
-#ifdef FastME
-  decide_intrabk_SAD();
-#endif
+	int_32_t v,block8x8,block,loop;  /* iterator */
+	int_32_t mode,dummy,lambda_motion_factor;
+	int_32_t ref,max_ref,best_fw_ref,best_bw_ref = 0,best_pdir = 0;
+	int_32_t min_cost = (1 << 30), temp_cost, fw_cost,mcost;
+	double lambda_mode, lambda_motion;
+	Macroblock * currMB = &img->mb_data[img->current_mb_nr];
 
-  //===== SET VALID MODES =====
-  memset(valid, 0, MAXMODE*sizeof(int));
-  memset(cost,  0, MAXMODE*sizeof(int));
-  valid[I4MB]   = 1;
-  valid[I16MB]  = 0;
-  valid[0]      = 1;
-  valid[1]      = (input->InterSearch16x16);
-  valid[2]      = (input->InterSearch16x8);
-  valid[3]      = (input->InterSearch8x16);
-  valid[4]      = (input->InterSearch8x8);
-  valid[5]      = 0;
-  valid[6]      = 0;
-  valid[7]      = 0;
-  valid[P8x8]   = valid[4];
-  //===== SET LAGRANGE PARAMETERS =====
-  lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
-  lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
-  // reset chroma intra predictor to default
-  currMB->c_ipred_mode = DC_PRED_8;
-  best_pdir  = 0;
-  mode = SKIP;
-  SetMotionVectorPredictor (img->mv[0][0][0][1], refFrArr, tmp_mv, 0, 0, 0, 16, 16, 0);
-  FindSkipModeMotionVector ();
-  cost[SKIP] =  Get_Skip_CostMB(imgY_org, 0, img->pix_x, img->pix_y, 1, img->mv[0][0][0][1][0], img->mv[0][0][0][1][1], &img->all_mv[0][0][0][0][0], &img->all_mv[0][0][0][0][1], 1, 1, 99999, 0);
-  if (img->current_mb_nr == 0)
-  {
-    fast_count = 0;
-  }
-  if (cost[SKIP] < min_cost)
-    {
-    min_cost = cost[SKIP];
-    best_mode = 0;
-    }
+	bool valid_mode[MAXMODE] = {0};
+	valid_mode[I4MB] = 1;
+	valid_mode[I16MB] = 0;
+	valid_mode[0] = 1; //skip mode ?
+	valid_mode[1] = input->InterSearch16x16;
+	valid_mode[2] = input->InterSearch16x8;
+	valid_mode[3] = input->InterSearch8x16;
+	valid_mode[4] = input->InterSearch8x8;
+	valid_mode[P8x8] = valid_mode[4];
+	for (loop=0; loop<5; loop++)
+	{
+		only_motion_cost[loop][0] = 99999;
+		only_motion_cost[loop][1] = 99999;
+		only_motion_cost[loop][2] = 99999;
+		only_motion_cost[loop][3] = 99999;
+	}
+
+	lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
+	lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
+	max_ref = img->nb_references;
+	if (img->number % input->intra_period == 1)//for close GOP
+	{
+		max_ref = 1;
+	}
+	currMB->c_ipred_mode = DC_PRED_8;
+	if (img->current_mb_nr == 166)
+	{
+		loop = 1;
+	}
+	for (loop = 0; loop < 7; loop++)
+	{
+		if (valid_mode[mode = mb_mode_table[loop]])
+		{
+			temp_cost = 0;
+			switch (mode)
+			{
+			case 0:      /* skip mode */
+				SetMotionVectorPredictor(img->mv[0][0][0][1],refFrArr,tmp_mv,0,0,0,16,16,0);
+				FindSkipModeMotionVector();
+				temp_cost = Get_Skip_CostMB(imgY_org,0,img->pix_x,img->pix_y,1,img->mv[0][0][0][1][0],img->mv[0][0][0][1][1],&img->all_mv[0][0][0][0][0],&img->all_mv[0][0][0][0][1],1,1,99999,0);
+				break;
+
+			case I4MB:   /* intra mode */
+				currMB->c_ipred_mode = DC_PRED_8;
+				Mode_Decision_for_AVSIntraMacroblock_not_rdo(lambda_mode,&temp_cost);
+				break;
+			
+			default:    /* inter16*16/16*8/8*16/8*8 mode */
+
+				for (block=0; block<num_blocks_in_mb[loop]; block++)
+				{
+					/* partition motion search for all refrence frames */
+					PartitionMotionSearch((mode<4?mode:4), block,lambda_motion);
+					fw_cost = 1<<30;
+					for (ref=0; ref<max_ref; ref++)
+					{
+						mcost = (int_32_t) (2*lambda_motion * min(ref,1));
+						mcost += motion_cost[(mode<4?mode:4)][ref+1][block];
+						if (mcost < fw_cost)
+						{
+							fw_cost = mcost;
+							best_fw_ref = ref;
+						}
+					}
+					temp_cost += fw_cost;
+					switch (mode)
+					{
+					case 1:
+						for (v=0; v<4; v++)
+						{
+							best8x8ref[mode][v] = best_fw_ref;
+							best8x8bwref[mode][v] = best_bw_ref;
+							best8x8pdir[mode][v] = best_pdir;
+						}
+						break;
+					case 2:
+						best8x8ref[mode][2*block] = best8x8ref[mode][2*block+1] = best_fw_ref;
+						best8x8bwref[mode][2*block] = best8x8bwref[mode][2*block+1] = best_bw_ref;
+						best8x8pdir[mode][2*block] = best8x8pdir[mode][2*block+1] = best_pdir;
+						break;
+					case 3:
+						best8x8ref[mode][block] = best8x8ref[mode][block+2] = best_fw_ref;
+						best8x8bwref[mode][block] = best8x8bwref[mode][block+2] = best_bw_ref;
+						best8x8pdir[mode][block] = best8x8pdir[mode][block+2] = best_pdir;
+						break;
+					case P8x8:
+						best8x8ref[mode][block] = best_fw_ref;
+						best8x8bwref[mode][block] = best_bw_ref;
+						best8x8pdir[mode][block] = best_pdir;
+						best8x8mode[block] = 4;
+						temp_cost += (REF_COST (lambda_motion_factor, B8Mode2Value ((mode<4?mode:4), best_pdir)) - 1);
+						break;
+					}
+					if (block < num_blocks_in_mb[loop]-1) /* store the motion info */
+					{
+						SetRefAndMotionVectors(block,(mode<4?mode:4),best_fw_ref,best_bw_ref,best_pdir);
+					}
+				}
+				break;
+			}
+			if (temp_cost < min_cost)
+			{
+				min_cost  = temp_cost;
+				best_mode = mode;
+			}
 #ifdef _FAST_MODE_DECISION_
-  if (min_cost < _SKIP_MODE_COST_THRESHOLD_)
-    {
-    fast_count++;
-    goto final;
-    }
+			if ((mode == SKIP && min_cost < _SKIP_MODE_COST_THRESHOLD_) ||
+			    (mode == 2 && abs(only_motion_cost[INTER16x16][0]-(only_motion_cost[INTER16x8][0]+only_motion_cost[INTER16x8][1])) < _COST_THRESHOLD_) ||
+			    (mode == 3 && abs((only_motion_cost[INTER8x16][0]+only_motion_cost[INTER8x16][1])-(only_motion_cost[INTER16x8][0]+only_motion_cost[INTER16x8][1])) < _COST_THRESHOLD_))
+			{
+				break;
+			}
 #endif
+		}
+	}
 
-  mode = INTER16x16; //INTER16x16
-  if (valid[mode])
-    {
-    block = 0;
-    PartitionMotionSearch (mode, block, lambda_motion);
-    fw_mcost=max_mcost;
-    for (ref=0; ref<max_ref; ref++)
-      {
-      mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
-      mcost += motion_cost[mode][ref+1][block];
-      if (mcost < fw_mcost)
-        {
-        fw_mcost    = mcost;
-        best_fw_ref = ref;
-        }
-      }
-    cost[INTER16x16] = fw_mcost;
-    best8x8ref [1][0] = best8x8ref [1][1] = best8x8ref [1][2] = best8x8ref [1][3] = best_fw_ref;
-    best8x8pdir[1][0] = best8x8pdir[1][1] = best8x8pdir[1][2] = best8x8pdir[1][3] = best_pdir;
-    best8x8bwref   [1][0] = best8x8bwref   [1][1] = best8x8bwref   [1][2] = best8x8bwref   [1][3] = best_bw_ref;
-
-    if (cost[INTER16x16] < min_cost)
-      {
-      best_mode = mode;
-      min_cost  = cost[INTER16x16];
-      }
-    }//INTER16x16
-  mode = INTER16x8; //INTER16x8
-  if (valid[mode])
-    {
-    for (block=0; block<2; block++)
-      {
-      PartitionMotionSearch (mode, block, lambda_motion);
-      fw_mcost=max_mcost;
-      for (ref=0; ref<max_ref; ref++)
-        {
-        mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
-        mcost += motion_cost[mode][ref+1][block];
-        if (mcost < fw_mcost)
-          {
-          fw_mcost    = mcost;
-          best_fw_ref = ref;
-          }
-        }
-      cost[INTER16x8] += fw_mcost;
-      best8x8ref [2][2*block] = best8x8ref [2][2*block+1] = best_fw_ref;
-      best8x8pdir[2][2*block] = best8x8pdir[2][2*block+1] = best_pdir;
-      best8x8bwref   [2][2*block] = best8x8bwref   [2][2*block+1] = best_bw_ref;
-
-      if (block==0)
-        SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
-      }
-    if (cost[INTER16x8] < min_cost)
-      {
-      best_mode = mode;
-      min_cost  = cost[INTER16x8];
-      }
-    }//INTER16x8
-#ifdef _FAST_MODE_DECISION_
-  if (abs(only_motion_cost[INTER16x16][0]-(only_motion_cost[INTER16x8][0]+only_motion_cost[INTER16x8][1])) < _COST_THRESHOLD_)
-    {
-    fast_count++;
-    goto final;
-    }
-#endif
-
-  mode = INTER8x16; //INTER8x16
-  if (valid[mode])
-    {
-    for (block=0; block<2; block++)
-      {
-      PartitionMotionSearch (mode, block, lambda_motion);
-      fw_mcost=max_mcost;
-      for (ref=0; ref<max_ref; ref++)
-        {
-        mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
-        mcost += motion_cost[mode][ref+1][block];
-        if (mcost < fw_mcost)
-          {
-          fw_mcost    = mcost;
-          best_fw_ref = ref;
-          }
-        }
-      cost[INTER8x16] += fw_mcost;
-
-      best8x8ref [3][  block] = best8x8ref [3][  block+2] = best_fw_ref;
-      best8x8pdir[3][  block] = best8x8pdir[3][  block+2] = best_pdir;
-      best8x8bwref   [3][block] = best8x8bwref   [3][block+2] = best_bw_ref;
-
-      if (block==0)
-        SetRefAndMotionVectors (block, mode, best_fw_ref, best_bw_ref, best_pdir);
-
-      }
-    if (cost[INTER8x16] < min_cost)
-      {
-      best_mode = mode;
-      min_cost  = cost[INTER8x16];
-      }
-    }//INTER8x16
-#ifdef _FAST_MODE_DECISION_
-  if (abs((only_motion_cost[INTER8x16][0]+only_motion_cost[INTER8x16][1])-(only_motion_cost[INTER16x8][0]+only_motion_cost[INTER16x8][1])) < _COST_THRESHOLD_)
-    {
-    fast_count++;
-    goto final;
-    }
-#endif
-  if (valid[P8x8])
-    {
-    mode = 4;
-    //=====  LOOP OVER 8x8 SUB-PARTITIONS  (Motion Estimation & Mode Decision) =====
-    for (block=0; block<4; block++)
-      {
-      //--- set coordinates ---
-      j0 = ((block/2)<<3);    //j1 = (j0>>2);
-      i0 = ((block%2)<<3);    //i1 = (i0>>2);
-      //=====  LOOP OVER POSSIBLE CODING MODES FOR 8x8 SUB-PARTITION  =====
-      min_cost_8x8=(1<<20);
-      min_rdcost=1e30;
-      //--- motion estimation for all reference frames ---
-      PartitionMotionSearch (mode, block, lambda_motion);
-      //--- get cost and reference frame for forward prediction ---
-      fw_mcost=max_mcost;
-      for (ref=0; ref<max_ref; ref++)
-        {
-        mcost  = (int_32_t)(2*lambda_motion*min(ref,1));
-        mcost += motion_cost[mode][ref+1][block];
-        if (mcost < fw_mcost)
-          {
-          fw_mcost    = mcost;
-          best_fw_ref = ref;
-          }
-        }
-
-      cost[P8x8] += fw_mcost;
-      cost[P8x8] += (REF_COST (lambda_motion_factor, B8Mode2Value (mode, best_pdir)) - 1);
-      best8x8mode           [block] = mode;
-      best8x8pdir     [P8x8][block] = best_pdir;
-      best8x8ref      [P8x8][block] = best_fw_ref;
-      best8x8bwref    [P8x8][block] = best_bw_ref;
-      if (block<3)
-        {
-        //===== set motion vectors and reference frames (prediction) =====
-        SetRefAndMotionVectors (block, mode, best8x8ref[P8x8][block], best8x8bwref[P8x8][block], best8x8pdir[P8x8][block]);
-        } // if (block<3)
-
-      } // for (cbp8x8=cbp_blk8x8=cnt_nonz_8x8=0, block=0; block<4; block++)
-    if(cost[P8x8]<min_cost)
-      {
-      best_mode = P8x8;
-      min_cost = cost[P8x8];
-      }
-    }
-
-  //INTRA
-  mode = I4MB;
-  if (valid[mode])
-  {
-    currMB->c_ipred_mode = DC_PRED_8;
-    /*currMB->cbp = */
-    Mode_Decision_for_AVSIntraMacroblock_not_rdo (lambda_mode, &intra_cost);
-
-    if (intra_cost < min_cost)
-    {
-      min_cost = intra_cost;
-      //===== set parameters for chosen mode =====
-      SetModesAndRefframeForBlocks (I4MB);
-      // pre-compute all chroma intra prediction modes
-      IntraChromaPrediction8x8(NULL, NULL, NULL);
-      dummy = 0;
-      img->NoResidueDirect = 0;
-      ChromaResidualCoding (&dummy);
-      best_mode = I4MB;
-    }
-  }
-final:
-  //===== set parameters for chosen mode =====
-  SetModesAndRefframeForBlocks (best_mode);
-  storeMotionInfo (0);
-  ////Rate control
-  //if (input->RCEnable)
-  //  {
-  //  for (j=0; j<16; j++)
-  //    {
-  //    for(i=0; i<16; i++)
-  //      {
-  //      diffy[j][i] = imgY_org[img->pix_y+j][img->pix_x+i] - img->mpr[j][i];
-  //      }
-  //    }
-  //  }
-
-  //// Rate control
-  //if(input->RCEnable)
-  //  {
-  //  img->MADofMB[img->current_mb_nr] = calc_MAD();
-  //  if(input->basicunit<img->total_number_mb)
-  //    {
-  //    img->TotalMADBasicUnit +=img->MADofMB[img->current_mb_nr];
-
-  //    /* delta_qp is present only for non-skipped macroblocks*/
-  //    if ((cbp!=0 || best_mode==I16MB))
-  //      currMB->prev_cbp = 1;
-  //    else
-  //      {
-  //      img->qp -= currMB->delta_qp;
-  //      currMB->delta_qp = 0;
-  //      currMB->qp = img->qp;
-  //      currMB->prev_cbp = 0;
-  //      }
-  //    }
-  //  }
-
-  img->reconflag=1;
-  if (!IS_INTRA(currMB))
-  {
-    LumaResidualCoding ();
-    dummy = 0;
-    img->NoResidueDirect = 0;
-    ChromaResidualCoding (&dummy);
-  }
-  SetMotionVectorsMB (currMB, 0);
-#ifdef _OUTPUT_TRACE_
-  if (pf_trace)
-  {
-    int i, j, b8;
-    b8 = 0;
-    fprintf(pf_trace, "frameno:%4d, mbnr:%4d, best_mode:%4d\n", frame_no, img->current_mb_nr, best_mode);
-    for (j=0; j<2; j++)
-    {
-      for (i=0; i<2; i++)
-      {
-      fprintf(pf_trace, "b8:%d, (%4d,%4d)\n", b8++, tmp_mv[0][img->block8_y][img->block8_x+4], tmp_mv[1][img->block8_y][img->block8_x+4]);
-      }
-    }
-    fclose(pf_trace);
-  }
-#endif
-  if (img->current_mb_nr==0)
-    intras=0;
-  if (IS_INTRA(currMB))
-  {
-    intras++;
-  }
+	SetModesAndRefframeForBlocks(best_mode);
+	storeMotionInfo(0);
+    if (best_mode == I4MB)
+	{
+		IntraChromaPrediction8x8(NULL,NULL,NULL);
+		dummy = 0;
+		img->NoResidueDirect = 0;
+		ChromaResidualCoding(&dummy);
+	}
+	else
+	{
+		img->reconflag = 1;
+		LumaResidualCoding();
+		dummy = 0;
+		img->NoResidueDirect = 0;
+		ChromaResidualCoding(&dummy);
+	}
+	SetMotionVectorsMB(currMB,0);
+	if (img->current_mb_nr == 0) intras = 0;
+	if (currMB->mb_type == I4MB)
+		intras++;
 }
+
+
 void c_avs_enc::encode_one_b_frame_macroblock_rdo_fast()
   {
   TLS static const int_32_t  b8_mode_table[2]  = {0, 4};         // DO NOT CHANGE ORDER !!!
