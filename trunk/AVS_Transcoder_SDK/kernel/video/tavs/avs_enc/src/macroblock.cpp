@@ -661,7 +661,6 @@ c_avs_enc::LumaPrediction4x4 (int_32_t  block_x,    // <--  relative horizontal 
 }
 
 
-
 /*
 *************************************************************************
 * Function:Residual Coding of an 8x8 Luma block (not for intra)
@@ -674,767 +673,255 @@ c_avs_enc::LumaPrediction4x4 (int_32_t  block_x,    // <--  relative horizontal 
 
 int_32_t                                       //  ==> coefficient cost
 c_avs_enc::LumaResidualCoding8x8 (int_32_t  *cbp,         //  --> cbp (updated according to processed 8x8 luminance block)
-                                  int_32_t  *cbp_blk,     //  --> block cbp (updated according to processed 8x8 luminance block)
-                                  int_32_t  block8x8,     // <--  block number of 8x8 block
-                                  int_32_t  fw_mode,      // <--  forward  prediction mode (1-7, 0=DIRECT)
-                                  int_32_t  bw_mode,      // <--  backward prediction mode (1-7, 0=DIRECT)
-                                  int_32_t  fw_refframe,  // <--  reference frame for forward prediction
-                                  int_32_t  bw_refframe   // <--  reference frame for backward prediction
-                                  )
+								  int_32_t  *cbp_blk,     //  --> block cbp (updated according to processed 8x8 luminance block)
+								  int_32_t  block8x8,     // <--  block number of 8x8 block
+								  int_32_t  fw_mode,      // <--  forward  prediction mode (1-7, 0=DIRECT)
+								  int_32_t  bw_mode,      // <--  backward prediction mode (1-7, 0=DIRECT)
+								  int_32_t  fw_refframe,  // <--  reference frame for forward prediction
+								  int_32_t  bw_refframe   // <--  reference frame for backward prediction
+								  )
 {
-  int_32_t    i, j;
-  int_16_t    coeff_cost = 0;
-  int_32_t    mb_y       = (block8x8 / 2) << 3;
-  int_32_t    mb_x       = (block8x8 % 2) << 3;
-  int_32_t    cbp_mask   = 1 << block8x8;
-  int_32_t    scrFlag = 0;                // 0=noSCR, 1=strongSCR, 2=jmSCR
-  byte** imgY_original = imgY_org;
-  byte **ref_pic_tmp, **ref_pic_tmp_bw;
-  int_32_t  pix_x    = img->pix_x;
-  int_32_t  pix_y    = img->pix_y;
-  Macroblock* currMB = &img->mb_data[img->current_mb_nr];
-  int_32_t  *****fmv_array = (fw_mode && bw_mode) ? img->all_omv    : img->all_mv;    // For MB level frame/field coding
-  int_32_t  *****bmv_array = (fw_mode && bw_mode) ? img->all_bw_omv : img->all_bmv;                                     // For MB level frame/field coding
-  int_32_t    direct  = (fw_mode == 0 && bw_mode == 0 && (img->type==B_IMG));
-  int_32_t    skipped = (fw_mode == 0 && bw_mode == 0 && (img->type!=B_IMG));
-  __declspec(align(16)) int_16_t curr_blk[B8_SIZE][B8_SIZE];
-  int_32_t    sad = 0;
-  TLS static int_32_t fw_pred[16];
-  TLS static int_32_t bw_pred[16];
-  int_32_t   y1, x1, y, x, y1_bw, x1_bw, y_bw, x_bw, mv[2];
-  byte  *d1, *d2, *d3, *d4;
-  int_16_t *d5, *d6;
-  int_32_t fw_refframe_ref ;
-
-  __m128i xmm0,zero128={0};
-
-  int_32_t width4  = ((img->width+2*IMG_PAD_SIZE-1)<<2)-32;
-  int_32_t height4 = ((img->height+2*IMG_PAD_SIZE-1)<<2)-32;
-
-  if (img->type==B_IMG)
-  {
-    scrFlag = 1;
-    fw_refframe_ref = 1;
-  }
-  else
-  {
-    fw_refframe_ref = fw_refframe;
-  }
-  if (direct)
-  {
-    fw_refframe= 0;
-    bw_refframe= 0;
-  }
-  /*if(img->current_mb_nr==263 && frame_no==5 && img->reconflag==1)
-  {
-  printf("block8x8: %d\n",block8x8);
-  for(jj=0;jj<8;jj++)
-  {
-  for(ii=0;ii<8;ii++)
-  {
-  printf("%3d ",img->mpr[jj+mb_y][ii+mb_x]);
-  }
-  printf("\n");
-  }
-  }*/
-  //参考帧数组:mref[ref][y1][x1][y][x]
-  //P帧:ref=0代表离当前P帧近的参考帧
-  //    ref=1代表离当前P帧远的参考帧
-  //B帧:ref=1代表前向参考帧
-  //    ref=0代表后向参考帧
-  //[y1][x1]代表当前mv指向的点在插值图像中的相对位置
-  //例如P帧:mvx=33,mvy=32
-  //那么对应的x1是 mvx%4=1, mvy%4=0, p_ref_frame=&mref[ref][y1][x1][y][x]
-
-  //双向
-  if (direct || (fw_mode && bw_mode))
-  {
-    //前向，根据mv计算参考帧的起始地址
-    mv[0] = fmv_array[block8x8 % 2][block8x8 / 2][0][fw_mode][0];
-    mv[1] = fmv_array[block8x8 % 2][block8x8 / 2][0][fw_mode][1];
-    y  = ((pix_y + mb_y + IMG_PAD_SIZE) << 2) + mv[1];
-    x  = ((pix_x + mb_x + IMG_PAD_SIZE) << 2) + mv[0];
-    if (y < 0)
-      y &= 3;
-    else if (y > height4)
-      y = height4 + (y & 3);
-    if (x < 0)
-      x &= 3;
-    else if (x > width4)
-      x = width4 + (x & 3);
-    y1 = y % 4;
-    x1 = x % 4;
-    y /= 4;
-    x /= 4;
-    // xzhao {
-    /*if(img->current_mb_nr==263 && frame_no==5 && img->reconflag==1 && block8x8==1)
-    {
-    printf("block8x8: %d\n",block8x8);
-    printf("foward:  x:%d   y%d\n",pix_x + mb_x,pix_y + mb_y);
-    printf("mv_x: %d  mv_y: %d\n",mv[0],mv[1]);
-    printf("compensated: x: %d  y: %d\n",(x-16)*4+x1,(y-16)*4+y1);
-
-    }*/
-    // xzhao }
-    //后向，根据mv计算参考帧的起始地址
-    mv[0] = bmv_array[block8x8 % 2][block8x8 / 2][0][bw_mode][0];
-    mv[1] = bmv_array[block8x8 % 2][block8x8 / 2][0][bw_mode][1];
-
-    y_bw  = ((pix_y + mb_y + IMG_PAD_SIZE) << 2) + mv[1];
-    x_bw  = ((pix_x + mb_x + IMG_PAD_SIZE) << 2) + mv[0];
-    if (y_bw < 0)
-      y_bw &= 3;
-    else if (y_bw > height4)
-      y_bw = height4 + (y_bw & 3);
-    if (x_bw < 0)
-      x_bw &= 3;
-    else if (x_bw > width4)
-      x_bw = width4 + (x_bw & 3);
-    y1_bw = y_bw % 4;
-    x1_bw = x_bw % 4;
-    y_bw /= 4;
-    x_bw /= 4;
-
-    ref_pic_tmp    = mref[1][y1][x1];         //前向
-    ref_pic_tmp_bw = mref[0][y1_bw][x1_bw];
-    d3 = &ref_pic_tmp[y][x];
-    d4 = &ref_pic_tmp[y + 1][x];
-    {
-      //输出B帧的预测
-      /*if (frame_no == 1 && img->current_mb_nr == 1379 && block8x8==1)
-      {
-      int j, i;
-      for (j=0; j<8; j++)
-      {
-      for (i=0; i<8; i++)
-      {
-      printf("%4d ", (ref_pic_tmp[y+j][x+i]+ref_pic_tmp_bw[y_bw+j][x_bw+i]/2));
-      }
-      printf("\n");
-      }
-      printf("\n");
-      exit(0);
-      }*/
-    }
-    /*   if(img->current_mb_nr==263 && frame_no==5 && img->reconflag==1)
-    {
-    for(jj=0;jj<8;jj++)
-    {
-    for(ii=0;ii<8;ii++)
-    {
-    //printf("%3d ",img->mpr[jj+mb_y][ii+mb_x]);
-    printf("%3d ",ref_pic_tmp[y+jj][x+ii]);
-    }
-    printf("\n");
-    }
-    printf("backward: x:%d   y%d\n",pix_x + mb_x,pix_y + mb_y);
-    printf("mv_x: %d  mv_y: %d\n",mv[0],mv[1]);
-    printf("compensated: x: %d  y: %d\n",(x_bw-16)*4+x1_bw,(y_bw-16)*4+y1_bw);
-    for(jj=0;jj<8;jj++)
-    {
-    for(ii=0;ii<8;ii++)
-    {
-    //printf("%3d ",img->mpr[jj+mb_y][ii+mb_x]);
-    printf("%3d ",ref_pic_tmp_bw[y_bw+jj][x_bw+ii]);
-    }
-    printf("\n");
-    }
-    }*/
-    __asm
-    {
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-    }
-
-    d1 = &imgY_original[pix_y + mb_y][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 1][pix_x + mb_x];
-    d3 = &ref_pic_tmp_bw[y_bw][x_bw];
-    d4 = &ref_pic_tmp_bw[y_bw + 1][x_bw];
-    d5 = &img->mpr[mb_y][mb_x];
-    d6 = &img->mpr[mb_y + 1][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm4, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm5, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm4, xmm7
-        punpcklbw  xmm5, xmm7
-
-        pavgw       xmm2, xmm4        //(fw + bw)/2
-        pavgw       xmm3, xmm5
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk, xmm0
-        movdqa      curr_blk + 16, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d3 = &ref_pic_tmp[y + 2][x];
-    d4 = &ref_pic_tmp[y + 3][x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 2][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 3][pix_x + mb_x];
-    d3 = &ref_pic_tmp_bw[y_bw + 2][x_bw];
-    d4 = &ref_pic_tmp_bw[y_bw + 3][x_bw];
-    d5 = &img->mpr[mb_y + 2][mb_x];
-    d6 = &img->mpr[mb_y + 3][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm4, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm5, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm4, xmm7
-        punpcklbw  xmm5, xmm7
-
-        pavgw       xmm2, xmm4        //(fw + bw)/2
-        pavgw       xmm3, xmm5
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 32, xmm0
-        movdqa      curr_blk + 48, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d3 = &ref_pic_tmp[y + 4][x];
-    d4 = &ref_pic_tmp[y + 5][x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 4][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 5][pix_x + mb_x];
-    d3 = &ref_pic_tmp_bw[y_bw + 4][x_bw];
-    d4 = &ref_pic_tmp_bw[y_bw + 5][x_bw];
-    d5 = &img->mpr[mb_y + 4][mb_x];
-    d6 = &img->mpr[mb_y + 5][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm4, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm5, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm4, xmm7
-        punpcklbw  xmm5, xmm7
-
-        pavgw       xmm2, xmm4        //(fw + bw)/2
-        pavgw       xmm3, xmm5
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 64, xmm0
-        movdqa      curr_blk + 80, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d3 = &ref_pic_tmp[y + 6][x];
-    d4 = &ref_pic_tmp[y + 7][x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 6][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 7][pix_x + mb_x];
-    d3 = &ref_pic_tmp_bw[y_bw + 6][x_bw];
-    d4 = &ref_pic_tmp_bw[y_bw + 7][x_bw];
-    d5 = &img->mpr[mb_y + 6][mb_x];
-    d6 = &img->mpr[mb_y + 7][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm4, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm5, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm4, xmm7
-        punpcklbw  xmm5, xmm7
-
-        pavgw       xmm2, xmm4        //(fw + bw)/2
-        pavgw       xmm3, xmm5
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 96, xmm0
-        movdqa      curr_blk + 112, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-  } //双向
-  //如果需要前向根据mv得到当前8x8块的前向的预测值
-  else if (fw_mode || skipped)
-  {
-    //根据mv计算参考帧的起始地址
-    mv[0] = fmv_array[block8x8 % 2][block8x8 / 2][fw_refframe][fw_mode][0];
-    mv[1] = fmv_array[block8x8 % 2][block8x8 / 2][fw_refframe][fw_mode][1];
-    y  = ((pix_y + mb_y + IMG_PAD_SIZE) << 2) + mv[1];
-    x  = ((pix_x + mb_x + IMG_PAD_SIZE) << 2) + mv[0];
-    if (y < 0)
-      y &= 3;
-    else if (y > height4)
-      y = height4 + (y & 3);
-    if (x < 0)
-      x &= 3;
-    else if (x > width4)
-      x = width4 + (x & 3);
-    y1 = y % 4;
-    x1 = x % 4;
-    y /= 4;
-    x /= 4;
-
-    ref_pic_tmp = mref[fw_refframe_ref][y1][x1];
-    d1 = &imgY_original[pix_y + mb_y][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 1][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y][x];
-    d4 = &ref_pic_tmp[y + 1][x];
-    d3 = &mref[fw_refframe_ref][y1][x1][y][x];
-    d4 = &mref[fw_refframe_ref][y1][x1][y + 1][x];
-    d5 = &img->mpr[mb_y][mb_x];
-    d6 = &img->mpr[mb_y + 1][mb_x];
-    {
-      //#define _OUTPUT_TRACE_
-#ifdef _OUTPUT_TRACE_
-      //输出预测
-      FILE* pf_trace = NULL;
-      int i, j;
-      if (frame_no == 4 && img->current_mb_nr == 2 && block8x8==1)
-      {
-        pf_trace = fopen("enc_trace.txt", "a");
-        fprintf(pf_trace, "prediction:  b8:%4d\n", block8x8);
-        for (j=0; j<8; j++)
-        {
-          for (i=0; i<8; i++)
-          {
-            fprintf(pf_trace, "%4d ", ref_pic_tmp[y+j][x+i]);
-          }
-          fprintf(pf_trace, "\n");
-        }
-        fprintf(pf_trace, "\n");
-        fclose(pf_trace);
-        exit(0);
-      }
-#endif
-    }
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in orig
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk, xmm0
-        movdqa      curr_blk + 16, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 2][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 3][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 2][x];
-    d4 = &ref_pic_tmp[y + 3][x];
-    d5 = &img->mpr[mb_y + 2][mb_x];
-    d6 = &img->mpr[mb_y + 3][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 32, xmm0
-        movdqa      curr_blk + 48, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 4][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 5][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 4][x];
-    d4 = &ref_pic_tmp[y + 5][x];
-    d5 = &img->mpr[mb_y + 4][mb_x];
-    d6 = &img->mpr[mb_y + 5][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 64, xmm0
-        movdqa      curr_blk + 80, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 6][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 7][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 6][x];
-    d4 = &ref_pic_tmp[y + 7][x];
-    d5 = &img->mpr[mb_y + 6][mb_x];
-    d6 = &img->mpr[mb_y + 7][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 96, xmm0
-        movdqa      curr_blk + 112, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-  }
-  //如果需要后向根据mv得到当前8x8块的后向的预测值，计算方法同前向
-  else
-  {
-    //根据mv计算参考帧的起始地址
-    mv[0] = bmv_array[block8x8 % 2][block8x8 / 2][bw_refframe][bw_mode][0];
-    mv[1] = bmv_array[block8x8 % 2][block8x8 / 2][bw_refframe][bw_mode][1];
-
-    y  = ((pix_y + mb_y + IMG_PAD_SIZE) << 2) + mv[1];
-    x  = ((pix_x + mb_x + IMG_PAD_SIZE) << 2) + mv[0];
-    if (y < 0)
-      y &= 3;
-    else if (y > height4)
-      y = height4 + (y & 3);
-    if (x < 0)
-      x &= 3;
-    else if (x > width4)
-      x = width4 + (x & 3);
-    y1 = y % 4;
-    x1 = x % 4;
-    y /= 4;
-    x /= 4;
-    {
-      //输出B帧的预测
-      //if (frame_no == 13 && img->current_mb_nr == 0 && block8x8==1 && bw_mode==4)
-      //{
-      //  int j, i;
-      //  ref_pic_tmp = mref[bw_refframe][y1][x1];
-      //  for (j=0; j<8; j++)
-      //  {
-      //    for (i=0; i<8; i++)
-      //    {
-      //      printf("%4d ", ref_pic_tmp[y+j][x+i]);
-      //    }
-      //    printf("\n");
-      //  }
-      //  printf("\n");
-      //  exit(0);
-      //}
-    }
-    ref_pic_tmp = mref[bw_refframe][y1][x1];
-    d1 = &imgY_original[pix_y + mb_y][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 1][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y][x];
-    d4 = &ref_pic_tmp[y + 1][x];
-    d5 = &img->mpr[mb_y][mb_x];
-    d6 = &img->mpr[mb_y + 1][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in org_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk, xmm0
-        movdqa      curr_blk + 16, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 2][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 3][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 2][x];
-    d4 = &ref_pic_tmp[y + 3][x];
-    d5 = &img->mpr[mb_y + 2][mb_x];
-    d6 = &img->mpr[mb_y + 3][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 32, xmm0
-        movdqa      curr_blk + 48, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 4][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 5][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 4][x];
-    d4 = &ref_pic_tmp[y + 5][x];
-    d5 = &img->mpr[mb_y + 4][mb_x];
-    d6 = &img->mpr[mb_y + 5][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 64, xmm0
-        movdqa      curr_blk + 80, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-
-    d1 = &imgY_original[pix_y + mb_y + 6][pix_x + mb_x];
-    d2 = &imgY_original[pix_y + mb_y + 7][pix_x + mb_x];
-    d3 = &ref_pic_tmp[y + 6][x];
-    d4 = &ref_pic_tmp[y + 7][x];
-    d5 = &img->mpr[mb_y + 6][mb_x];
-    d6 = &img->mpr[mb_y + 7][mb_x];
-
-    __asm
-    {
-      mov      esi,  dword ptr [d1]  //read in ref_frame
-      movdqu    xmm0, xmmword ptr [esi]
-      mov      esi,  dword ptr [d2]
-      movdqu    xmm1, xmmword ptr [esi]
-
-      mov      esi,  dword ptr [d3]  //read in ref_frame
-      movdqu    xmm2, xmmword ptr [esi]
-      mov      esi,  dword ptr [d4]
-      movdqu    xmm3, xmmword ptr [esi]
-
-      pxor    xmm7, xmm7        //byte -> int_16_t
-        punpcklbw  xmm0, xmm7
-        punpcklbw  xmm1, xmm7
-        punpcklbw  xmm2, xmm7
-        punpcklbw  xmm3, xmm7
-
-        psubw       xmm0, xmm2        //org - pred
-        psubw       xmm1, xmm3
-
-        movdqa      curr_blk + 96, xmm0
-        movdqa      curr_blk + 112, xmm1
-        mov      esi,  dword ptr [d5]
-      movdqa      xmmword ptr [esi],    xmm2
-        mov      esi,  dword ptr [d6]
-      movdqa      xmmword ptr [esi],    xmm3
-    }
-  }
-
-  if (!skipped)
-  {
-    avs_dct_sse(curr_blk);
-    coeff_cost = scanquant_B8   (img->qp, 0, block8x8, curr_blk, scrFlag, cbp, cbp_blk);
-  }
+	
+	int_32_t coeff_cost = 0;
+	int_32_t cbp_mask   = 1 << block8x8;
+	int_32_t scrFlag = 0;                // 0=noSCR, 1=strongSCR, 2=jmSCR
+	int_32_t mv[2],fw_ref,it;
+	int_32_t h_fw,v_fw,h_bw,v_bw,h,v,blkh = block8x8 % 2, blkv = block8x8 / 2;
+	int_32_t pix_h = img->pix_x, pix_v = img->pix_y,mb_h = blkh  << 3, mb_v = blkv << 3;
+	int_32_t width4  = ((img->width + (IMG_PAD_SIZE << 1) - 1) << 2) - 32;
+	int_32_t height4 = ((img->height+ (IMG_PAD_SIZE << 1) - 1) << 2) - 32;
+	int_32_t skipped = (fw_mode==0 && bw_mode==0 && img->type != B_IMG);
+    int_32_t direct = (fw_mode==0 && bw_mode==0 && img->type == B_IMG);
+	int_32_t *****fw_mv = ((fw_mode && bw_mode) ? img->all_omv : img->all_mv);
+	int_32_t *****bw_mv = ((fw_mode && bw_mode) ? img->all_bw_omv : img->all_bmv);
+	byte     **fw_ref_pic, ** bw_ref_pic, **imgY_original = imgY_org;
+	int_32_t dir    = ((direct || (fw_mode && bw_mode)) ? 2 : ((fw_mode || skipped) ? 0 : 1));
+	byte     *d1,*d2,*d3,*d4,*d5,*d6;
+	int_16_t *d7,*d8;
+	__declspec(align(16)) int_16_t curr_blk[B8_SIZE][B8_SIZE],*pos;
+	__m128i xmm0, zero128={0};
+	scrFlag = (img->type == B_IMG ? 1 : scrFlag);
+	fw_ref = (img->type == B_IMG ? 1 : fw_refframe);
+	if (direct)
+	{
+		fw_refframe = bw_refframe = 0;
+	}
+
+	switch (dir)
+	{
+	case 0:  /* forward */
+		mv[0] = fw_mv[blkh][blkv][fw_refframe][fw_mode][0];
+		mv[1] = fw_mv[blkh][blkv][fw_refframe][fw_mode][1];
+		h_fw = ((pix_h + mb_h + IMG_PAD_SIZE) << 2) + mv[0];
+		v_fw = ((pix_v + mb_v + IMG_PAD_SIZE) << 2) + mv[1];
+		if (h_fw<0)
+			h_fw &= 3;
+		else if (h_fw>width4)
+			h_fw = width4 + (h_fw & 3);
+		if (v_fw<0)
+			v_fw &= 3;
+		else if (v_fw>height4)
+			v_fw = height4 + (v_fw & 3);
+		h = h_fw & 3, v = v_fw & 3;
+		h_fw >>= 2, v_fw >>= 2;
+
+		fw_ref_pic = mref[fw_ref][v][h];
+		for (pos = (int_16_t *)curr_blk , it = 0; it<8; it+=2)
+		{
+			d1 = &imgY_original[pix_v + mb_v + it][pix_h + mb_h];
+			d2 = &imgY_original[pix_v + mb_v + it + 1][pix_h + mb_h];
+			d3 = &fw_ref_pic[v_fw + it][h_fw];
+			d4 = &fw_ref_pic[v_fw + it + 1][h_fw];
+			d7 = &img->mpr[mb_v+it][mb_h];
+			d8 = &img->mpr[mb_v+it+1][mb_h];
+			_asm
+			{
+				mov    esi, dword ptr [d1]
+				movdqu xmm0, xmmword ptr[esi]
+				mov    esi, dword ptr[d2]
+				movdqu xmm1, xmmword ptr[esi]
+				mov    esi, dword ptr[d3]
+				movdqu xmm2, xmmword ptr[esi]
+				mov    esi, dword ptr[d4]
+				movdqu xmm3, xmmword ptr[esi]
+
+				pxor xmm7, xmm7
+				punpcklbw xmm0, xmm7
+				punpcklbw xmm1, xmm7
+				punpcklbw xmm2, xmm7
+				punpcklbw xmm3, xmm7
+				
+				psubw xmm0, xmm2
+				psubw xmm1, xmm3
+				
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm0
+				add pos, 16
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm1
+                add pos, 16
+				mov esi, dword ptr [d7]
+				movdqa xmmword ptr[esi], xmm2
+				mov esi, dword ptr [d8]
+				movdqa xmmword ptr[esi], xmm3
+			}
+		}
+		break;
+
+	case 1:  /* backward */
+		mv[0] = bw_mv[blkh][blkv][bw_refframe][bw_mode][0];
+		mv[1] = bw_mv[blkh][blkv][bw_refframe][bw_mode][1];
+		h_bw = ((pix_h + mb_h + IMG_PAD_SIZE) << 2) + mv[0];
+		v_bw = ((pix_v + mb_v + IMG_PAD_SIZE) << 2) + mv[1];
+		if (h_bw<0)
+			h_bw &= 3;
+		else if (h_bw>width4)
+			h_bw = width4 + (h_bw & 3);
+		if (v_bw<0)
+			v_bw &= 3;
+		else if (v_bw>height4)
+			v_bw = height4 + (v_bw & 3);
+		h = h_bw & 3, v = v_bw & 3;
+		h_bw >>= 2, v_bw >>= 2;
+		bw_ref_pic = mref[bw_refframe][v][h];
+		for (pos = (int_16_t *)curr_blk, it = 0; it<8; it+=2)
+		{
+			d1 = &imgY_original[pix_v + mb_v + it][pix_h + mb_h];
+			d2 = &imgY_original[pix_v + mb_v + it + 1][pix_h + mb_h];
+			d3 = &bw_ref_pic[v_bw + it][h_bw];
+			d4 = &bw_ref_pic[v_bw + it + 1][h_bw];
+			d7 = &img->mpr[mb_v + it][mb_h];
+			d8 = &img->mpr[mb_v + it + 1][mb_h];
+			_asm
+			{
+				mov esi, dword ptr [d1]
+				movdqu xmm0, xmmword ptr [esi]
+				mov esi, dword ptr [d2]
+				movdqu xmm1, xmmword ptr [esi]
+				mov esi, dword ptr [d3]
+				movdqu xmm2, xmmword ptr [esi]
+				mov esi, dword ptr [d4]
+				movdqu xmm3, xmmword ptr [esi]
+
+				pxor xmm7, xmm7
+				punpcklbw xmm0, xmm7
+				punpcklbw xmm1, xmm7
+				punpcklbw xmm2, xmm7
+				punpcklbw xmm3, xmm7
+				
+				psubw xmm0, xmm2
+				psubw xmm1, xmm3
+				
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm0
+				add pos, 16
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm1
+				add pos, 16
+				mov esi, dword ptr [d7]
+				movdqa xmmword ptr [esi], xmm2
+				mov esi, dword ptr [d8]
+				movdqa xmmword ptr [esi], xmm3
+ 			}
+		}
+		break;
+
+	case 2:  /* bi-direction */
+        /* forward  */
+		mv[0] = fw_mv[blkh][blkv][0][fw_mode][0];
+		mv[1] = fw_mv[blkh][blkv][0][fw_mode][1];
+		h_fw = ((pix_h + mb_h + IMG_PAD_SIZE) << 2) + mv[0];
+		v_fw = ((pix_v + mb_v + IMG_PAD_SIZE) << 2) + mv[1];
+		if (h_fw<0) 
+			h_fw &= 3;
+		else if (h_fw>width4) 
+			h_fw = width4 + (h_fw & 3);
+		if (v_fw<0) 
+			v_fw &= 3;
+		else if (v_fw>height4) 
+			v_fw = height4 + (v_fw & 3);
+		h = h_fw & 3, v = v_fw & 3;
+		h_fw >>= 2, v_fw >>= 2;
+		fw_ref_pic = mref[1][v][h];
+		/* backward  */
+		mv[0] = bw_mv[blkh][blkv][0][bw_mode][0];
+		mv[1] = bw_mv[blkh][blkv][0][bw_mode][1];
+		h_bw = ((pix_h + mb_h + IMG_PAD_SIZE) << 2) + mv[0];
+		v_bw = ((pix_v + mb_v + IMG_PAD_SIZE) << 2) + mv[1];
+		if (h_bw<0) 
+			h_bw &= 3;
+		else if (h_bw>width4) 
+			h_bw = width4 + (h_bw & 3);
+		if (v_bw<0) 
+			v_bw &= 3;
+		else if (v_bw>height4) 
+			v_bw = height4 + (v_bw & 3);
+		h = h_bw & 3, v = v_bw & 3;
+		h_bw >>= 2, v_bw >>= 2;
+		bw_ref_pic = mref[0][v][h];
+
+		for (pos = (int_16_t*)curr_blk, it = 0; it<8; it+=2)
+		{
+			d1 = &imgY_original[pix_v + mb_v + it][pix_h + mb_h];
+			d2 = &imgY_original[pix_v + mb_v + it + 1][pix_h + mb_h];
+			d3 = &fw_ref_pic[v_fw + it][h_fw];
+			d4 = &fw_ref_pic[v_fw + it + 1][h_fw];
+			d5 = &bw_ref_pic[v_bw + it][h_bw];
+			d6 = &bw_ref_pic[v_bw + it + 1][h_bw];
+			d7 = &img->mpr[mb_v + it][mb_h];
+			d8 = &img->mpr[mb_v + it + 1][mb_h];
+
+			_asm
+			{
+				mov esi, dword ptr [d1]
+				movdqu xmm0, xmmword ptr [esi]
+				mov esi, dword ptr [d2]
+				movdqu xmm1, xmmword ptr [esi]
+				mov esi, dword ptr [d3]
+				movdqu xmm2, xmmword ptr [esi]
+				mov esi, dword ptr [d4]
+				movdqu xmm3, xmmword ptr [esi]
+				mov esi, dword ptr [d5]
+				movdqu xmm4, xmmword ptr [esi]
+				mov esi, dword ptr [d6]
+				movdqu xmm5, xmmword ptr [esi]
+
+				pxor xmm7, xmm7
+				punpcklbw xmm0, xmm7
+				punpcklbw xmm1, xmm7
+				punpcklbw xmm2, xmm7
+				punpcklbw xmm3, xmm7
+				punpcklbw xmm4, xmm7
+				punpcklbw xmm5, xmm7
+
+				pavgw xmm2, xmm4
+				pavgw xmm3, xmm5
+				psubw xmm0, xmm2
+				psubw xmm1, xmm3
+				
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm0
+				add pos, 16
+				mov esi, dword ptr [pos]
+				movdqa xmmword ptr [esi], xmm1
+				add pos, 16
+
+				mov esi, dword ptr [d7]
+				movdqa xmmword ptr [esi], xmm2
+				mov esi, dword ptr [d8]
+				movdqa xmmword ptr [esi], xmm3
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	
+	if (!skipped)
+	{
+		avs_dct_sse(curr_blk);
+		coeff_cost = scanquant_B8   (img->qp, 0, block8x8, curr_blk, scrFlag, cbp, cbp_blk);
+	}
   /*
   The purpose of the action below is to prevent that single or 'expensive' coefficients are coded.
   With 4x4 transform there is larger chance that a single coefficient in a 8x8 or 16x16 block may be nonzero.
@@ -1460,18 +947,17 @@ c_avs_enc::LumaResidualCoding8x8 (int_32_t  *cbp,         //  --> cbp (updated a
     coeff_cost  = 0;
     (*cbp)     &=  (63 - cbp_mask);
     (*cbp_blk) &= ~(51 << (4*block8x8-2*(block8x8%2)));
-    for (j=mb_y; j<mb_y+8; j++)
+    for (v=mb_v; v<mb_v+8; v++)
     {
       //imgY[img->pix_y+j][img->pix_x+i] = img->mpr[j][i];
-      i=mb_x;
-      xmm0 = _mm_load_si128((__m128i*)(img->mpr[j]+i));
+      h=mb_h;
+      xmm0 = _mm_load_si128((__m128i*)(img->mpr[v]+h));
       xmm0 = _mm_packus_epi16(xmm0,zero128);
-      _mm_storel_epi64((__m128i *)(imgY[img->pix_y+j]+img->pix_x+i),xmm0);
+      _mm_storel_epi64((__m128i *)(imgY[img->pix_y+v]+img->pix_x+h),xmm0);
     }
   }
-  return coeff_cost;
+  return coeff_cost;	
 }
-
 
 void
 c_avs_enc::LumaPrediction (int_32_t  *cbp,         //  --> cbp (updated according to processed 8x8 luminance block)
