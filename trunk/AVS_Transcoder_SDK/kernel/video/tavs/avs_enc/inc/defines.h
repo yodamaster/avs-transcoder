@@ -50,14 +50,14 @@
 #define _SKIP_MODE_COST_THRESHOLD_ 100
 #define _COST_THRESHOLD_ 0
 #endif
-//#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
+#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
                                          //         it, just enable this macro.
 
 #define _THREE_STEP_MOTION_SEARCH_       // zhwang
                                          // Notice: Using Three-step-motion-search to accelerate the 
                                          //         ME process
 //#define _OUTPUT_DEC_IMG_
-#define _FAST_INTERPOLATION_             // xzhao   
+//#define _FAST_INTERPOLATION_             // xzhao   
                                          // Notice: Using Fast Interpolation Algorithm will introduce 
                                          //         ignorable mismatch between decoded frame and rec-
                                          //         onstructed frame, but the overall encoding time 
@@ -68,6 +68,9 @@
 * #define FIELDINTE
 */
 //#define _ME_FOR_RATE_CONTROL_
+/*Added By YueLei Xie for Fast_Me */
+#define FastME
+/*Ended By YueLei Xie */
 #define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4)
 #define MAX_ITEMS_TO_PARSE  10000
 #define MAXHEADERSIZE 100
