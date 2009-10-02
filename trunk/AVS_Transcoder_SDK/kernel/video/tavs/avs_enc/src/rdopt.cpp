@@ -1305,7 +1305,7 @@ int_32_t c_avs_enc:: RDCost_for_macroblocks (double lambda, int_32_t mode, doubl
   }
 
   //Rate control
-  if (input->RCEnable)
+  if (input->RCEnable == 1)
   {
 	  for(j=0; j<16; j++)
 		  memcpy(pred[j], img->mpr[j], 16*sizeof(int_16_t));
@@ -1888,7 +1888,7 @@ void c_avs_enc::encode_one_intra_macroblock_rdo()
     SetModesAndRefframeForBlocks (I4MB);
     if (RDCost_for_macroblocks (lambda_mode, I4MB, &min_rdcost))
       {
-      if (input->RCEnable)
+      if (input->RCEnable == 1)
       {
         //Rate control
         for (j=0; j<16; j++)
@@ -1936,7 +1936,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   int_32_t valid[MAXMODE];
   int_32_t block, index, mode, ref, i, j;
   int_32_t lambda_motion_factor;
-  int_32_t fw_mcost, mcost, max_mcost=(1<<30);
+  int_32_t fw_mcost, mcost, max_mcost=(1<<30),min_cost,cost8x8,cost;
   int_32_t curr_cbp_blk, cnt_nonz = 0, best_cnt_nonz = 0, best_fw_ref = 0, best_bw_ref = 0, best_pdir = 0;
   int_32_t write_ref   = input->no_multpred>1;
   int_32_t max_ref     = img->nb_references;
@@ -1948,6 +1948,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
   int_32_t **refar     = refFrArr;
   int_32_t bid_best_fw_ref = 0, bid_best_bw_ref = 0;
   int_32_t mb_available_up, mb_available_left, mb_available_up_left;
+  int_32_t adjust_ref = 0;
   max_ref = img->nb_references;
   if (img->number % input->intra_period == 1)//for close GOP
   {
@@ -1990,6 +1991,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
 #ifdef FastME
 
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
+  cost8x8 = 1<<20;
   min_cost=cost8x8;
   best_mode=P8x8;
 
@@ -2036,7 +2038,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       PartitionMotionSearch (mode, block, lambda_motion);
       //--- get cost and reference frame for forward prediction ---
       fw_mcost=max_mcost;
-      for (ref=0; ref<max_ref-adjust_ref; ref++)
+      for (ref=0; ref<max_ref; ref++)
       {
         mcost  = (write_ref ? REF_COST_FWD (lambda_motion_factor, ref) : 0);
         mcost += motion_cost[mode][ref+1][block];
@@ -2264,7 +2266,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
 
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
       {
-        if (input->RCEnable)
+        if (input->RCEnable == 1)
         {
           //Rate control
           if(mode == P8x8)
@@ -2292,7 +2294,7 @@ void c_avs_enc::encode_one_inter_macroblock_rdo()
       }
     }
   }
-  if(input->RCEnable)
+  if(input->RCEnable == 1)
   {
     img->MADofMB[img->current_mb_nr] = calc_MAD();
     if(input->basicunit<img->total_number_mb)
@@ -2349,7 +2351,9 @@ void c_avs_enc::encode_one_inter_macroblock_not_rdo()
 		only_motion_cost[loop][2] = 99999;
 		only_motion_cost[loop][3] = 99999;
 	}
-
+#ifdef FastME
+	decide_intrabk_SAD();
+#endif
 	lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
 	lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
 	max_ref = img->nb_references;
@@ -2454,6 +2458,9 @@ void c_avs_enc::encode_one_inter_macroblock_not_rdo()
 	if (img->current_mb_nr == 0) intras = 0;
 	if (currMB->mb_type == I4MB)
 		intras++;
+#ifdef FastME
+	skip_intrabk_SAD(best_mode, max_ref);
+#endif
 }
 
 
@@ -2970,10 +2977,12 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
   int_32_t *****allmvs = img->all_mv;
   int_32_t **refar     = refFrArr;
   int_32_t bid_best_fw_ref = 0, bid_best_bw_ref = 0;
+  int_32_t adjust_ref;
   int_32_t mb_available_up, mb_available_left, mb_available_up_left;
   max_ref = min (img->nb_references, img->buf_cycle);
   if(!img->picture_structure)
   {
+	  adjust_ref = 0;
     if (max_ref > 2)
       max_ref = 2;
     if(img->old_type != img->type)
@@ -2981,6 +2990,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
   }
   else
   {
+	  adjust_ref = 0;
     if (max_ref > 1)
       max_ref = 1;
   }
@@ -3015,6 +3025,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
   Get_IP_direct();
 
 #ifdef FastME
+  int ref;
   cost8x8 = 1<<20;
   //===== MOTION ESTIMATION FOR 16x16, 16x8, 8x16 BLOCKS =====
   min_cost=cost8x8;
@@ -3457,7 +3468,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
     //--- re-set coding state (as it was before 8x8 block coding) ---
     reset_coding_state (cs_mb);
     //Rate control
-    if (input->RCEnable)
+    if (input->RCEnable == 1)
     {
       for (j=0; j<16; j++)
       {
@@ -3689,7 +3700,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
 
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
       {
-        if (input->RCEnable)
+        if (input->RCEnable == 1)
         {
           if(mode == P8x8)
           {
@@ -3721,7 +3732,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_rdo()
       img->NoResidueDirect = 1;
       if (RDCost_for_macroblocks (lambda_mode, mode, &min_rdcost))
       {
-        if (input->RCEnable)
+        if (input->RCEnable == 1)
         {
           //Rate control
           for (j=0; j<16; j++)
@@ -3750,7 +3761,7 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
 	int_32_t it,blk0,blk1,block,loop;
 	int_32_t mode,sub_mode,best_mode,dummy;
 	int_32_t min_cost,temp_cost,fw_cost,bw_cost,bid_cost,temp_cost_8x8[2];
-	int_32_t best_fw_ref = 0,best_bw_ref = 0, best_bid_fw_ref = 0, best_bid_bw_ref = 0, best_pdir;
+	int_32_t max_ref, adjust_ref,best_fw_ref = 0,best_bw_ref = 0, best_bid_fw_ref = 0, best_bid_bw_ref = 0, best_pdir;
 	int_32_t lambda_motion_factor;
 	double lambda_motion,lambda_mode;
 	Macroblock * currMB = &img->mb_data[img->current_mb_nr];
@@ -3764,7 +3775,24 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
 	valid[3] = input->InterSearch8x16;
 	valid[4] = input->InterSearch8x8;
 	valid[P8x8] = valid[4];
-	
+#ifdef FastME
+	decide_intrabk_SAD();
+#endif	
+	max_ref = min (img->nb_references, img->buf_cycle);
+	if(!img->picture_structure)
+	{
+		adjust_ref = 0;
+		if (max_ref > 2)
+			max_ref = 2;
+		if(img->old_type != img->type)
+			max_ref = 1;
+	}
+	else
+	{
+		adjust_ref = 0;
+		if (max_ref > 1)
+			max_ref = 1;
+	}
 	lambda_mode = lambda_motion = QP2QUANT[max(0,img->qp-SHIFT_QP)];
 	lambda_motion_factor = LAMBDA_FACTOR (lambda_motion);
 
@@ -3890,6 +3918,9 @@ void c_avs_enc::encode_one_b_frame_macroblock_not_rdo()
 		intras = 0;
 	if (best_mode == I4MB)
 		intras++;
+#ifdef FastME
+	skip_intrabk_SAD(best_mode, max_ref-adjust_ref);
+#endif  
 }
 
 int_32_t  c_avs_enc::Mode_Decision_for_AVSIntraMacroblock_not_rdo (double lambda,  int_32_t* total_cost)
