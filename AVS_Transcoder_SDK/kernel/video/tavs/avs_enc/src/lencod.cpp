@@ -45,6 +45,7 @@
 #include "avs_enc.h"
 #include "global.h"
 
+
 #ifdef FastME
 #include "fast_me.h"
 #endif
@@ -167,6 +168,7 @@ int_32_t c_avs_enc::avs_enc_create()
   /* allocate memory for frame buffers */
   init_global_buffers();
   Init_Motion_Search_Module();
+
 #ifdef _DEBUG
   information_init();
 #endif
@@ -212,7 +214,7 @@ int_32_t c_avs_enc::avs_enc_destroy()
 int_32_t c_avs_enc::avs_enc_encode()
 {
   int_32_t i;
-
+  int_32_t j;
   init_global_variables();
   OpenBitStreamFile(input->outfile);
   p_avs_enc_frame->length = 0;
@@ -222,12 +224,54 @@ int_32_t c_avs_enc::avs_enc_encode()
   }
   gframe_no=current_encoded_frame;
   goprate = 0;
-
+  /* Added By YueLei Xie for rate control */
+  if ( input->RCEnable == 3)
+  {
+	  float t_fbb;
+	  int_32_t t_qp, tleft;
+	  if ( !i_gop_encoded )
+	  {
+		  t_fbb = float(i_rate_per_gop_expected) / input->GopLength / (img->height * img->width * 3 / 2); 
+		  i_QPip = max(0, min(int(-10.365 * log(t_fbb) + 5.5655 + 0.5), 61));
+		  i_QPb  = i_QPip + 2;
+	  }
+	  else
+	  {
+		  t_qp = 0;
+		  tleft = 0;
+		 t_qp = i_rate_remain / 5 + i_rate_per_gop_expected;
+		 t_fbb = float(t_qp) / input->GopLength / ( img->height * img->width * 3 / 2);
+		 if ( t_fbb < 1e-5 )
+		 {
+			i_QPip = max(0, min(63, i_QPip + 3));
+			i_QPb  = max(0, min(63, i_QPip + 2));
+		 }
+		 else
+		 {
+			 t_qp = int(-10.365 * log(t_fbb) + 5.5655 + 0.5);
+			 
+			 if ( abs( t_qp - i_QPip ) > 3 )
+			 {
+				 i_QPip = ( t_qp > i_QPip ? i_QPip + 3 : i_QPip - 3 );
+			 }
+			 else
+			 {
+				 i_QPip = t_qp;
+			 }
+			 if ( i_QPip > 50 ) i_QPip = 50;
+			 i_QPip = max(0, min(63, i_QPip));
+			 i_QPb  = max(0, min(63, i_QPip + 2));
+		 }
+		 
+	  }
+  }
+  /* Ended By YueLei Xie for rate control */
   for (i=0; i<dec_frm_num; i++)
   {
     if (i == 0)
       p_avs_enc_frame->type[0] = AVS_TYPE_I;
-    else if (inputs.successive_Bframe == 0 || i % (inputs.successive_Bframe + 1) == 1 || (i>input->GopLength-input->successive_Bframe && dec_frm_num%(inputs.successive_Bframe + 1)!=1))
+    else if (inputs.successive_Bframe == 0 || i % (inputs.successive_Bframe + 1) == 1 
+		|| (i>input->GopLength-input->successive_Bframe && dec_frm_num%(inputs.successive_Bframe + 1)!=1))
       p_avs_enc_frame->type[0] = AVS_TYPE_P;
     else
       p_avs_enc_frame->type[0] = AVS_TYPE_B;
@@ -238,7 +282,13 @@ int_32_t c_avs_enc::avs_enc_encode()
   }
   memcpy((byte*)p_avs_enc_frame->bitstream + p_avs_enc_frame->length, pORABS->buf, pORABS->iBytePosition);
   p_avs_enc_frame->length += pORABS->iBytePosition;
- 
+  /* Added by YueLei Xie for rate control */
+  if ( input->RCEnable == 3 )
+  {
+	  i_gop_encoded++;
+	  i_rate_remain += i_rate_per_gop_expected - goprate;
+  }
+  /* Ended By YueLei Xie for rate control */
   return 0;
 }
 
@@ -346,6 +396,17 @@ void c_avs_enc::init_img()
   img->total_number_mb = (img->width * img->height) >> 8;
 
   GBIM_value = 0;
+
+  /* Added by YueLei Xie for rate control */
+  if ( input->RCEnable == 3 )
+  {
+	  i_rate_per_gop_expected = input->GopLength * ( input->bit_rate  / img->framerate );
+	  i_gop_encoded = 0;
+	  i_QPip = input->qp0;
+	  i_QPb  = input->qpB;
+	  i_rate_remain = 0;
+  }
+  /* ended By YueLei Xie */
 }
 
 /*
@@ -1063,8 +1124,10 @@ int_32_t c_avs_enc::get_mem_ref(byte *****ref)
 {
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   int_32_t  i, j, k;
+  /* To add + 1? by YueLei Xie */
   int_32_t  height = img->height + (IMG_PAD_SIZE << 1);
   int_32_t  width = img->width + (IMG_PAD_SIZE << 1);
+  /* ended By YueLei Xie */
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
   if((*ref = (byte ****) _aligned_malloc(4 * sizeof(byte ***), 16)) == NULL) no_mem_exit("get_mem_ref: ref");
@@ -1076,7 +1139,10 @@ int_32_t c_avs_enc::get_mem_ref(byte *****ref)
     {
       if(((*ref)[k][j] = (byte **) _aligned_malloc(height * sizeof(byte *), 16)) == NULL)
         no_mem_exit("get_mem_ref: ref");
-      for(i = 0; i < (img->height + (IMG_PAD_SIZE << 1)); i++)
+	  /* changed by YueLei Xie */
+      //for(i = 0; i < (img->height + (IMG_PAD_SIZE << 1)); i++)
+	  for ( i = 0; i < height; i++ )
+	  /* ended By YueLei xie */
       {
         if(((*ref)[k][j][i] = (byte *) _aligned_malloc(width * sizeof(byte), 16)) == NULL)
           no_mem_exit("get_mem_ref: ref");
@@ -1208,7 +1274,7 @@ int_32_t c_avs_enc::encode_IP_frame(avs_enc_frame_t *pFrame)
 
   if(first_frm_flag == 1)
   {
-    if(input->RCEnable)
+    if(input->RCEnable == 1)
     {
       rc_init_seq();
     }
@@ -1256,7 +1322,7 @@ int_32_t c_avs_enc::encode_IP_frame(avs_enc_frame_t *pFrame)
     else
       picture_distance = gframe_no+input->successive_Bframe;
   }
-  if(input->RCEnable && img->type == INTRA_IMG)
+  if(input->RCEnable == 1 && img->type == INTRA_IMG)
   {
     M = input->successive_Bframe + 1;
     n = input->GopLength;; //Goplength和标准编码器中的IntraPeriod不同
