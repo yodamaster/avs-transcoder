@@ -142,12 +142,16 @@ int c_avs_enc::encode_one_frame ()
 #endif
   //Rate control
   img->FieldControl=0;
-  if(input->RCEnable)
+  if(input->RCEnable == 1)
   {
     /*update the number of MBs in the basic unit for MB adaptive coding*/
     img->BasicUnit = input->basicunit;
     rc_init_pict(1,0,1);
     img->qp  = updateQuantizationParameter(0);
+  }
+  else if ( input->RCEnable == 3 )
+  {
+	  img->qp = (img->type == B_IMG) ? i_QPb : i_QPip;
   }
   if (input->InterlaceCodingOption == FRAME_CODING)  // !! frame coding or paff coding
   {
@@ -208,7 +212,7 @@ int c_avs_enc::encode_one_frame ()
 #endif
 
   //Rate control
-  if(input->RCEnable)
+  if(input->RCEnable == 1)
   {
     bits = stat->bit_ctr-stat->bit_ctr_n;
     rc_update_pict_frame(bits);
@@ -221,7 +225,7 @@ int c_avs_enc::encode_one_frame ()
   else
   {
     //Rate control
-    if(input->RCEnable)
+    if(input->RCEnable == 1)
     {
       if(input->InterlaceCodingOption == FRAME_CODING)
         bits = stat->bit_ctr-stat->bit_ctr_n;
@@ -251,7 +255,7 @@ int c_avs_enc::encode_one_frame ()
 
   stat->bit_ctr_n = stat->bit_ctr;
   //Rate control
-  if(input->RCEnable)
+  if(input->RCEnable == 1)
   {
     rc_update_pict(bits);
     /*update the parameters of quadratic R-D model*/
@@ -2766,7 +2770,7 @@ void c_avs_enc::ReadOneFrame ()
   else
   {
     memcpy(imgY_org_buffer, pInputImage, bytes_y+2*bytes_uv);
-  }
+  } 
   // xzhao }
 }
 
