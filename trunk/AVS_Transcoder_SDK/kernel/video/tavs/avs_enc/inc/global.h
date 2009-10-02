@@ -291,8 +291,8 @@ typedef struct tag_InputParameters
                         * prevent errors to propagate from the past */
   int_32_t  blc_size[9][2]; /* !< array for different block sizes */
   int_32_t  infile_header;  /* !< If input file has a header set this to the length of the header */
-  char    infile[100];  /* !< YUV 4:2:0 input format */
-  char    outfile[100];  /* !< H.26L compressed output bitstream */
+  char    infile[128];  /* !< YUV 4:2:0 input format */
+  char    outfile[128];  /* !< H.26L compressed output bitstream */
   char    ReconFile[100]; /* !< Reconstructed Pictures */
   char    TraceFile[100]; /* !< Trace Outputs */
   char   DecRecFile[100];
@@ -1327,6 +1327,129 @@ public:
   pel_t line[16];
   MB_INFO * pMbInfo;
   int_32_t dec_frm_num;
+
+  /*Added By YueLei Xie*/
+
+  /* for rate control */
+  int_32_t i_gop_encoded;
+  int_32_t i_rate_per_gop_expected;
+  int_32_t i_QPip, i_QPb;
+  int_32_t i_rate_remain;
+
+#ifdef FastME
+  int **McostState; //state for integer pel search
+
+  int *****all_mincost;//store the MV and SAD information needed;
+  int *****all_bwmincost;//store for backward prediction
+  int pred_SAD_space,pred_SAD_time,pred_SAD_ref,pred_SAD_uplayer;//SAD prediction
+  int pred_MV_time[2],pred_MV_ref[2],pred_MV_uplayer[2];//pred motion vector by space or tempral correlation,Median is provided
+
+  //for half_stop
+  float Quantize_step;
+  float  Bsize[8];
+  int Thresh4x4;
+  float AlphaSec[8];
+  float AlphaThird[8];
+  int  flag_intra[124];//HD enough
+  int  flag_intra_SAD;
+
+  /* modified by YueLei Xie char to byte */
+  byte **SearchState; //state for fractional pel search
+  /* Ended By YueLei Xie */
+  pel_t (c_avs_enc::*PelY_14) (pel_t**, int, int);
+  pel_t * (c_avs_enc::*get_ref_line)(int, pel_t*, int, int);
+  void DefineThreshold();
+  void DefineThresholdMB();
+  int get_mem_mincost (int****** mv);
+  int get_mem_bwmincost (int****** mv);
+  int get_mem_FME();
+  void free_mem_mincost (int***** mv);
+  void free_mem_bwmincost (int***** mv);
+  void free_mem_FME();
+  void   decide_intrabk_SAD();
+  void skip_intrabk_SAD(int best_mode, int ref_max);
+int                                     //  ==> minimum motion cost after search
+	  FastIntegerPelBlockMotionSearch  (pel_t**   orig_pic,     // <--  not used
+	  int       ref,          // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,    // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,    // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,    // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,    // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,    // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,         //  --> motion vector (x) - in pel units
+	  int*      mv_y,         //  --> motion vector (y) - in pel units
+	  int       search_range, // <--  1-d search range in pel units                         
+	  int       min_mcost,    // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda) ;      // <--  lagrangian parameter for determining motion cost
+  int AddUpSADQuarter(int pic_pix_x,int pic_pix_y,int blocksize_x,int blocksize_y,
+	  int cand_mv_x,int cand_mv_y, pel_t ****ref_pic, pel_t**   orig_pic, int Mvmcost, int min_mcost,int useABT);
+
+  int                                                   //  ==> minimum motion cost after search
+	  FastSubPelBlockMotionSearch (pel_t**   orig_pic,      // <--  original pixel values for the AxB block
+	  int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,     // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,     // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,          // <--> in: search center (x) / out: motion vector (x) - in pel units
+	  int*      mv_y,          // <--> in: search center (y) / out: motion vector (y) - in pel units
+	  int       search_pos2,   // <--  search positions for    half-pel search  (default: 9)
+	  int       search_pos4,   // <--  search positions for quarter-pel search  (default: 9)
+	  int       min_mcost,     // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda,
+	  int	useABT);        // <--  lagrangian parameter for determining motion cost
+
+  void FME_SetMotionVectorPredictor (int  pmv[2],
+	  int  **refFrArr,
+	  int  ***tmp_mv,
+	  int  ref_frame,
+	  int  mb_x,
+	  int  mb_y,
+	  int  blockshape_x,
+	  int  blockshape_y,
+	  int  blocktype,
+	  int  ref);
+
+  int                                         //  ==> minimum motion cost after search
+	  FME_BlockMotionSearch (int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       search_range,  // <--  1-d search range for integer-position search
+	  double    lambda         // <--  lagrangian parameter for determining motion cost
+	  );
+
+  int                                         //  ==> minimum motion cost after search
+	  FME_BlockMotionSearch_bid (int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       search_range,  // <--  1-d search range for integer-position search
+	  double    lambda         // <--  lagrangian parameter for determining motion cost
+	  );
+  int                                                   //  ==> minimum motion cost after search
+	  FastSubPelBlockMotionSearch_bid (pel_t**   orig_pic,      // <--  original pixel values for the AxB block
+	  int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,     // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,     // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,          // <--> in: search center (x) / out: motion vector (x) - in pel units
+	  int*      mv_y,          // <--> in: search center (y) / out: motion vector (y) - in pel units
+	  int       search_pos2,   // <--  search positions for    half-pel search  (default: 9)
+	  int       search_pos4,   // <--  search positions for quarter-pel search  (default: 9)
+	  int       min_mcost,     // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda,
+	  int	useABT);        // <--  lagrangian parameter for determining motion cost
+  int AddUpSADQuarter_bid(int pic_pix_x,int pic_pix_y,int blocksize_x,int blocksize_y,
+	  int cand_mv_x,int cand_mv_y, pel_t ****ref_pic, pel_t ****ref_pic_bid, pel_t**   orig_pic, 
+	  int Mvmcost, int min_mcost,int useABT,int DistanceIndexFw, int DistanceIndexBw);
+  int c_avs_enc::PartCalMad(pel_t *ref_pic,pel_t** orig_pic,int blocksize_y,int blocksize_x, int blocksize_x4,int mcost,int min_mcost,int cand_x,int cand_y);
+
+#endif
+  /*Ended By YueLei Xie*/
 #ifdef ROI_ENABLE
   byte *ROIArray;
   byte* YCbCr[3];
