@@ -157,7 +157,7 @@ void c_avs_enc::start_macroblock()
   currMB->slice_nr = img->current_slice_nr;
 
   // Rate control
-  if(input->RCEnable)
+  if(input->RCEnable == 1)
   {
     /*frame layer rate control*/
     if(input->basicunit==img->total_number_mb)
