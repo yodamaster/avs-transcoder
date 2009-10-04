@@ -49,7 +49,7 @@
 #pragma comment(lib,"../bin/TextDet")
 #endif
 
-class  __declspec(dllexport)  c_avs_enc;
+class __declspec(dllexport) c_avs_enc;
 
 typedef int_32_t (*LocateTextRegions_t)(byte* YCbCr[3],int_32_t w[3],int_32_t h[3],byte* ROIArray);
 
@@ -291,8 +291,8 @@ typedef struct tag_InputParameters
                         * prevent errors to propagate from the past */
   int_32_t  blc_size[9][2]; /* !< array for different block sizes */
   int_32_t  infile_header;  /* !< If input file has a header set this to the length of the header */
-  char    infile[100];  /* !< YUV 4:2:0 input format */
-  char    outfile[100];  /* !< H.26L compressed output bitstream */
+  char    infile[128];  /* !< YUV 4:2:0 input format */
+  char    outfile[128];  /* !< H.26L compressed output bitstream */
   char    ReconFile[100]; /* !< Reconstructed Pictures */
   char    TraceFile[100]; /* !< Trace Outputs */
   char   DecRecFile[100];
@@ -390,7 +390,7 @@ typedef struct tag_ImageParameters
   int_32_t  no_multpred;    /* !< 1: prediction from the last frame only. 2: prediction from the
                             * last or second last frame etc. */
   int_32_t  qp;      /* !< quant for the current frame */
-  float       framerate;
+  float     framerate;
 
   int_32_t  width;      /* !< Number of pels */
   int_32_t  width_cr;    /* !< Number of pels chroma */
@@ -432,7 +432,7 @@ typedef struct tag_ImageParameters
 
   int_32_t  tr;
   int_32_t  fld_type;    /* !< top or bottom field */
-  uint_32_t  fld_flag;
+  uint_32_t fld_flag;
   int_32_t  direct_intraP_ref[4][4];
   int_32_t  imgtr_next_P_frm;
   int_32_t  imgtr_last_P_frm;
@@ -624,15 +624,15 @@ typedef struct tag_RD_DATA
 typedef struct tag_OutputStream
 {
   FILE    *f;
-  byte        buf[STREAM_BUF_SIZE];
-  uint_32_t  uPreBytes;      /* 最近写入的3个字节，初始值是0xFFFFFFFF */
+  byte      buf[STREAM_BUF_SIZE];
+  uint_32_t uPreBytes;      /* 最近写入的3个字节，初始值是0xFFFFFFFF */
   int_32_t  iBytePosition;      /* 当前字节位置 */
   int_32_t  iBitOffset;      /* 当前位偏移，0表示最高位 */
   int_32_t  iNumOfStuffBits;    /* 已插入的填充位的个数，遇到开始码时置0 */
   int_32_t  iBitsCount;      /* 码流总位数 */
 } OutputStream;
 
-class __declspec(dllexport) c_avs_enc
+class __declspec(dllexport)  c_avs_enc
 {
 public:
   c_avs_enc();
@@ -641,7 +641,7 @@ public:
 #ifdef _THREE_STEP_MOTION_SEARCH_
   int_32_t three_step_pattern_x[9], three_step_pattern_y[9];
   void_t init_3_step_search();
-  int_32_t TSSMotionSearch(pel_t **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double   lambda, int_32_t block_index);
+  int_32_t TSSMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double   lambda, int_32_t block_index);
 #endif
   pel_t****   interpolation; // [288+16*2][352+16*2] 
   __m128i clip0;
@@ -899,7 +899,7 @@ public:
   int_32_t    avs_enc_destroy();
   int_32_t    avs_enc_encode();
   void_t      Configure(char *av);
-  int_32_t    init_global_variables();    
+  int_32_t    init_global_variables();
   int_32_t    avs_enc_frame(avs_enc_frame_t *pFrame);
   void_t      information_init();
   int_32_t    write_start_code(OutputStream *p, unsigned char code);
@@ -1019,11 +1019,11 @@ public:
   void_t      Clear_Motion_Search_Module();
   int_32_t    FullPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_range,int_32_t min_mcost,double lambda, int_32_t debug_flag);
   int_32_t    SubPelBlockMotionSearch(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda,int_32_t block_index);
-  int_32_t    SubPelBlockMotionSearch_bid(pel_t  **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda, int_32_t block_index);
-  int_32_t    BlockMotionSearch(int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t search_range,double lambda, int_32_t block_index);
+  int_32_t    SubPelBlockMotionSearch_bid(pel_t  **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda,int_32_t block_index);
+  int_32_t    BlockMotionSearch(int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t search_range,double lambda,int_32_t block_index);
   int_32_t    GetSkipCostMB(double lambda);
   void_t      FindSkipModeMotionVector();
-  void_t      SetMotionVectorPredictor(int_32_t pmv[2],int_32_t **refFrArr,int_32_t ***tmp_mv,int_32_t ref_frame,int_32_t mb_pix_x,int_32_t mb_pix_y,int_32_t blockshape_x,int_32_t blockshape_y,int_32_t ref);
+  void_t      SetMotionVectorPredictor(int_32_t pmv[2],int_32_t **refFrArr,int_32_t ***tmp_mv,int_32_t ref_frame,int_32_t mb_pix_x,int_32_t mb_pix_y,int_32_t blockshape_x,int_32_t blockshape_y,int_32_t ref);    
   int_32_t    Get_Skip_CostMB(pel_t   **orig_pic,int_32_t ref,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t blocktype,int_32_t pred_mv_x,int_32_t pred_mv_y,int_32_t *mv_x,int_32_t *mv_y,int_32_t search_pos2,int_32_t search_pos4,int_32_t min_mcost,double lambda);
   int_32_t    Get_Direct_Cost8x8(int_32_t, double);
   int_32_t    Get_Direct_CostMB(double);
@@ -1055,8 +1055,8 @@ public:
 
   /* HRD consideration */
   long      UpperBound1, UpperBound2, LowerBound;
-  double      InitialDelayOffset;
-  double      OMEGA;
+  double    InitialDelayOffset;
+  double    OMEGA;
 
   double      Wp, Wb;
   int_32_t    TotalPFrame;
@@ -1100,7 +1100,7 @@ public:
   double      ReferenceMAD[21];
 
   /* quadratic rate-distortion model */
-  myboolean      m_rgRejected[21];
+  myboolean   m_rgRejected[21];
   double      P_frm_Qstep[21];
   double      P_frm_R[21];
   double      m_X1, m_X2; //R-Q model parameters
@@ -1151,7 +1151,7 @@ public:
   double      BUCFMAD[6336];    /* LIZG */
   double      FCBUCFMAD[6336];
   double      FCBUPFMAD[6336];
-  myboolean   GOPOverdue;
+  myboolean      GOPOverdue;
 
   /* compute macroblock activity for rate control */
   int_32_t    diffy[16][16];
@@ -1269,14 +1269,14 @@ public:
   int_32_t    writeSyntaxElement_Run(SyntaxElement *se, Bitstream *bitstream);
   int_32_t    symbol2vlc(SyntaxElement *sym);
   int_32_t    encode_IP_frame(avs_enc_frame_t *pFrame);
-  int_32_t    encode_B_frame(avs_enc_frame_t *pFrame);    
+  int_32_t    encode_B_frame(avs_enc_frame_t *pFrame);
   void_t      OpenORABS(OutputStream *p, char *fname);
   void_t      CloseORABS(OutputStream *p);
   void_t      FlushORABS(OutputStream *p);
 
   /* entropy coding */
   int_32_t write_n_bit(OutputStream *p,int_32_t b,int_32_t n);
-  _inline  void_t write_1_bit(OutputStream *p, int_32_t b);
+  _inline void_t        write_1_bit(OutputStream *p, int_32_t b);
   int_32_t    write_align_stuff(OutputStream *p);
   int_32_t    write_a_byte(OutputStream *p, int_32_t b);
   /* header */
@@ -1322,11 +1322,134 @@ public:
   void_t          OneComponentLumaPrediction4x4(int_32_t *mpred,int_32_t pic_pix_x,int_32_t pic_pix_y,int_32_t *mv,int_32_t ref);
   void_t          SetRefAndMotionVectors(int_32_t block,int_32_t mode,int_32_t ref,int_32_t bw_ref,int_32_t pdir);
   avs_enc_create_t* p_avsCreate;
-  avs_enc_frame_t*  p_avs_enc_frame;
+  avs_enc_frame_t*  p_avs_enc_frame;  
   //avs_enc_stats_t * p_stats;
   pel_t line[16];
   MB_INFO * pMbInfo;
   int_32_t dec_frm_num;
+
+  /*Added By YueLei Xie*/
+
+  /* for rate control */
+  int_32_t i_gop_encoded;
+  int_32_t i_rate_per_gop_expected;
+  int_32_t i_QPip, i_QPb;
+  int_32_t i_rate_remain;
+
+#ifdef FastME
+  int **McostState; //state for integer pel search
+
+  int *****all_mincost;//store the MV and SAD information needed;
+  int *****all_bwmincost;//store for backward prediction
+  int pred_SAD_space,pred_SAD_time,pred_SAD_ref,pred_SAD_uplayer;//SAD prediction
+  int pred_MV_time[2],pred_MV_ref[2],pred_MV_uplayer[2];//pred motion vector by space or tempral correlation,Median is provided
+
+  //for half_stop
+  float Quantize_step;
+  float  Bsize[8];
+  int Thresh4x4;
+  float AlphaSec[8];
+  float AlphaThird[8];
+  int  flag_intra[124];//HD enough
+  int  flag_intra_SAD;
+
+  /* modified by YueLei Xie char to byte */
+  byte **SearchState; //state for fractional pel search
+  /* Ended By YueLei Xie */
+  pel_t (c_avs_enc::*PelY_14) (pel_t**, int, int);
+  pel_t * (c_avs_enc::*get_ref_line)(int, pel_t*, int, int);
+  void DefineThreshold();
+  void DefineThresholdMB();
+  int get_mem_mincost (int****** mv);
+  int get_mem_bwmincost (int****** mv);
+  int get_mem_FME();
+  void free_mem_mincost (int***** mv);
+  void free_mem_bwmincost (int***** mv);
+  void free_mem_FME();
+  void   decide_intrabk_SAD();
+  void skip_intrabk_SAD(int best_mode, int ref_max);
+int                                     //  ==> minimum motion cost after search
+	  FastIntegerPelBlockMotionSearch  (pel_t**   orig_pic,     // <--  not used
+	  int       ref,          // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,    // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,    // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,    // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,    // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,    // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,         //  --> motion vector (x) - in pel units
+	  int*      mv_y,         //  --> motion vector (y) - in pel units
+	  int       search_range, // <--  1-d search range in pel units                         
+	  int       min_mcost,    // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda) ;      // <--  lagrangian parameter for determining motion cost
+  int AddUpSADQuarter(int pic_pix_x,int pic_pix_y,int blocksize_x,int blocksize_y,
+	  int cand_mv_x,int cand_mv_y, pel_t ****ref_pic, pel_t**   orig_pic, int Mvmcost, int min_mcost,int useABT);
+
+  int                                                   //  ==> minimum motion cost after search
+	  FastSubPelBlockMotionSearch (pel_t**   orig_pic,      // <--  original pixel values for the AxB block
+	  int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,     // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,     // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,          // <--> in: search center (x) / out: motion vector (x) - in pel units
+	  int*      mv_y,          // <--> in: search center (y) / out: motion vector (y) - in pel units
+	  int       search_pos2,   // <--  search positions for    half-pel search  (default: 9)
+	  int       search_pos4,   // <--  search positions for quarter-pel search  (default: 9)
+	  int       min_mcost,     // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda,
+	  int	useABT);        // <--  lagrangian parameter for determining motion cost
+
+  void FME_SetMotionVectorPredictor (int  pmv[2],
+	  int  **refFrArr,
+	  int  ***tmp_mv,
+	  int  ref_frame,
+	  int  mb_x,
+	  int  mb_y,
+	  int  blockshape_x,
+	  int  blockshape_y,
+	  int  blocktype,
+	  int  ref);
+
+  int                                         //  ==> minimum motion cost after search
+	  FME_BlockMotionSearch (int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       search_range,  // <--  1-d search range for integer-position search
+	  double    lambda         // <--  lagrangian parameter for determining motion cost
+	  );
+
+  int                                         //  ==> minimum motion cost after search
+	  FME_BlockMotionSearch_bid (int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       search_range,  // <--  1-d search range for integer-position search
+	  double    lambda         // <--  lagrangian parameter for determining motion cost
+	  );
+  int                                                   //  ==> minimum motion cost after search
+	  FastSubPelBlockMotionSearch_bid (pel_t**   orig_pic,      // <--  original pixel values for the AxB block
+	  int       ref,           // <--  reference frame (0... or -1 (backward))
+	  int       pic_pix_x,     // <--  absolute x-coordinate of regarded AxB block
+	  int       pic_pix_y,     // <--  absolute y-coordinate of regarded AxB block
+	  int       blocktype,     // <--  block type (1-16x16 ... 7-4x4)
+	  int       pred_mv_x,     // <--  motion vector predictor (x) in sub-pel units
+	  int       pred_mv_y,     // <--  motion vector predictor (y) in sub-pel units
+	  int*      mv_x,          // <--> in: search center (x) / out: motion vector (x) - in pel units
+	  int*      mv_y,          // <--> in: search center (y) / out: motion vector (y) - in pel units
+	  int       search_pos2,   // <--  search positions for    half-pel search  (default: 9)
+	  int       search_pos4,   // <--  search positions for quarter-pel search  (default: 9)
+	  int       min_mcost,     // <--  minimum motion cost (cost for center or huge value)
+	  double    lambda,
+	  int	useABT);        // <--  lagrangian parameter for determining motion cost
+  int AddUpSADQuarter_bid(int pic_pix_x,int pic_pix_y,int blocksize_x,int blocksize_y,
+	  int cand_mv_x,int cand_mv_y, pel_t ****ref_pic, pel_t ****ref_pic_bid, pel_t**   orig_pic, 
+	  int Mvmcost, int min_mcost,int useABT,int DistanceIndexFw, int DistanceIndexBw);
+  int c_avs_enc::PartCalMad(pel_t *ref_pic,pel_t** orig_pic,int blocksize_y,int blocksize_x, int blocksize_x4,int mcost,int min_mcost,int cand_x,int cand_y);
+
+#endif
+  /*Ended By YueLei Xie*/
 #ifdef ROI_ENABLE
   byte *ROIArray;
   byte* YCbCr[3];
