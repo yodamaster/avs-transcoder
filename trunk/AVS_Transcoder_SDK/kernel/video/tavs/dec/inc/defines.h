@@ -46,6 +46,7 @@
  * define FastME ;
  * #define FIELDINTE
  */
+#define FastME
 #define _THREE_STEP_MOTION_SEARCH_
 #define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4)
 
