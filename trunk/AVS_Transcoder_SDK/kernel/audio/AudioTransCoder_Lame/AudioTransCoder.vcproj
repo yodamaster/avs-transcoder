@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="AudioTransCoder"
 	ProjectGUID="{0A9C4EF3-691C-4E52-A963-7624E3CFE360}"
+	RootNamespace="AudioTransCoder"
 	>
 	<Platforms>
 		<Platform
@@ -22,6 +23,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -73,6 +75,7 @@
 				OutputFile=".\Debug/AudioTransCoder.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="&quot;F:\Transcoder\AVS-transcoder\AVS_Transcoder_SDK\kernel\audio\AudioTransCoder_Lame&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/AudioTransCoder.pdb"
 				SubSystem="1"
@@ -223,13 +226,109 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\av3enc\src\bew_flpvq.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\bew_mr_analysis.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\block_switch.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\encframe.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\getcmdarg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\getopt.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\getopt1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\intMDCT.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\MDCT.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\polar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\psych.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\psychfft.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\quantization.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\sam_bs_cbc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\sam_cbc_huffman.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\sam_encode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\sam_encode_cbc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\src\sam_encode_frame.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter=".h"
 			>
 			<File
+				RelativePath=".\av3enc\include\av3enc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\bew_flpvq.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\bew_mr_analysis.h"
+				>
+			</File>
+			<File
 				RelativePath="BladeMP3EncDLL.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\block_switch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\getcmdarg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\global_funcs.h"
 				>
 			</File>
 			<File
@@ -237,7 +336,43 @@
 				>
 			</File>
 			<File
+				RelativePath=".\av3enc\include\intMDCT.h"
+				>
+			</File>
+			<File
 				RelativePath="m2aenc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\MDCT.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mpeg4ip_getopt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\polar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\psych.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\psychfft.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\quantization.h"
+				>
+			</File>
+			<File
+				RelativePath=".\av3enc\include\sam_encode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\wavfmt.h"
 				>
 			</File>
 		</Filter>
