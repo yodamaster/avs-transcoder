@@ -50,7 +50,7 @@
 #define _SKIP_MODE_COST_THRESHOLD_ 100
 #define _COST_THRESHOLD_ 0
 #endif
-#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
+//#define _OUTPUT_RECON_IMG_             // Notice: Output the reconstructed yuv sequence. If u need 
                                          //         it, just enable this macro.
 
 #define _THREE_STEP_MOTION_SEARCH_       // zhwang
@@ -71,7 +71,7 @@
 /*Added By YueLei Xie for Fast_Me */
 #define FastME
 /*Ended By YueLei Xie */
-#define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4)
+#define AVS_OUT_BUFFER_SIZE  (1024 * 1024 * 4 * 4)
 #define MAX_ITEMS_TO_PARSE  10000
 #define MAXHEADERSIZE 100
 
@@ -182,5 +182,5 @@
 
 #define MAX_SYMBOLS_PER_MB  1200    /* !< Maximum number of different syntax elements for one MB */
 
-#define STREAM_BUF_SIZE  1024    /* must large than 3 */
+#define STREAM_BUF_SIZE  1024 * 2    /* must large than 3 */
 #endif
