@@ -215,6 +215,11 @@ int_32_t c_avs_enc::avs_enc_encode()
 {
   int_32_t i;
   int_32_t j;
+  int_32_t min_qp = 20, max_qp = 42;
+  int_32_t pixels_in_frame = img->height * img->width * 3 / 2;
+  int_32_t rate_allocated;
+  int_32_t t_qp;
+  float    t_fbb;
   init_global_variables();
   OpenBitStreamFile(input->outfile);
   p_avs_enc_frame->length = 0;
@@ -227,42 +232,18 @@ int_32_t c_avs_enc::avs_enc_encode()
   /* Added By YueLei Xie for rate control */
   if ( input->RCEnable == 3)
   {
-	  float t_fbb;
-	  int_32_t t_qp, tleft;
 	  if ( !i_gop_encoded )
 	  {
-		  t_fbb = float(i_rate_per_gop_expected) / input->GopLength / (img->height * img->width * 3 / 2); 
+		  rate_allocated = i_rate_per_gop_expected;
+		  t_fbb = float(rate_allocated) / (input->GopLength) / pixels_in_frame;
 		  i_QPip = max(0, min(int(-10.365 * log(t_fbb) + 5.5655 + 0.5), 61));
 		  i_QPb  = i_QPip + 2;
+		  min_qp = max(0, min(i_QPip - 3, 61));
+		  max_qp = max(0, min(i_QPip + 12, 61));
 	  }
 	  else
 	  {
-		  t_qp = 0;
-		  tleft = 0;
-		 t_qp = i_rate_remain / 5 + i_rate_per_gop_expected;
-		 t_fbb = float(t_qp) / input->GopLength / ( img->height * img->width * 3 / 2);
-		 if ( t_fbb < 1e-5 )
-		 {
-			i_QPip = max(0, min(63, i_QPip + 3));
-			i_QPb  = max(0, min(63, i_QPip + 2));
-		 }
-		 else
-		 {
-			 t_qp = int(-10.365 * log(t_fbb) + 5.5655 + 0.5);
-			 
-			 if ( abs( t_qp - i_QPip ) > 3 )
-			 {
-				 i_QPip = ( t_qp > i_QPip ? i_QPip + 3 : i_QPip - 3 );
-			 }
-			 else
-			 {
-				 i_QPip = t_qp;
-			 }
-			 if ( i_QPip > 50 ) i_QPip = 50;
-			 i_QPip = max(0, min(63, i_QPip));
-			 i_QPb  = max(0, min(63, i_QPip + 2));
-		 }
-		 
+		  rate_allocated = i_rate_remain / 5 + i_rate_per_gop_expected;
 	  }
   }
   /* Ended By YueLei Xie for rate control */
@@ -276,6 +257,34 @@ int_32_t c_avs_enc::avs_enc_encode()
     else
       p_avs_enc_frame->type[0] = AVS_TYPE_B;
 
+	/* Added By YueLei Xie for rate control */
+	if ( input->RCEnable == 3 && p_avs_enc_frame->type[0] != AVS_TYPE_B )
+	{
+		t_fbb = float(rate_allocated - goprate) / (input->GopLength - i) / pixels_in_frame;
+
+		if ( t_fbb < 1e-5 )
+		{
+			i_QPip = max(min_qp, min(max_qp, i_QPip + 3));
+			i_QPb  = max(min_qp, min(max_qp, i_QPip + 2));
+		}
+		else
+		{
+			t_qp = int(-10.365 * log(t_fbb) + 5.5655 + 0.5);
+
+			if ( abs( t_qp - i_QPip ) > 3 )
+			{
+				i_QPip = ( t_qp > i_QPip ? i_QPip + 3 : i_QPip - 3 );
+			}
+			else
+			{
+				i_QPip = t_qp;
+			}
+			i_QPip = max(min_qp, min(max_qp, i_QPip));
+			i_QPb  = max(min_qp, min(max_qp, i_QPip + 2));
+		}
+	}
+	/* Ended By YueLei Xie for rate control */
+
     p_avs_enc_frame->input = p_avs_enc_frame->inputfrm[i];
     avs_enc_frame(p_avs_enc_frame);
     gframe_no++;
@@ -287,6 +296,7 @@ int_32_t c_avs_enc::avs_enc_encode()
   {
 	  i_gop_encoded++;
 	  i_rate_remain += i_rate_per_gop_expected - goprate;
+	  //printf("i_rate_per_gop_expected: %d, goprate: %d, i_rate_remain: %d\n", i_rate_per_gop_expected,goprate,i_rate_remain);
   }
   /* Ended By YueLei Xie for rate control */
   return 0;
@@ -1372,6 +1382,7 @@ int_32_t c_avs_enc::encode_B_frame(avs_enc_frame_t *pFrame)
 
   img->frame_num++;    /* increment frame_num once for B-frames */
   img->frame_num %= (1 << (LOG2_MAX_FRAME_NUM_MINUS4 + 4));
+
 
   if(img->b_frame_to_code <= input->successive_Bframe * 2)
   {
